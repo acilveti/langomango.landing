@@ -41,7 +41,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               <li>Fun and Interactive Learning</li>
             </ul>
           </BasicSection>
-          <BasicSection imageUrl="/image-6.png" title="A completely free platform." overTitle="zero cost solution" reversed>
+          <BasicSection reversed imageUrl="/free-service.svg" title="A completely free platform." overTitle="zero cost solution" reversed>
             <p>
               A fully free platform for classrooms. Thanks to our business and subscription model, we offer our platform at no cost to
               teachers and students. Only users with premium subscriptions are required to pay, allowing schools and students to enjoy all
