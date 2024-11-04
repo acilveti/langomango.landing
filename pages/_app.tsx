@@ -29,7 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <script defer src="https://umami.langomango.com/script.js" data-website-id="0e80a32b-37a5-4ad5-afb3-c419a33bf643"></script>
+        <script defer src="https://umami.langomango.com/script.js" data-website-id="e403e978-5d31-4d8c-b5b3-ba90fc2fc56c"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
