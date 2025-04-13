@@ -18,39 +18,67 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   return (
     <>
       <Head>
-        <title>{EnvVars.SITE_NAME}</title>
-        <meta
-          name="description"
-          content="Language learning platform, focused in learners and teachers alike."
-        />
+        <title>LangoMango</title>
+        <meta name="description" content="Language learning platform, focused on readers and bookworms." />
       </Head>
       <HomepageWrapper>
         <WhiteBackgroundContainer>
           <Hero />
           {/* <Partners /> */}
-          <BasicSection imageUrl="/demo-illustration-1.svg" title="Designed with student and teacher experience in mind" overTitle="All in one solution">
-            <p>
-              The LangoMango platform is thoughtfully designed to enhance both student and teacher experiences. It offers a range of tools aimed at making learning more engaging, effective, and enjoyable. From easy-to-use features to a variety of interactive elements, the platform is built to ensure a seamless learning journey, all guided by the expertise of teachers.
-            </p>
+          <BasicSection imageUrl="/demo-illustration-1.svg" title="Seamless learning while reading" overTitle="All in one solution">
+            <p>Get massive amounts of comprehensible input (~30,000 words per book for beginners), with super low effort.</p>
             <ul>
-              <li>Easy-to-Use Tools</li>
-              <li>Simple and Clear Design</li>
-              <li>Fun and Interactive Learning</li>
+              <li>Adjustable mixed-language ratio based on your level</li>
+              <li>Instant sentence translations with a simple tap</li>
+              <li>Word-by-word assistance for difficult terms</li>
             </ul>
-          </BasicSection>
-          <BasicSection imageUrl="/image-6.png" title="A completely free platform." overTitle="zero cost solution" reversed>
-            <p>
-              A fully free platform for classrooms. Thanks to our business and subscription model, we offer our platform at no cost to teachers and students. Only users with premium subscriptions are required to pay, allowing schools and students to enjoy all features without any fees.
-            </p>
           </BasicSection>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer>
           <Cta />
+          <BasicSection
+      reversed
+      imageUrl="/smart-reading.svg"
+      title="Works on kindle, kobo and smartphones"
+      overTitle="Enjoy in your favorite device"
+    >
+      <p>
+        Experience LangoMango on your favorite Kindle or Kobo e-reader! Enjoy the exceptional battery life, paper-like display, and 
+        distraction-free environment that makes e-readers perfect for immersive reading. Simply access through your device's browser 
+        and dive into your books with all the language learning features at your fingertips. Whether you're lounging at home or reading 
+        under the sun, your trusted e-reader now becomes your language learning companion.
+      </p>
+    </BasicSection>
+
+          <BasicSection imageUrl="/smart-chat.svg" title="Play the numbers game" overTitle="Huge language exposure">
+            <p>
+              Studies approximate the required comprehensible input to reach fluency at 2,000,000 words. With an average novel containing
+              100,000 words and LangoMango's ability to gradually increase your target language percentage, you'll accumulate significant
+              exposure while enjoying great stories. Follow a natural progression while you improve
+               from A1-15% - A2-30% - B60% - B2-90% - C1-100%  target language content as you improve.
+            </p>
+          </BasicSection>
+
+          <BasicSection reversed imageUrl="/smart-reading-news.svg" title="Cost effective" overTitle="Language learning made affordable">
+            <p>
+              LangoMango mixes content in your native and target languages at a proportion you can handle, creating the perfect learning
+              environment. Built-in sentence translation and word-wise assistance makes the target language easy to read through,
+              eliminating the need for expensive textbooks or courses.
+            </p>
+          </BasicSection>
+
+          <BasicSection imageUrl="/smart-reading-novels.svg" title="Enjoy while you read" overTitle="Deepen Understanding with Stories">
+            <p>
+              The best part is that you'll get so addicted to reading that you'll forget you're getting an incredible amount of input in
+              your target language. Reading novels enhances your understanding of the language naturally, offering engaging, story-based
+              learning that deepens cultural understanding, idiomatic expressions, and nuanced vocabulary.
+            </p>
+          </BasicSection>
+          <Cta />
           {/* <FeaturesGallery /> */}
           <PricingTablesSection />
-          <Features />
+          {/* <Features /> */}
           {/* <Testimonials /> */}
-
         </DarkerBackgroundContainer>
       </HomepageWrapper>
     </>

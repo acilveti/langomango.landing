@@ -15,23 +15,98 @@ export default function Hero() {
   return (
     <HeroWrapper>
       <Contents>
-        <CustomOverTitle>Boost Your teaching with LangoMango</CustomOverTitle>
-        <Heading>Elevate Your Teaching Business with Our Language Platform</Heading>
-        <Description>
-          Enhance your students learning experience with tools that improve lesson quality and student engagement. Our platform works alongside your methods to boost student outcomes, helping you deliver more effective lessons. Set yourself apart from other educators and academies by providing an enriched learning environment that leads to higher profitability - all at zero cost.
+        <CustomOverTitle>Learn Languages by Reading Real Novels</CustomOverTitle>
+        <Heading style={{ fontSize: '4rem' }}>Enjoying eBooks?<br/> Use it to learn languages</Heading>
+        <Description style={{ lineHeight: '2' }}>
+          Langomango's smart reader makes every ebook you read a huge{' '}
+          <span
+            className="wordWisePosition"
+            data-translation="oportunidad"
+            style={{
+              display: 'inline',
+              borderBottom: '2px dotted #ccc',
+              position: 'relative',
+            }}
+          >
+            opportunity
+          </span>{' '}
+          of getting massive exposure to the language you want to{' '}
+          <span
+            className="wordWisePosition"
+            data-translation="aprender"
+            style={{
+              display: 'inline',
+              borderBottom: '2px dotted #ccc',
+              position: 'relative',
+            }}
+          >
+            learn
+          </span>
+          , through its language mixing algorithms.
+          <br/>
+          <span
+            className="wordWisePress"
+            data-translation="Leverage"
+            style={{
+              display: 'inline',
+              borderBottom: '2px dotted #ccc',
+              position: 'relative',
+              cursor: 'pointer',
+            }}
+          >
+            Aprovecha
+          </span> your reading hobby to supercharge your learning ability with low effort.
         </Description>
+      <ImageContainer style={{
+              padding:'2px'
+            }}>
+        <NextImage
+          src={'/portada.jpeg'}
+          alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
+          layout="fill"
+          objectFit="cover"
+          
+        />
+      </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" href="https://app.langomango.com/sign-up" >
-            start now <span>&rarr;</span>
+          <Button data-umami-event="Hero button" href="https://app.langomango.com/sign-up">
+            Start Reading Smarter Today <span>&rarr;</span>
           </Button>
         </CustomButtonGroup>
       </Contents>
-      <ImageContainer>
-        <NextImage src={"/demo-illustration-2.svg" } alt={"elevate"} layout="fill" objectFit="fill" />
-      </ImageContainer>
-      {/* <ImageContainer>
-        <HeroIllustration />
-      </ImageContainer> */}
+
+      <style jsx>{`
+        span.wordWisePosition::before {
+          content: attr(data-translation);
+          position: absolute;
+          top: -8px;
+          color: #111010;
+          font-size: 0.7em;
+          white-space: normal;
+          
+          overflow: hidden;
+          line-height: 0.8 !important;
+          font-weight: 600;
+        }
+        
+        span.wordWisePress::before {
+          content: attr(data-translation);
+          position: absolute;
+          top: -8px;
+          color: #111010;
+          font-size: 0.7em;
+          white-space: normal;
+          overflow: hidden;
+          line-height: 0.8 !important;
+          font-weight: 600;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        
+        span.wordWisePress:active::before {
+          opacity: 1;
+        }
+      `}</style>
     </HeroWrapper>
   );
 }

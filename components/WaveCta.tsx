@@ -21,7 +21,7 @@ export default function WaveCta() {
       </svg>
       <CtaWrapper>
         <Container>
-          <Title>Stand out from the competition, take the step.</Title>
+          <Title>Enjoy reading while learning.</Title>
           <CustomButtonGroup>
             <Button data-umami-event="wave cta button" href="https://app.langomango.com/sign-up">
               Create an account <span>&rarr;</span>
