@@ -13,10 +13,10 @@ export default function Cta() {
     <CtaWrapper>
       <Container>
         <Stack>
-          <OverTitle>Enhance Your Teaching Journey with Us</OverTitle>
-          <SectionTitle>Transform Your Classroom Experience</SectionTitle>
+          <OverTitle>Try the smart reader</OverTitle>
+          <SectionTitle>Use the demo</SectionTitle>
           <Description>
-            Unlock new possibilities in your teaching experience. From effective strategies to innovative tools, we're here to support your growth and make a lasting impact on your students.
+            Get a grasp of the exposure you could achieve reading ebooks with langomango's reader.
           </Description>
 
           <ButtonGroup>

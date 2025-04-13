@@ -7,29 +7,14 @@ import SectionTitle from 'components/SectionTitle';
 export default function PricingTablesSection() {
   return (
     <Wrapper>
-      <SectionTitle>A Subscription to Suit Every Need</SectionTitle>
+      <SectionTitle>Leverage your learning at low cost</SectionTitle>
       <AutofitGrid>
         <PricingCard
-          title="Academia"
-          description="Ideal for educators and their students."
-          benefits={['For business instructors', 'Language teachers', 'Classroom students']}
+          title="Beta-phase"
+          description="Be part of our beta phase."
+          benefits={['Be one of the first users', 'premium in person assistance', 'direct comunication with langomango founder']}
         >
-          $0<span>/month</span>
-        </PricingCard>
-        <PricingCard
-          title="Personal Free"
-          description="Perfect for independent language learners."
-          benefits={['Self-guided learners without instructors']}
-          isOutlined
-        >
-          $0<span>/month</span>
-        </PricingCard>
-        <PricingCard
-          title="Personal Premium"
-          description="Unlock your full learning potential."
-          benefits={['Committed solo learners', 'Classroom students aiming for excellence']}
-        >
-          $12<span>/month</span>
+          $10<span> per 3 months</span>
         </PricingCard>
       </AutofitGrid>
     </Wrapper>
