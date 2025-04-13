@@ -44,8 +44,8 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
     >
       <p>
         Experience LangoMango on your favorite Kindle or Kobo e-reader! Enjoy the exceptional battery life, paper-like display, and 
-        distraction-free environment that makes e-readers perfect for immersive reading. Simply access through your device's browser 
-        and dive into your books with all the language learning features at your fingertips. Whether you're lounging at home or reading 
+        distraction-free environment that makes e-readers perfect for immersive reading. Simply access through your devices browser 
+        and dive into your books with all the language learning features at your fingertips. Whether you are lounging at home or reading 
         under the sun, your trusted e-reader now becomes your language learning companion.
       </p>
     </BasicSection>
@@ -53,7 +53,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <BasicSection imageUrl="/smart-chat.svg" title="Play the numbers game" overTitle="Huge language exposure">
             <p>
               Studies approximate the required comprehensible input to reach fluency at 2,000,000 words. With an average novel containing
-              100,000 words and LangoMango's ability to gradually increase your target language percentage, you'll accumulate significant
+              100,000 words and LangoMangos ability to gradually increase your target language percentage, you will accumulate significant
               exposure while enjoying great stories. Follow a natural progression while you improve
                from A1-15% - A2-30% - B60% - B2-90% - C1-100%  target language content as you improve.
             </p>
@@ -69,7 +69,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
           <BasicSection imageUrl="/smart-reading-novels.svg" title="Enjoy while you read" overTitle="Deepen Understanding with Stories">
             <p>
-              The best part is that you'll get so addicted to reading that you'll forget you're getting an incredible amount of input in
+              The best part is that you will get so addicted to reading that you will forget you are getting an incredible amount of input in
               your target language. Reading novels enhances your understanding of the language naturally, offering engaging, story-based
               learning that deepens cultural understanding, idiomatic expressions, and nuanced vocabulary.
             </p>
