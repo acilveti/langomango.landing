@@ -30,7 +30,7 @@ export default function PricingCard({ title, description, benefits, isOutlined, 
           </CustomRichText>
         )}
       </PriceContainer>
-      <CustomButton data-umami-event="pricing button" href="https://app.langomango.com/sign-up" >Get started</CustomButton>
+      <CustomButton data-umami-event="pricing button" href="https://beta-app.langomango.com/beta-phase" >Get started</CustomButton>
     </Wrapper>
   );
 }

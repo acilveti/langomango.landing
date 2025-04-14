@@ -69,7 +69,7 @@ export default function Hero() {
         />
       </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" href="https://app.langomango.com/sign-up">
+          <Button data-umami-event="Hero button" href="https://beta-app.langomango.com/beta-phase">
             Start Reading Smarter Today <span>&rarr;</span>
           </Button>
         </CustomButtonGroup>

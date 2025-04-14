@@ -20,7 +20,7 @@ import { NewsletterModalContextProvider, useNewsletterModalContext } from 'conte
 import { NavItems } from 'types';
 
 const navItems: NavItems = [
-  { title: 'SignUp/ Login', href: 'https://app.langomango.com/sign-up', outlined: true },
+  { title: 'SignUp/ Login', href: 'https://beta-app.langomango.com/beta-phase', outlined: true },
 ];
 
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
