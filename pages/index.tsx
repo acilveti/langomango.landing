@@ -27,7 +27,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           {/* <Partners /> */}
           <BasicSection1 imageUrl="/multiplatform.jpeg" title="Seamless learning while reading" overTitle="All in one solution">
             <p>
-              Obtén{' '}
+              Get{' '}
               <span
                 className="wordWisePosition"
                 data-translation="massive"
@@ -39,7 +39,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 enorme
               </span>{' '}
-              cantidad de input comprensible (~30,000 palabras por libro para{' '}
+              amount of comprehensible input (~30,000 words per book for{' '}
               <span
                 className="wordWisePress"
                 data-translation="beginners"
@@ -52,12 +52,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 principiantes
               </span>
-              ), con muy poco esfuerzo.
+              ), with very little effort.
             </p>
             <ul>
-              <li>Ratio de mezcla de idiomas ajustable según tu nivel</li>
-              <li>Traducciones instantáneas con un simple toque</li>
-              <li>Asistencia palabra por palabra para términos difíciles</li>
+              <li>Adjustable language mix ratio according to your level</li>
+              <li>Instant translations with a simple touch</li>
+              <li>Word-by-word assistance for difficult terms</li>
             </ul>
           </BasicSection1>
         </WhiteBackgroundContainer>
@@ -70,7 +70,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             overTitle="Enjoy in your favorite device"
           >
             <p>
-              ¡Experimenta LangoMango en tu{' '}
+              Experience LangoMango on your{' '}
               <span
                 className="wordWisePosition"
                 data-translation="favorite"
@@ -82,7 +82,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 favorito
               </span>{' '}
-              Kindle o Kobo! Disfruta de la excepcional duración de batería, pantalla similar al papel, y ambiente{' '}
+              Kindle or Kobo! Enjoy the exceptional battery life, paper-like display, and{' '}
               <span
                 className="wordWisePress"
                 data-translation="distraction-free"
@@ -95,7 +95,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 libre de distracciones
               </span>{' '}
-              que hace que los e-readers sean perfectos para una lectura inmersiva. Simplemente{' '}
+              environment that makes e-readers perfect for immersive reading. Simply{' '}
               <span
                 className="wordWisePosition"
                 data-translation="access"
@@ -107,7 +107,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 accede
               </span>{' '}
-              a través del navegador de tu dispositivo y{' '}
+              through your device's browser and{' '}
               <span
                 className="wordWisePress"
                 data-translation="dive"
@@ -120,7 +120,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 sumérgete
               </span>{' '}
-              en tus libros con todas las funciones de aprendizaje de idiomas al alcance de tu mano. Ya sea que estés{' '}
+              into your books with all language learning features at your fingertips. Whether you're{' '}
               <span
                 className="wordWisePosition"
                 data-translation="lounging"
@@ -132,7 +132,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 descansando
               </span>{' '}
-              en casa o leyendo bajo el{' '}
+              at home or reading under the{' '}
               <span
                 className="wordWisePress"
                 data-translation="sun"
@@ -145,13 +145,13 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 sol
               </span>
-              , tu e-reader de confianza ahora se convierte en tu compañero de aprendizaje de idiomas.
+              , your trusted e-reader now becomes your language learning companion.
             </p>
           </BasicSection>
 
           <BasicSection imageUrl="/smart-chat.svg" title="Play the numbers game" overTitle="Huge language exposure">
             <p>
-              Los estudios calculan que el input comprensible{' '}
+              Studies estimate that the comprehensible input{' '}
               <span
                 className="wordWisePosition"
                 data-translation="required"
@@ -163,7 +163,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 necesario
               </span>{' '}
-              para alcanzar fluidez es de 2,000,000 de palabras. Con una novela{' '}
+              to achieve fluency is 2,000,000 words. With an{' '}
               <span
                 className="wordWisePress"
                 data-translation="average"
@@ -176,7 +176,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 promedio
               </span>{' '}
-              que contiene 100,000 palabras y la capacidad de LangoMango para aumentar gradualmente el{' '}
+              novel containing 100,000 words and LangoMango's ability to gradually increase the{' '}
               <span
                 className="wordWisePosition"
                 data-translation="percentage"
@@ -188,7 +188,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 porcentaje
               </span>{' '}
-              del idioma objetivo, podrás{' '}
+              of the target language, you'll be able to{' '}
               <span
                 className="wordWisePress"
                 data-translation="accumulate"
@@ -201,7 +201,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 acumular
               </span>{' '}
-              una exposición significativa mientras disfrutas de grandes historias. Sigue una progresión{' '}
+              significant exposure while enjoying great stories. Follow a{' '}
               <span
                 className="wordWisePosition"
                 data-translation="natural"
@@ -213,7 +213,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 natural
               </span>{' '}
-              mientras{' '}
+              progression as you{' '}
               <span
                 className="wordWisePress"
                 data-translation="improve"
@@ -226,13 +226,13 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 mejoras
               </span>{' '}
-              desde A1-15% - A2-30% - B1-60% - B2-90% - C1-100% de contenido en el idioma objetivo a medida que avanzas.
+              from A1-15% - A2-30% - B1-60% - B2-90% - C1-100% of target language content as you advance.
             </p>
           </BasicSection>
 
           <BasicSection reversed imageUrl="/smart-reading-news.svg" title="Cost effective" overTitle="Language learning made affordable">
             <p>
-              LangoMango combina contenido en tu idioma{' '}
+              LangoMango combines content in your{' '}
               <span
                 className="wordWisePosition"
                 data-translation="native"
@@ -244,7 +244,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 nativo
               </span>{' '}
-              y el idioma objetivo en una proporción que puedes{' '}
+              language and the target language in a ratio you can{' '}
               <span
                 className="wordWisePress"
                 data-translation="handle"
@@ -257,7 +257,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 manejar
               </span>
-              , creando el ambiente perfecto de aprendizaje. La traducción de{' '}
+              , creating the perfect learning environment. Built-in{' '}
               <span
                 className="wordWisePosition"
                 data-translation="sentence"
@@ -269,7 +269,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 oraciones
               </span>{' '}
-              integrada y la asistencia palabra por palabra hacen que el idioma objetivo sea{' '}
+              translation and word-by-word assistance make the target language{' '}
               <span
                 className="wordWisePress"
                 data-translation="easy"
@@ -282,13 +282,13 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 fácil
               </span>{' '}
-              de leer, eliminando la necesidad de costosos libros de texto o cursos.
+              to read, eliminating the need for expensive textbooks or courses.
             </p>
           </BasicSection>
 
           <BasicSection imageUrl="/smart-reading-novels.svg" title="Enjoy while you read" overTitle="Deepen Understanding with Stories">
             <p>
-              La{' '}
+              The{' '}
               <span
                 className="wordWisePosition"
                 data-translation="best"
@@ -300,7 +300,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 mejor
               </span>{' '}
-              parte es que te volverás tan adicto a{' '}
+              part is that you'll become so addicted to{' '}
               <span
                 className="wordWisePress"
                 data-translation="reading"
@@ -313,7 +313,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 leer
               </span>{' '}
-              que olvidarás que estás recibiendo una cantidad increíble de input en tu idioma objetivo. La lectura de novelas{' '}
+              that you'll forget you're receiving an incredible amount of input in your target language. Novel{' '}
               <span
                 className="wordWisePosition"
                 data-translation="enhances"
@@ -325,7 +325,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 mejora
               </span>{' '}
-              tu comprensión del idioma de forma natural, ofreciendo un aprendizaje{' '}
+              your language comprehension naturally, offering an{' '}
               <span
                 className="wordWisePress"
                 data-translation="engaging"
@@ -338,7 +338,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 atractivo
               </span>{' '}
-              basado en historias que profundiza la comprensión cultural, expresiones idiomáticas y vocabulario con matices.
+              story-based learning that deepens cultural understanding, idiomatic expressions, and nuanced vocabulary.
             </p>
           </BasicSection>
           <Cta />
@@ -378,6 +378,10 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         
         span.wordWisePress:active::before {
           opacity: 1;
+        }
+        .BasicSection p, 
+        .BasicSection1 p {
+          line-height: 2; /* Adjust this value as needed */
         }
       `}</style>
     </>
