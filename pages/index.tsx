@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -21,6 +22,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       <Head>
         <title>LangoMango</title>
         <meta name="description" content="Language learning platform, focused on readers and bookworms." />
+        <Analytics/>
       </Head>
       <HomepageWrapper>
         <WhiteBackgroundContainer>
