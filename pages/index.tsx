@@ -107,7 +107,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 accede
               </span>{' '}
-              through your device's browser and{' '}
+              through your devices browser and{' '}
               <span
                 className="wordWisePress"
                 data-translation="dive"
@@ -120,7 +120,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 sumérgete
               </span>{' '}
-              into your books with all language learning features at your fingertips. Whether you're{' '}
+              into your books with all language learning features at your fingertips. Whether you are{' '}
               <span
                 className="wordWisePosition"
                 data-translation="lounging"
@@ -176,7 +176,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 promedio
               </span>{' '}
-              novel containing 100,000 words and LangoMango's ability to gradually increase the{' '}
+              novel containing 100,000 words and LangoMangos ability to gradually increase the{' '}
               <span
                 className="wordWisePosition"
                 data-translation="percentage"
@@ -188,7 +188,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 porcentaje
               </span>{' '}
-              of the target language, you'll be able to{' '}
+              of the target language, you will be able to{' '}
               <span
                 className="wordWisePress"
                 data-translation="accumulate"
@@ -300,7 +300,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 mejor
               </span>{' '}
-              part is that you'll become so addicted to{' '}
+              part is that you will become so addicted to{' '}
               <span
                 className="wordWisePress"
                 data-translation="reading"
@@ -313,7 +313,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               >
                 leer
               </span>{' '}
-              that you'll forget you're receiving an incredible amount of input in your target language. Novel{' '}
+              that you will forget you are receiving an incredible amount of input in your target language. Novel{' '}
               <span
                 className="wordWisePosition"
                 data-translation="enhances"
@@ -379,10 +379,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         span.wordWisePress:active::before {
           opacity: 1;
         }
-        .BasicSection p, 
-        .BasicSection1 p {
-          line-height: 2; /* Adjust this value as needed */
-        }
+        
       `}</style>
     </>
   );
