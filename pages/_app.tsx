@@ -3,13 +3,13 @@ import 'swiper/css/bundle';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 
+import { Analytics } from '@vercel/analytics/react';
 import { AppProps } from 'next/dist/shared/lib/router/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { ColorModeScript } from 'nextjs-color-mode';
 import React, { PropsWithChildren } from 'react';
 import { TinaEditProvider } from 'tinacms/dist/edit-state';
-import { Analytics } from '@vercel/analytics/next';
 
 import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
@@ -19,6 +19,7 @@ import NewsletterModal from 'components/NewsletterModal';
 import WaveCta from 'components/WaveCta';
 import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { NavItems } from 'types';
+
 
 const navItems: NavItems = [
   { title: 'SignUp/ Login', href: 'https://beta-app.langomango.com/beta-phase', outlined: true },
@@ -43,12 +44,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         /> */}
         {/* <script async src="https://www.google-analytics.com/analytics.js"></script> */}
-        <Analytics />
+        <Analytics/>
       </Head>
       <ColorModeScript />
       <GlobalStyle />
 
       <Providers>
+        
         <Modals />
         <Navbar items={navItems} />
         <TinaEditProvider
