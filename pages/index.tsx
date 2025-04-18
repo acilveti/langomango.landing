@@ -15,6 +15,13 @@ import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
 
+import AutofitGrid from 'components/AutofitGrid';
+import BasicCard from 'components/BasicCard';
+import Page from 'components/Page';
+import SectionTitle from 'components/SectionTitle';
+import YoutubeVideo from 'components/YoutubeVideo';
+import { media } from 'utils/media';
+import FaqSection from 'views/PricingPage/FaqSection';
 
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
@@ -65,7 +72,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </BasicSection1>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer>
+          <Wrapper>
+            <SectionTitle>Easy reading in ebooks</SectionTitle>
+            <YoutubeVideo url="https://www.youtube.com/watch?v=L6JMhu2SrVs" />
+          </Wrapper>
           <Cta />
+          <FeaturesGallery />
           <BasicSection
             reversed
             imageUrl="/smart-reading.svg"
@@ -349,6 +361,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <PricingTablesSection />
           {/* <Features /> */}
           {/* <Testimonials /> */}
+          <FaqSection/>
         </DarkerBackgroundContainer>
       </HomepageWrapper>
 
@@ -421,3 +434,22 @@ export async function getStaticProps() {
     },
   };
 }
+
+
+const Wrapper = styled.div`
+  & > *:not(:first-child) {
+    margin-top: 10rem;
+  }
+`;
+
+const CustomAutofitGrid = styled(AutofitGrid)`
+  --autofit-grid-item-size: 40rem;
+
+  ${media('<=tablet')} {
+    --autofit-grid-item-size: 30rem;
+  }
+
+  ${media('<=phone')} {
+    --autofit-grid-item-size: 100%;
+  }
+`;

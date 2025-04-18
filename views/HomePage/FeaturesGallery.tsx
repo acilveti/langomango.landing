@@ -10,26 +10,26 @@ import { media } from 'utils/media';
 
 const TABS = [
   {
-    title: 'Elevate your business',
+    title: 'Smart assistance for easy learning',
     description:
-      '<p>Increase your customer retention and satisfaction with a more modern, enjoyable, and effective teaching method. Our platform helps you improve your teaching business by offering tools that enhance both instructor and student experiences. Differentiate yourself from the competition and unlock new potential with our innovative solutions.</p>',
-    imageUrl: '/demo-illustration-3.png',
+      '<p>Get in text assistance for reading in your target learning for an easy learning language experience. Get a fluent reading even in not learned parts.</p>',
+    imageUrl: '/feature1.jpeg',
     baseColor: '249,82,120',
     secondColor: '221,9,57',
   },
   {
-    title: 'Zero cost for teachers and their students',
+    title: 'Whole sentences instant translation in just one tap',
     description:
-      '<p>Our business model allows us to provide educators and education businesses with free access to our platform. Teachers and students can use all essential features at no cost, creating a seamless and accessible learning experience. Only individuals who opt for our premium subscription will have additional features and perks to enhance their experience.</p>',
-    imageUrl: '/demo-illustration-4.png',
+      '<p>Sometimes you just do not understand a sentece or word. Get inmediate translations to make the term association and learning posible almost instantly.</p>',
+    imageUrl: '/feature3.jpeg',
     baseColor: '57,148,224',
     secondColor: '99,172,232',
   },
   {
-    title: 'Boost your students\' learning',
+    title: 'Adjustable target language presence in your text',
     description:
-      '<p>Take your students’ learning experience to the next level. Our platform equips you with powerful tools to engage students, track progress, and personalize lessons. By providing a more interactive and hands-on approach, you’ll help students absorb information more effectively, leading to better outcomes and higher satisfaction.</p>',
-    imageUrl: '/demo-illustration-5.png',
+      '<p>Control how much exposure you hve to your learning target language to adapt to fit your level</p>',
+    imageUrl: '/feature2.jpeg',
     baseColor: '88,193,132',
     secondColor: '124,207,158',
   },
@@ -76,8 +76,8 @@ export default function FeaturesGallery() {
   return (
     <FeaturesGalleryWrapper>
       <Content>
-        <OverTitle>features</OverTitle>
-        <SectionTitle>What are you signing in for?</SectionTitle>
+        <OverTitle>key features</OverTitle>
+        <SectionTitle>What are the key features?</SectionTitle>
       </Content>
       <GalleryWrapper>
         <TabsContainer>{tabsMarkup}</TabsContainer>
