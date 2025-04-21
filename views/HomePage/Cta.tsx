@@ -25,6 +25,40 @@ export default function Cta() {
                 Take a tour <span>&rarr;</span>
               </Button>
             </NextLink>
+            <NextLink href="#whitepaper" passHref>
+              <OutlinedButton transparent>
+                Are you an author? <span>&rarr;</span>
+              </OutlinedButton>
+            </NextLink>
+          </ButtonGroup>
+        </Stack>
+      </Container>
+    </CtaWrapper>
+  );
+}
+
+export function CtaAuthors() {
+  return (
+    <CtaWrapper>
+      <Container>
+        <Stack>
+          <OverTitle>Join Langomango Authors</OverTitle>
+          <SectionTitle>Start being paid for your work</SectionTitle>
+          <Description>
+            Join to start getting paid for your work.
+          </Description>
+
+          <ButtonGroup>
+            <NextLink data-umami-event="cta button" href="https://ebook-beta.langomango.com/demo/reader" passHref>
+              <Button data-umami-event="cta button">
+                Join now <span>&rarr;</span>
+              </Button>
+            </NextLink>
+            <NextLink href="https://langomango.com" passHref>
+              <OutlinedButton  transparent>
+                Want to read using our app? <span>&rarr;</span>
+              </OutlinedButton>
+            </NextLink>
           </ButtonGroup>
         </Stack>
       </Container>

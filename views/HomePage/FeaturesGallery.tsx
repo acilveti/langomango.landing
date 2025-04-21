@@ -77,7 +77,7 @@ export default function FeaturesGallery() {
     <FeaturesGalleryWrapper>
       <Content>
         <OverTitle>key features</OverTitle>
-        <SectionTitle>What are the key features?</SectionTitle>
+        <SectionTitle>What are the key features of the app?</SectionTitle>
       </Content>
       <GalleryWrapper>
         <TabsContainer>{tabsMarkup}</TabsContainer>

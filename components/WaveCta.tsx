@@ -26,6 +26,11 @@ export default function WaveCta() {
             <Button data-umami-event="wave cta button" href="https://beta-app.langomango.com/beta-phase">
               Create an account <span>&rarr;</span>
             </Button>
+            <NextLink href="/authors" passHref>
+              <OutlinedButton transparent>
+                Are you an author? <span>&rarr;</span>
+              </OutlinedButton>
+            </NextLink>
           </CustomButtonGroup>
         </Container>
       </CtaWrapper>
