@@ -14,9 +14,14 @@ import Partners from 'views/HomePage/Partners';
 import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-
+import { useEffect } from 'react';
+import { captureReferral, addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
 
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
+  useEffect(() => {
+    captureReferral();
+  }, []);
+  
   return (
     <>
       <Head>
