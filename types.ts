@@ -1,4 +1,11 @@
-export type SingleNavItem = { title: string; href: string; outlined?: boolean };
+import React from 'react';
+
+export type SingleNavItem = { 
+  title: string; 
+  href: string; 
+  outlined?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+};
 
 export type NavItems = SingleNavItem[];
 

@@ -12,14 +12,17 @@ import { addReferralToUrl } from 'utils/referral';
 
 export default function Hero() {
   const { setIsModalOpened } = useNewsletterModalContext();
-
+  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+    };
   return (
     <HeroWrapper>
       <Contents>
         <CustomOverTitle>Learn Languages by Reading Real Novels</CustomOverTitle>
         <Heading style={{ fontSize: '4rem' }}>Enjoying eBooks?<br/> Use it to learn languages</Heading>
         <Description style={{ lineHeight: '2' }}>
-          Langomango's smart reader makes every ebook you read a huge{' '}
+          Langomango smart reader makes every ebook you read a huge{' '}
           <span
             className="wordWisePosition"
             data-translation="oportunidad"
@@ -70,7 +73,7 @@ export default function Hero() {
         />
       </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" href={addReferralToUrl("https://beta-app.langomango.com/beta-phase")}>
+          <Button data-umami-event="Hero button" onClick={handleButtonClick} >
             Start Reading Smarter Today <span>&rarr;</span>
           </Button>
           <NextLink href="https://langomango.com/authors" passHref>

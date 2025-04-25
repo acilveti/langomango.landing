@@ -85,12 +85,21 @@ export default function Navbar({ items }: NavbarProps) {
   );
 }
 
-function NavItem({ href, title, outlined }: SingleNavItem) {
+function NavItem({ href, title, outlined, onClick }: SingleNavItem) {
   const { setIsModalOpened } = useNewsletterModalContext();
 
   function showNewsletterModal() {
     setIsModalOpened(true);
   }
+
+  // Handle the click event
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (onClick) {
+      // If there's a custom onClick handler provided, use it
+      onClick(e);
+    }
+    // If no onClick handler provided, the default link behavior will occur
+  };
 
   // if (outlined) {
   //   return <CustomButton onClick={showNewsletterModal}>{title}</CustomButton>;
@@ -98,8 +107,8 @@ function NavItem({ href, title, outlined }: SingleNavItem) {
 
   return (
     <NavItemWrapper outlined={outlined}>
-      <NextLink data-umami-event="navbar button" href={href} passHref>
-        <a data-umami-event="navbar button">{title}</a>
+      <NextLink href={href} passHref>
+        <a data-umami-event="navbar button" onClick={handleClick}>{title}</a>
       </NextLink>
     </NavItemWrapper>
   );

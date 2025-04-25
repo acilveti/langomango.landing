@@ -21,8 +21,25 @@ import { NewsletterModalContextProvider, useNewsletterModalContext } from 'conte
 import { NavItems } from 'types';
 import {addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
 
-const navItems: NavItems = [
-  { title: 'SignUp/ Login', href: addReferralToUrl('https://beta-app.langomango.com/beta-phase'), outlined: true },
+
+export const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.preventDefault();
+  window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+};
+
+// Define a custom nav item type that includes the onClick handler
+type NavItemWithHandler = NavItems[0] & {
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+};
+
+// Create navigation items with the onClick handler
+const navItems: NavItemWithHandler[] = [
+  { 
+    title: 'SignUp/ Login', 
+    href: addReferralToUrl('https://beta-app.langomango.com/beta-phase'), 
+    outlined: true,
+    onClick: handleButtonClick, // Add the onClick handler
+  },
 ];
 
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });

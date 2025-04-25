@@ -1,3 +1,4 @@
+'use client'
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import Button from 'components/Button';
@@ -6,10 +7,23 @@ import Container from 'components/Container';
 import SectionTitle from 'components/SectionTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
-import {  addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
+import { addReferralToUrl } from 'utils/referral';
+import React from 'react';
 
 export default function WaveCta() {
   const { setIsModalOpened } = useNewsletterModalContext();
+  
+  // Function to handle button click with proper type annotation for anchor elements
+  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+  };
+
+  // Function to handle outlined button click with proper type annotation for anchor elements
+  const handleOutlinedButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = "/authors";
+  };
 
   return (
     <>
@@ -24,14 +38,19 @@ export default function WaveCta() {
         <Container>
           <Title>Enjoy reading while learning.</Title>
           <CustomButtonGroup>
-            <Button data-umami-event="wave cta button" href={addReferralToUrl("https://beta-app.langomango.com/beta-phase")}>
+            <Button 
+              data-umami-event="wave cta button" 
+              onClick={handleButtonClick}
+            >
               Create an account <span>&rarr;</span>
             </Button>
-            <NextLink href="/authors" passHref>
-              <OutlinedButton transparent>
-                Are you an author? <span>&rarr;</span>
-              </OutlinedButton>
-            </NextLink>
+            
+            <OutlinedButton 
+              transparent 
+              onClick={handleOutlinedButtonClick}
+            >
+              Are you an author? <span>&rarr;</span>
+            </OutlinedButton>
           </CustomButtonGroup>
         </Container>
       </CtaWrapper>
