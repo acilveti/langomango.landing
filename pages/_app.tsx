@@ -19,10 +19,10 @@ import NewsletterModal from 'components/NewsletterModal';
 import WaveCta from 'components/WaveCta';
 import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { NavItems } from 'types';
-
+import {addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
 
 const navItems: NavItems = [
-  { title: 'SignUp/ Login', href: 'https://beta-app.langomango.com/beta-phase', outlined: true },
+  { title: 'SignUp/ Login', href: addReferralToUrl('https://beta-app.langomango.com/beta-phase'), outlined: true },
 ];
 
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });

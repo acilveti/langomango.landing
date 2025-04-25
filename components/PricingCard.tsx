@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { media } from 'utils/media';
 import Button from './Button';
 import RichText from './RichText';
+import { addReferralToUrl } from 'utils/referral';
 
 interface PricingCardProps {
   title: string;
@@ -30,7 +31,7 @@ export default function PricingCard({ title, description, benefits, isOutlined, 
           </CustomRichText>
         )}
       </PriceContainer>
-      <CustomButton data-umami-event="pricing button" href="https://beta-app.langomango.com/beta-phase" >Get started</CustomButton>
+      <CustomButton data-umami-event="pricing button" href={addReferralToUrl("https://beta-app.langomango.com/beta-phase")} >Get started</CustomButton>
     </Wrapper>
   );
 }

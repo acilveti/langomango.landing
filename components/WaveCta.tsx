@@ -6,6 +6,7 @@ import Container from 'components/Container';
 import SectionTitle from 'components/SectionTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
+import {  addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
 
 export default function WaveCta() {
   const { setIsModalOpened } = useNewsletterModalContext();
@@ -23,7 +24,7 @@ export default function WaveCta() {
         <Container>
           <Title>Enjoy reading while learning.</Title>
           <CustomButtonGroup>
-            <Button data-umami-event="wave cta button" href="https://beta-app.langomango.com/beta-phase">
+            <Button data-umami-event="wave cta button" href={addReferralToUrl("https://beta-app.langomango.com/beta-phase")}>
               Create an account <span>&rarr;</span>
             </Button>
             <NextLink href="/authors" passHref>

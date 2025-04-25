@@ -8,6 +8,7 @@ import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
+import { addReferralToUrl } from 'utils/referral';
 
 export default function Hero() {
   const { setIsModalOpened } = useNewsletterModalContext();
@@ -69,7 +70,7 @@ export default function Hero() {
         />
       </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" href="https://beta-app.langomango.com/beta-phase">
+          <Button data-umami-event="Hero button" href={addReferralToUrl("https://beta-app.langomango.com/beta-phase")}>
             Start Reading Smarter Today <span>&rarr;</span>
           </Button>
           <NextLink href="https://langomango.com/authors" passHref>
