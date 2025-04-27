@@ -1,0 +1,57 @@
+{
+    "hero": {
+      "overTitle": "Learn Languages by Reading Real Novels",
+      "heading": "Enjoying eBooks? Use it to learn languages",
+      "description": "Langomango smart reader makes every ebook you read a huge opportunity of getting massive exposure to the language you want to learn, through its language mixing algorithms. Leverage your reading hobby to supercharge your learning ability with low effort."
+    },
+    "section1": {
+      "title": "Seamless learning while reading",
+      "overTitle": "All in one solution",
+      "description": "Get massive amount of comprehensible input (~30,000 words per book for beginners), with very little effort.",
+      "bulletPoint": {
+        "adjustable": "Adjustable language mix ratio according to your level",
+        "instant": "Instant translations with a simple touch",
+        "wordByWord": "Word-by-word assistance for difficult terms"
+      }
+    },
+    "section2": {
+      "title": "Works on kindle, kobo and smartphones",
+      "overTitle": "Enjoy in your favorite device",
+      "description": "Experience LangoMango on your favorite Kindle or Kobo! Enjoy the exceptional battery life, paper-like display, and distraction-free environment that makes e-readers perfect for immersive reading. Simply access through your devices browser and dive into your books with all language learning features at your fingertips. Whether you are lounging at home or reading under the sun, your trusted e-reader now becomes your language learning companion."
+    },
+    "section3": {
+      "title": "Play the numbers game",
+      "overTitle": "Huge language exposure",
+      "description": "Studies estimate that the comprehensible input required to achieve fluency is 2,000,000 words. With an average novel containing 100,000 words and LangoMangos ability to gradually increase the percentage of the target language, you will be able to accumulate significant exposure while enjoying great stories. Follow a natural progression as you improve from A1-15% - A2-30% - B1-60% - B2-90% - C1-100% of target language content as you advance."
+    },
+    "section4": {
+      "title": "Cost effective",
+      "overTitle": "Language learning made affordable",
+      "description": "LangoMango combines content in your native language and the target language in a ratio you can handle, creating the perfect learning environment. Built-in sentence translation and word-by-word assistance make the target language easy to read, eliminating the need for expensive textbooks or courses."
+    },
+    "section5": {
+      "title": "Enjoy while you read",
+      "overTitle": "Deepen Understanding with Stories",
+      "description": "The best part is that you will become so addicted to reading that you will forget you are receiving an incredible amount of input in your target language. Novel enhances your language comprehension naturally, offering an engaging story-based learning that deepens cultural understanding, idiomatic expressions, and nuanced vocabulary."
+    },
+    "pricing": {
+      "title": "Leverage your learning at low cost",
+      "beta": {
+        "title": "Beta-phase",
+        "description": "Be part of our beta phase.",
+        "benefits": [
+          "Be one of the first users",
+          "premium in person assistance",
+          "direct comunication with langomango founder"
+        ],
+        "price": "$10",
+        "period": "per 3 months"
+      }
+    },
+    "videoSection": {
+      "title": "Easy reading in ebooks"
+    },
+    "faq": {
+      "title": "Frequently asked questions"
+    }
+  }

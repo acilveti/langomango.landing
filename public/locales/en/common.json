@@ -1,0 +1,21 @@
+{
+    "title": "LangoMango",
+    "description": "Language learning platform, focused on readers and bookworms.",
+    "signUpLogin": "SignUp/ Login",
+    "createAccount": "Create an account",
+    "startReading": "Start Reading Smarter Today",
+    "areYouAuthor": "Are you an author?",
+    "features": {
+      "title": "What are the key features of the app?",
+      "overTitle": "key features"
+    },
+    "cta": {
+      "title": "Try the smart reader",
+      "subtitle": "Use the demo",
+      "description": "Get a grasp of the exposure you could achieve reading ebooks with langomango's reader.",
+      "button": "Take a tour"
+    },
+    "footer": {
+      "copyright": "Copyright 2021 LangoMango"
+    }
+  }

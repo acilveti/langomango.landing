@@ -1,0 +1,21 @@
+{
+    "title": "LangoMango",
+    "description": "Plataforma de aprendizaje de idiomas, enfocada en lectores y devoradores de libros.",
+    "signUpLogin": "Registrarse/Iniciar sesión",
+    "createAccount": "Crear una cuenta",
+    "startReading": "Comienza a leer de manera más inteligente hoy",
+    "areYouAuthor": "¿Eres autor?",
+    "features": {
+      "title": "¿Cuáles son las características principales de la aplicación?",
+      "overTitle": "características principales"
+    },
+    "cta": {
+      "title": "Prueba el lector inteligente",
+      "subtitle": "Usa la demo",
+      "description": "Comprende la exposición que podrías lograr leyendo libros electrónicos con el lector de langomango.",
+      "button": "Hacer un recorrido"
+    },
+    "footer": {
+      "copyright": "Copyright 2021 LangoMango"
+    }
+  }
