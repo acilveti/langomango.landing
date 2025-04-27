@@ -52,21 +52,21 @@ export function CtaAuthors() {
     <CtaWrapper>
       <Container>
         <Stack>
-          <OverTitle>Join Langomango Authors</OverTitle>
-          <SectionTitle>Start being paid for your work</SectionTitle>
+          <OverTitle>{t('authorCta.title')}</OverTitle>
+          <SectionTitle>{t('authorCta.subtitle')}</SectionTitle>
           <Description>
-            Join to start getting paid for your work.
+            {t('authorCta.description')}
           </Description>
-
+  
           <ButtonGroup>
             <NextLink href="https://ebook-beta.langomango.com/demo/reader" passHref>
               <Button data-umami-event="cta button">
-                Join now <span>&rarr;</span>
+                {t('authorCta.button')} <span>&rarr;</span>
               </Button>
             </NextLink>
             <NextLink href="/" passHref>
               <OutlinedButton transparent>
-                Want to read using our app? <span>&rarr;</span>
+                {t('authorCta.secondaryButton')} <span>&rarr;</span>
               </OutlinedButton>
             </NextLink>
           </ButtonGroup>

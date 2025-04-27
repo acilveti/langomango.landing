@@ -9,18 +9,11 @@ export default function FaqSection() {
   
   return (
     <Wrapper>
-      <SectionTitle>{t('home:faq.title')}</SectionTitle>
-      <Accordion title={t('home:faq.languages.title')}>
-        {t('home:faq.languages.content')}
-      </Accordion>
-      
-      {/* Add more FAQ items here as needed */}
-      {/* Example:
-      <Accordion title={t('home:faq.pricing.title')}>
-        {t('home:faq.pricing.content')}
-      </Accordion>
-      */}
-    </Wrapper>
+  <SectionTitle>{t('faq.sectionTitle')}</SectionTitle>
+  <Accordion title={t('faq.languagesAvailable.title')}>
+      {t('faq.languagesAvailable.content')}
+  </Accordion>
+</Wrapper>
   );
 }
 

@@ -1,91 +1,91 @@
 {
   "title": "LangoMango",
-  "description": "Plataforma de aprendizaje de idiomas, enfocada en lectores y devoradores de libros.",
+  "description": "Plataforma de aprendizaje de idiomas enfocada en lectores y amantes de los libros.",
   "signUpLogin": "Registrarse/Iniciar sesión",
   "createAccount": "Crear una cuenta",
-  "startReading": "Comienza a leer de manera más inteligente hoy",
+  "startReading": "Empieza a leer de forma más inteligente hoy",
   "areYouAuthor": "¿Eres autor?",
   "features": {
-    "title": "¿Cuáles son las características principales de la aplicación?",
-    "overTitle": "características principales",
+    "title": "¿Cuáles son las características clave de la aplicación?",
+    "overTitle": "características clave",
     "tabs": {
       "smart_assistance": {
         "title": "Asistencia inteligente para un aprendizaje fácil",
-        "description": "Obtén asistencia en el texto para leer en tu idioma objetivo para una experiencia de aprendizaje fácil. Logra una lectura fluida incluso en partes no aprendidas."
+        "description": "Recibe asistencia en el texto mientras lees en tu idioma objetivo para una experiencia de aprendizaje sencilla. Disfruta de una lectura fluida incluso en las partes que no has aprendido."
       },
       "instant_translation": {
         "title": "Traducción instantánea de frases completas con un solo toque",
-        "description": "A veces simplemente no entiendes una frase o palabra. Obtén traducciones inmediatas para hacer posible la asociación de términos y el aprendizaje casi al instante."
+        "description": "A veces no entiendes una frase o palabra. Obtén traducciones inmediatas para asociar términos y aprender casi al instante."
       },
       "adjustable_language": {
         "title": "Presencia ajustable del idioma objetivo en tu texto",
-        "description": "Controla cuánta exposición tienes a tu idioma objetivo para adaptarlo a tu nivel."
+        "description": "Controla tu exposición al idioma que estás aprendiendo para adaptarlo a tu nivel. Logra disfrutar mientras aprendes."
       }
     }
   },
   "cta": {
     "title": "Prueba el lector inteligente",
     "subtitle": "Usa la demo",
-    "description": "Comprende la exposición que podrías lograr leyendo libros electrónicos con el lector de langomango.",
+    "description": "Descubre la exposición que podrías lograr leyendo eBooks con el lector de Langomango.",
     "button": "Hacer un recorrido"
   },
   "waveCta": {
     "title": "¿Listo para transformar tu experiencia de lectura?",
-    "description": "Únete a LangoMango hoy y comienza a aprender idiomas mientras disfrutas de tus libros favoritos.",
-    "mainButton": "Comenzar ahora",
+    "description": "Únete a LangoMango hoy y empieza a aprender idiomas mientras disfrutas de tus libros favoritos.",
+    "mainButton": "Comienza ahora",
     "secondaryButton": "Conoce más sobre nuestra plataforma"
   },
   "authorCta": {
-    "title": "Únete a Langomango Authors",
-    "subtitle": "Comienza a recibir pagos por tu trabajo",
-    "description": "Únete para comenzar a recibir pagos por tu trabajo.",
-    "button": "Unirse ahora",
-    "secondaryButton": "¿Quieres leer usando nuestra aplicación?"
+    "title": "Únete a los autores de Langomango",
+    "subtitle": "Empieza a monetizar tu trabajo",
+    "description": "Únete para comenzar a recibir ingresos por tu trabajo.",
+    "button": "Únete ahora",
+    "secondaryButton": "¿Quieres leer usando nuestra app?"
   },
   "authorPage": {
     "title": "Autores",
     "description": "Únete a LangoMango como autor y monetiza tus libros a través de nuestra plataforma de aprendizaje de idiomas.",
     "hero": {
       "overTitle": "Monetiza tus libros",
-      "heading": "Únete a LangoMango Authors",
-      "description": "Gana ingresos cuando los lectores usen tus libros para aprender idiomas con nuestra innovadora plataforma. Alcanza una nueva audiencia de estudiantes de idiomas mientras recibes una compensación justa por tu trabajo."
+      "heading": "Únete a los autores de LangoMango",
+      "description": "Genera ingresos cuando los lectores usen tus libros para aprender idiomas. Alcanza una nueva audiencia de estudiantes mientras recibes una compensación justa por tu trabajo."
     },
     "section1": {
-      "title": "Recibe pagos por tu trabajo",
+      "title": "Monetiza tu audiencia",
       "overTitle": "Un nuevo canal para monetizar tu trabajo",
-      "description": "Retribución justa y generosa para autores, por la lectura de los libros electrónicos dentro de la aplicación, y por referir nuestra aplicación a sus seguidores y fans.",
+      "description": "Retribución justa y generosa para autores por las lecturas dentro de la app y por referir usuarios.",
       "bulletPoint": {
-        "referral": "$10 por cada usuario referido que se suscribe a LangoMango",
-        "income": "Compartimos el 50% de los ingresos generados por las suscripciones de usuarios con los autores cuando los usuarios leen tus libros electrónicos"
+        "referral": "$10 por usuario referido que se suscriba a LangoMango",
+        "income": "Compartimos el 50% de los ingresos por suscripciones cuando los usuarios leen tus eBooks"
       }
     },
     "section2": {
-      "title": "Expande tu alcance de audiencia",
-      "overTitle": "Conéctate con estudiantes de idiomas en todo el mundo",
-      "description": "Aprovecha un mercado creciente de estudiantes de idiomas que buscan contenido atractivo. Tus libros se convierten en valiosas herramientas de aprendizaje, ayudando a los lectores a mejorar sus habilidades lingüísticas mientras disfrutan de tus historias."
+      "title": "La alternativa para evitar la pirateria",
+      "overTitle": "Consigue ingresos por tu trabajo",
+      "description": "Tus libros y audiencia se convierten en herramientas valiosas para el aprendizaje, monetizalos y consigue generar ingresos."
     },
     "section3": {
       "title": "Proceso de integración sencillo",
       "overTitle": "Incorporación simple",
-      "description": "Unirse al programa de autores de LangoMango es sencillo. Sube tus libros electrónicos, establece tus preferencias de idioma y comienza a ganar. Nuestra plataforma maneja todos los aspectos técnicos de integrar tu contenido con nuestras funciones de aprendizaje de idiomas."
+      "description": "Unirse al programa de autores es fácil: sube tus eBooks, configura preferencias y comienza a ganar. Nos encargamos de los aspectos técnicos."
     },
     "section4": {
-      "title": "Análisis detallados",
-      "overTitle": "Seguimiento de tu rendimiento",
-      "description": "Accede a estadísticas completas sobre cómo los lectores interactúan con tus libros. Observa qué títulos son más populares, realiza un seguimiento de las tasas de finalización de lectura y comprende cómo se está utilizando tu contenido para el aprendizaje de idiomas."
+      "title": "Analíticas detalladas",
+      "overTitle": "Monitorea tu desempeño",
+      "description": "Accede a estadísticas completas sobre cómo interactúan los lectores con tus libros. Identifica tus títulos más populares y tasas de finalización."
     },
     "section5": {
-      "title": "Apoyo a autores globalmente",
+      "title": "Apoyo global a autores",
       "overTitle": "Comunidad internacional de autores",
-      "description": "Únete a autores de todo el mundo que forman parte del ecosistema LangoMango. Apoyamos múltiples idiomas y proporcionamos recursos para ayudarte a tener éxito en el mercado global de aprendizaje de idiomas."
+      "description": "Únete a autores de todo el mundo. Soporte múltiples idiomas y recursos para triunfar en el mercado global."
     },
     "videoSection": {
       "title": "Cómo funciona LangoMango para autores"
     },
     "cta": {
-      "title": "Únete a LangoMango Authors hoy",
-      "subtitle": "Comienza a monetizar tu trabajo",
-      "description": "Empieza a ganar ingresos con tus libros a través de nuestra plataforma de aprendizaje de idiomas.",
+      "title": "Únete a los autores de LangoMango hoy",
+      "subtitle": "Empieza a monetizar tu trabajo",
+      "description": "Comienza a generar ingresos con tus libros a través de nuestra plataforma.",
       "button": "Únete ahora",
       "secondaryButton": "Saber más"
     }
@@ -96,9 +96,16 @@
   },
   "footer": {
     "copyright": "Copyright 2021 LangoMango",
-    "about": "Sobre Nosotros",
+    "about": "Sobre nosotros",
     "contact": "Contacto",
-    "privacy": "Política de Privacidad",
-    "terms": "Términos de Servicio"
+    "privacy": "Política de privacidad",
+    "terms": "Términos del servicio"
+  },
+  "faq": {
+    "sectionTitle": "Preguntas frecuentes",
+    "languagesAvailable": {
+      "title": "¿Qué idiomas están disponibles?",
+      "content": "Idiomas actualmente soportados: Inglés, Español, Francés, Alemán, Chino, Japonés, Coreano, Ruso, Portugués, Italiano, Neerlandés, Sueco, Noruego, Danés, Finlandés, Polaco, Turco, Árabe, Hindi, Tailandés, Vietnamita, Indonesio, Malayo, Hebreo, Griego, Rumano, Húngaro, Checo, Eslovaco, Búlgaro, Croata, Serbio, Ucraniano, Estonio, Letón, Lituano, Vasco.\n\nIdiomas probados con usuarios: Inglés, Español, Alemán, Francés, Búlgaro y Vasco. Continuamos realizando pruebas con más casos reales."
+    }
   }
 }

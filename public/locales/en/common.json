@@ -19,7 +19,7 @@
       },
       "adjustable_language": {
         "title": "Adjustable target language presence in your text",
-        "description": "Control how much exposure you have to your learning target language to adapt to fit your level."
+        "description": "Control how much exposure you have to your learning target language to adapt to fit your level. Achieve a point to enjoy and learn at the same time."
       }
     }
   },
@@ -100,5 +100,19 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
+  },
+  "authorCta": {
+  "title": "Join Langomango Authors",
+  "subtitle": "Start being paid for your work",
+  "description": "Join to start getting paid for your work.",
+  "button": "Join now",
+  "secondaryButton": "Want to read using our app?"
+},
+  "faq": {
+  "sectionTitle": "Frequently Asked Questions",
+  "languagesAvailable": {
+    "title": "What languages are available?",
+    "content": "The current languages supported are: English\nSpanish\nFrench\nGerman\nChinese\nJapanese\nKorean\nRussian\nPortuguese\nItalian\nDutch\nSwedish\nNorwegian\nDanish\nFinnish\nPolish\nTurkish\nArabic\nHindi\nThai\nVietnamese\nIndonesian\nMalay\nHebrew\nGreek\nRomanian\nHungarian\nCzech\nSlovak\nBulgarian\nCroatian\nSerbian\nUkrainian\nEstonian\nLatvian\nLithuanian\nBasque.\n\nThe languages that we have tested with users are: English, Spanish, German, French, Bulgarian and Basque. Tests are being performed with more real cases as you are reading this."
   }
+}
 }
