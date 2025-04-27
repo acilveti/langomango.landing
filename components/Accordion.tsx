@@ -9,6 +9,11 @@ interface AccordionProps {
   isOpen?: boolean;
 }
 
+// Add proper typing for the Icon's props
+interface IconProps {
+  isActive: boolean;
+}
+
 export default function Accordion({ title, isOpen, children }: PropsWithChildren<AccordionProps>) {
   const [hasCollapsed, setHasCollapsed] = useState(!isOpen);
   const isActive = !hasCollapsed;
@@ -53,7 +58,7 @@ const TitleWrapper = styled.div`
   align-items: center;
 `;
 
-const Icon = styled.div<{ isActive: boolean }>`
+const Icon = styled.div<IconProps>`
   width: 2.4rem;
   transition: transform 0.3s;
   transform: rotateZ(${(p) => (p.isActive ? 180 : 0)}deg);
