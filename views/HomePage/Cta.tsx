@@ -1,3 +1,4 @@
+// views/HomePage/Cta.tsx
 import NextLink from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
@@ -7,27 +8,34 @@ import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
 import { media } from 'utils/media';
+import { useTranslation } from 'next-i18next';
+import { addReferralToUrl } from 'utils/referral';
 
 export default function Cta() {
+  const { t } = useTranslation(['common', 'home']);
+  
+  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = "https://ebook-beta.langomango.com/demo/reader";
+  };
+
   return (
     <CtaWrapper>
       <Container>
         <Stack>
-          <OverTitle>Try the smart reader</OverTitle>
-          <SectionTitle>Use the demo</SectionTitle>
+          <OverTitle>{t('common:cta.title')}</OverTitle>
+          <SectionTitle>{t('common:cta.subtitle')}</SectionTitle>
           <Description>
-            Get a grasp of the exposure you could achieve reading ebooks with langomango's reader.
+            {t('common:cta.description')}
           </Description>
 
           <ButtonGroup>
-            <NextLink data-umami-event="cta button" href="https://ebook-beta.langomango.com/demo/reader" passHref>
-              <Button data-umami-event="cta button">
-                Take a tour <span>&rarr;</span>
-              </Button>
-            </NextLink>
-            <NextLink href="#whitepaper" passHref>
+            <Button data-umami-event="cta button" onClick={handleButtonClick}>
+              {t('common:cta.button')} <span>&rarr;</span>
+            </Button>
+            <NextLink href="/authors" passHref>
               <OutlinedButton transparent>
-                Are you an author? <span>&rarr;</span>
+                {t('common:areYouAuthor')} <span>&rarr;</span>
               </OutlinedButton>
             </NextLink>
           </ButtonGroup>
@@ -38,6 +46,8 @@ export default function Cta() {
 }
 
 export function CtaAuthors() {
+  const { t } = useTranslation(['common', 'home']);
+  
   return (
     <CtaWrapper>
       <Container>
@@ -49,13 +59,13 @@ export function CtaAuthors() {
           </Description>
 
           <ButtonGroup>
-            <NextLink data-umami-event="cta button" href="https://ebook-beta.langomango.com/demo/reader" passHref>
+            <NextLink href="https://ebook-beta.langomango.com/demo/reader" passHref>
               <Button data-umami-event="cta button">
                 Join now <span>&rarr;</span>
               </Button>
             </NextLink>
-            <NextLink href="https://langomango.com" passHref>
-              <OutlinedButton  transparent>
+            <NextLink href="/" passHref>
+              <OutlinedButton transparent>
                 Want to read using our app? <span>&rarr;</span>
               </OutlinedButton>
             </NextLink>

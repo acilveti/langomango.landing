@@ -7,38 +7,46 @@ import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
-
-const TABS = [
-  {
-    title: 'Smart assistance for easy learning',
-    description:
-      '<p>Get in text assistance for reading in your target learning for an easy learning language experience. Get a fluent reading even in not learned parts.</p>',
-    imageUrl: '/feature1.jpeg',
-    baseColor: '249,82,120',
-    secondColor: '221,9,57',
-  },
-  {
-    title: 'Whole sentences instant translation in just one tap',
-    description:
-      '<p>Sometimes you just do not understand a sentece or word. Get inmediate translations to make the term association and learning posible almost instantly.</p>',
-    imageUrl: '/feature3.jpeg',
-    baseColor: '57,148,224',
-    secondColor: '99,172,232',
-  },
-  {
-    title: 'Adjustable target language presence in your text',
-    description:
-      '<p>Control how much exposure you hve to your learning target language to adapt to fit your level</p>',
-    imageUrl: '/feature2.jpeg',
-    baseColor: '88,193,132',
-    secondColor: '124,207,158',
-  },
-];
+import { useTranslation } from 'next-i18next'; // Import the translation hook
 
 export default function FeaturesGallery() {
-  const [currentTab, setCurrentTab] = useState(TABS[0]);
+  const { t } = useTranslation(); // Initialize the translation hook
+  
+  // Define tabs with translation keys instead of hardcoded text
+  const TABS = [
+    {
+      titleKey: 'features.tabs.smart_assistance.title',
+      descriptionKey: 'features.tabs.smart_assistance.description',
+      imageUrl: '/feature1.jpeg',
+      baseColor: '249,82,120',
+      secondColor: '221,9,57',
+    },
+    {
+      titleKey: 'features.tabs.instant_translation.title',
+      descriptionKey: 'features.tabs.instant_translation.description',
+      imageUrl: '/feature3.jpeg',
+      baseColor: '57,148,224',
+      secondColor: '99,172,232',
+    },
+    {
+      titleKey: 'features.tabs.adjustable_language.title',
+      descriptionKey: 'features.tabs.adjustable_language.description',
+      imageUrl: '/feature2.jpeg',
+      baseColor: '88,193,132',
+      secondColor: '124,207,158',
+    },
+  ];
 
-  const imagesMarkup = TABS.map((singleTab, idx) => {
+  // Map translation keys to translated content
+  const translatedTabs = TABS.map(tab => ({
+    ...tab,
+    title: t(tab.titleKey),
+    description: `<p>${t(tab.descriptionKey)}</p>`,
+  }));
+
+  const [currentTab, setCurrentTab] = useState(translatedTabs[0]);
+
+  const imagesMarkup = translatedTabs.map((singleTab, idx) => {
     const isActive = singleTab.title === currentTab.title;
     const isFirst = idx === 0;
 
@@ -49,7 +57,7 @@ export default function FeaturesGallery() {
     );
   });
 
-  const tabsMarkup = TABS.map((singleTab, idx) => {
+  const tabsMarkup = translatedTabs.map((singleTab, idx) => {
     const isActive = singleTab.title === currentTab.title;
 
     return (
@@ -70,14 +78,14 @@ export default function FeaturesGallery() {
   });
 
   function handleTabClick(idx: number) {
-    setCurrentTab(TABS[idx]);
+    setCurrentTab(translatedTabs[idx]);
   }
 
   return (
     <FeaturesGalleryWrapper>
       <Content>
-        <OverTitle>key features</OverTitle>
-        <SectionTitle>What are the key features of the app?</SectionTitle>
+        <OverTitle>{t('features.overTitle')}</OverTitle>
+        <SectionTitle>{t('features.title')}</SectionTitle>
       </Content>
       <GalleryWrapper>
         <TabsContainer>{tabsMarkup}</TabsContainer>

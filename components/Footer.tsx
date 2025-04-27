@@ -1,55 +1,28 @@
+// components/Footer.tsx
 import NextLink from 'next/link';
 import { FacebookIcon, LinkedinIcon, TwitterIcon } from 'react-share';
 import styled from 'styled-components';
 import Container from 'components/Container';
 import { media } from 'utils/media';
+import { useTranslation } from 'next-i18next';
 
 type SingleFooterListItem = { title: string; href: string };
 type FooterListItems = SingleFooterListItem[];
 type SingleFooterList = { title: string; items: FooterListItems };
 type FooterItems = SingleFooterList[];
 
-const footerItems: FooterItems = [
-  // {
-  //   title: 'Company',
-  //   items: [
-  //     { title: 'About Us', href: '/about' },
-  //     { title: 'Careers', href: '/careers' },
-  //     { title: 'Privacy Policy', href: '/privacy-policy' },
-  //     { title: 'Terms of Service', href: '/terms-of-service' },
-  //   ],
-  // },
-  {
-    title: 'Product',
-    items: [
-      // { title: 'Features', href: '/features' },
-      // { title: 'Pricing', href: '/pricing' },
-      // { title: 'Mobile App', href: '/mobile-app' },
-      { title: 'Languages Offered', href: '/languages' },
-    ],
-  },
-  // {
-  //   title: 'Resources',
-  //   items: [
-  //     { title: 'Blog', href: '/blog' },
-  //     { title: 'Learning Tips', href: '/learning-tips' },
-  //     { title: 'Webinars', href: '/webinars' },
-  //     { title: 'Case Studies', href: '/case-studies' },
-  //   ],
-  // },
-  // {
-  //   title: 'Support',
-  //   items: [
-  //     { title: 'Help Center', href: '/help-center' },
-  //     { title: 'FAQ', href: '/faq' },
-  //     { title: 'Contact Support', href: '/contact' },
-  //     { title: 'Community Forum', href: '/community-forum' },
-  //   ],
-  // },
-];
-
-
 export default function Footer() {
+  const { t } = useTranslation(['common']);
+  
+  const footerItems: FooterItems = [
+    {
+      title: "Product",
+      items: [
+        { title: "Languages Offered", href: '/languages' },
+      ],
+    },
+  ];
+
   return (
     <FooterWrapper>
       <Container>
@@ -60,25 +33,9 @@ export default function Footer() {
         </ListContainer>
         <BottomBar>
           <ShareBar>
-            {/* <NextLink href="https://www.twitter.com/my-saas-startup" passHref>
-              <a>
-                <TwitterIcon size={50} round={true} />
-              </a>
-            </NextLink>
-
-            <NextLink href="https://www.facebook.com/my-saas-startup" passHref>
-              <a>
-                <FacebookIcon size={50} round={true} />
-              </a>
-            </NextLink>
-
-            <NextLink href="https://www.linkedin.com/my-saas-startup" passHref>
-              <a>
-                <LinkedinIcon size={50} round={true} />
-              </a>
-            </NextLink> */}
+            {/* Social media links can be added here if needed */}
           </ShareBar>
-          <Copyright>&copy; Copyright 2021 My Saas Startup</Copyright>
+          <Copyright>{t('common:footer.copyright')}</Copyright>
         </BottomBar>
       </Container>
     </FooterWrapper>

@@ -1,52 +1,25 @@
+// views/PricingPage/FaqSection.tsx
 import styled from 'styled-components';
 import Accordion from 'components/Accordion';
 import SectionTitle from 'components/SectionTitle';
+import { useTranslation } from 'next-i18next';
 
 export default function FaqSection() {
+  const { t } = useTranslation(['common', 'home']);
+  
   return (
     <Wrapper>
-      <SectionTitle>Frequently asked question</SectionTitle>
-      <Accordion title="What languages are available">
-      The current languages supported are: English
-Spanish
-French
-German
-Chinese
-Japanese
-Korean
-Russian
-Portuguese
-Italian
-Dutch
-Swedish
-Norwegian
-Danish
-Finnish
-Polish
-Turkish
-Arabic
-Hindi
-Thai
-Vietnamese
-Indonesian
-Malay
-Hebrew
-Greek
-Romanian
-Hungarian
-Czech
-Slovak
-Bulgarian
-Croatian
-Serbian
-Ukrainian
-Estonian
-Latvian
-Lithuanian
-Basque.
-The languages that we have tested with users are: English, spanish, German, french, Bulgarian and Basque. Test are being performed with more real cases as you are reading this. Lorem sint culpa.
+      <SectionTitle>{t('home:faq.title')}</SectionTitle>
+      <Accordion title={t('home:faq.languages.title')}>
+        {t('home:faq.languages.content')}
       </Accordion>
       
+      {/* Add more FAQ items here as needed */}
+      {/* Example:
+      <Accordion title={t('home:faq.pricing.title')}>
+        {t('home:faq.pricing.content')}
+      </Accordion>
+      */}
     </Wrapper>
   );
 }

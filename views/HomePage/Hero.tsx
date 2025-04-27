@@ -1,84 +1,48 @@
+// views/HomePage/Hero.tsx
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
-import HeroIllustration from 'components/HeroIllustation';
 import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { addReferralToUrl } from 'utils/referral';
+import { useTranslation } from 'next-i18next';
 
 export default function Hero() {
+  const { t } = useTranslation(['common', 'home']);
   const { setIsModalOpened } = useNewsletterModalContext();
+  
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
-    };
+    e.preventDefault();
+    window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+  };
+  
   return (
     <HeroWrapper>
       <Contents>
-        <CustomOverTitle>Learn Languages by Reading Real Novels</CustomOverTitle>
-        <Heading style={{ fontSize: '4rem' }}>Enjoying eBooks?<br/> Use it to learn languages</Heading>
+        <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
+        <Heading style={{ fontSize: '4rem' }}>{t('home:hero.heading')}</Heading>
         <Description style={{ lineHeight: '2' }}>
-          Langomango smart reader makes every ebook you read a huge{' '}
-          <span
-            className="wordWisePosition"
-            data-translation="oportunidad"
-            style={{
-              display: 'inline',
-              borderBottom: '2px dotted #ccc',
-              position: 'relative',
-            }}
-          >
-            opportunity
-          </span>{' '}
-          of getting massive exposure to the language you want to{' '}
-          <span
-            className="wordWisePosition"
-            data-translation="aprender"
-            style={{
-              display: 'inline',
-              borderBottom: '2px dotted #ccc',
-              position: 'relative',
-            }}
-          >
-            learn
-          </span>
-          , through its language mixing algorithms.
-          <br/>
-          <span
-            className="wordWisePress"
-            data-translation="Leverage"
-            style={{
-              display: 'inline',
-              borderBottom: '2px dotted #ccc',
-              position: 'relative',
-              cursor: 'pointer',
-            }}
-          >
-            Aprovecha
-          </span> your reading hobby to supercharge your learning ability with low effort.
+          {t('home:hero.description')}
         </Description>
-      <ImageContainer style={{
-              padding:'2px'
-            }}>
-        <NextImage
-          src={'/portada.jpeg'}
-          alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
-          layout="fill"
-          objectFit="cover"
-          
-        />
-      </ImageContainer>
+        <ImageContainer style={{ padding: '2px' }}>
+          <NextImage
+            src={'/portada.jpeg'}
+            alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
+            layout="fill"
+            objectFit="cover"
+          />
+        </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" onClick={handleButtonClick} >
-            Start Reading Smarter Today <span>&rarr;</span>
+          <Button data-umami-event="Hero button" onClick={handleButtonClick}>
+            {t('common:startReading')} <span>&rarr;</span>
           </Button>
-          <NextLink href="https://langomango.com/authors" passHref>
+          <NextLink href="/authors" passHref>
             <Button transparent>
-              Are you an author? <span>&rarr;</span>
+              {t('common:areYouAuthor')} <span>&rarr;</span>
             </Button>
           </NextLink>
         </CustomButtonGroup>
@@ -92,7 +56,6 @@ export default function Hero() {
           color: #111010;
           font-size: 0.7em;
           white-space: normal;
-          
           overflow: hidden;
           line-height: 0.8 !important;
           font-weight: 600;
@@ -167,25 +130,6 @@ const ImageContainer = styled.div`
     width: 100%;
   }
 `;
-
-// const ImageContainer = styled.div`
-//   display: flex;
-//   flex: 1;
-//   justify-content: flex-end;
-//   align-items: flex-start;
-
-//   svg {
-//     max-width: 45rem;
-//   }
-
-//   ${media('<=desktop')} {
-//     margin-top: 2rem;
-//     justify-content: center;
-//     svg {
-//       max-width: 80%;
-//     }
-//   }
-// `;
 
 const Description = styled.p`
   font-size: 1.8rem;

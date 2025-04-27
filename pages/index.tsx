@@ -1,4 +1,4 @@
-// pages/index.tsx with i18n implementation
+// pages/index.tsx with correctly implemented i18n
 import { Analytics } from '@vercel/analytics/react';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
@@ -54,9 +54,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               {t('home:section1.description')}
             </p>
             <ul>
-              {['adjustable', 'instant', 'wordByWord'].map((key) => (
-                <li key={key}>{t(`home:section1.bulletPoint.${key}`)}</li>
-              ))}
+              <li>{t('home:section1.bulletPoint.adjustable')}</li>
+              <li>{t('home:section1.bulletPoint.instant')}</li>
+              <li>{t('home:section1.bulletPoint.wordByWord')}</li>
             </ul>
           </BasicSection1>
         </WhiteBackgroundContainer>
@@ -195,11 +195,13 @@ const CustomAutofitGrid = styled(AutofitGrid)`
 `;
 
 export async function getStaticProps({ locale }: { locale: string }) {
+  // This line is essential
+  const translations = await serverSideTranslations(locale, ['common', 'home']);
+  
   return {
     props: {
       posts: await getAllPosts(),
-      // Add the necessary i18n translations
-      ...(await serverSideTranslations(locale, ['common', 'home'])),
+      ...translations, // Make sure this spread operator is here
     },
   };
 }

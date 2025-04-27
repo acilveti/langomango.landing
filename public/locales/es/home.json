@@ -1,57 +1,81 @@
 {
-    "hero": {
-      "overTitle": "Aprende idiomas leyendo novelas reales",
-      "heading": "¿Disfrutando de libros electrónicos? Úsalos para aprender idiomas",
-      "description": "El lector inteligente de Langomango hace que cada libro electrónico que lees sea una gran oportunidad para obtener una exposición masiva al idioma que quieres aprender, a través de sus algoritmos de mezcla de idiomas. Aprovecha tu afición por la lectura para potenciar tu capacidad de aprendizaje con poco esfuerzo."
-    },
-    "section1": {
-      "title": "Aprendizaje perfecto mientras lees",
-      "overTitle": "Solución todo en uno",
-      "description": "Obtén una cantidad masiva de input comprensible (~30.000 palabras por libro para principiantes), con muy poco esfuerzo.",
-      "bulletPoint": {
-        "adjustable": "Proporción de mezcla de idiomas ajustable según tu nivel",
-        "instant": "Traducciones instantáneas con un simple toque",
-        "wordByWord": "Asistencia palabra por palabra para términos difíciles"
-      }
-    },
-    "section2": {
-      "title": "Funciona en kindle, kobo y smartphones",
-      "overTitle": "Disfruta en tu dispositivo favorito",
-      "description": "¡Experimenta LangoMango en tu Kindle o Kobo favorito! Disfruta de la excepcional duración de la batería, la pantalla similar al papel y el entorno libre de distracciones que hace que los lectores electrónicos sean perfectos para una lectura inmersiva. Simplemente accede a través del navegador de tu dispositivo y sumérgete en tus libros con todas las funciones de aprendizaje de idiomas al alcance de tu mano. Ya sea que estés descansando en casa o leyendo bajo el sol, tu confiable lector electrónico ahora se convierte en tu compañero de aprendizaje de idiomas."
-    },
-    "section3": {
-      "title": "Juega el juego de los números",
-      "overTitle": "Enorme exposición al idioma",
-      "description": "Los estudios estiman que el input comprensible necesario para lograr fluidez es de 2.000.000 de palabras. Con una novela promedio que contiene 100.000 palabras y la capacidad de LangoMango para aumentar gradualmente el porcentaje del idioma objetivo, podrás acumular una exposición significativa mientras disfrutas de grandes historias. Sigue una progresión natural a medida que mejoras de A1-15% - A2-30% - B1-60% - B2-90% - C1-100% del contenido en el idioma objetivo a medida que avanzas."
-    },
-    "section4": {
-      "title": "Rentable",
-      "overTitle": "Aprendizaje de idiomas asequible",
-      "description": "LangoMango combina contenido en tu idioma nativo y el idioma objetivo en una proporción que puedes manejar, creando el entorno de aprendizaje perfecto. La traducción de oraciones incorporada y la asistencia palabra por palabra hacen que el idioma objetivo sea fácil de leer, eliminando la necesidad de libros de texto o cursos costosos."
-    },
-    "section5": {
-      "title": "Disfruta mientras lees",
-      "overTitle": "Comprensión profunda con historias",
-      "description": "La mejor parte es que te volverás tan adicto a la lectura que olvidarás que estás recibiendo una cantidad increíble de input en tu idioma objetivo. La novela mejora tu comprensión del idioma de forma natural, ofreciendo un aprendizaje atractivo basado en historias que profundiza la comprensión cultural, las expresiones idiomáticas y el vocabulario con matices."
-    },
-    "pricing": {
-      "title": "Potencia tu aprendizaje a bajo costo",
-      "beta": {
-        "title": "Fase beta",
-        "description": "Sé parte de nuestra fase beta.",
-        "benefits": [
-          "Sé uno de los primeros usuarios",
-          "asistencia premium en persona",
-          "comunicación directa con el fundador de langomango"
-        ],
-        "price": "$10",
-        "period": "por 3 meses"
-      }
-    },
-    "videoSection": {
-      "title": "Lectura fácil en libros electrónicos"
-    },
-    "faq": {
-      "title": "Preguntas frecuentes"
+  "hero": {
+    "overTitle": "Aprende idiomas leyendo novelas reales",
+    "heading": "¿Disfrutando de libros electrónicos? Úsalos para aprender idiomas",
+    "description": "El lector inteligente de Langomango hace que cada libro electrónico que lees sea una gran oportunidad para obtener una exposición masiva al idioma que quieres aprender, a través de sus algoritmos de mezcla de idiomas. Aprovecha tu afición por la lectura para potenciar tu capacidad de aprendizaje con poco esfuerzo."
+  },
+  "section1": {
+    "title": "Aprendizaje perfecto mientras lees",
+    "overTitle": "Solución todo en uno",
+    "description": "Obtén una cantidad masiva de input comprensible (~30.000 palabras por libro para principiantes), con muy poco esfuerzo.",
+    "bulletPoint": {
+      "adjustable": "Proporción de mezcla de idiomas ajustable según tu nivel",
+      "instant": "Traducciones instantáneas con un simple toque",
+      "wordByWord": "Asistencia palabra por palabra para términos difíciles"
     }
+  },
+  "section2": {
+    "title": "Funciona en kindle, kobo y smartphones",
+    "overTitle": "Disfruta en tu dispositivo favorito",
+    "description": "¡Experimenta LangoMango en tu Kindle o Kobo favorito! Disfruta de la excepcional duración de la batería, la pantalla similar al papel y el entorno libre de distracciones que hace que los lectores electrónicos sean perfectos para una lectura inmersiva. Simplemente accede a través del navegador de tu dispositivo y sumérgete en tus libros con todas las funciones de aprendizaje de idiomas al alcance de tu mano. Ya sea que estés descansando en casa o leyendo bajo el sol, tu confiable lector electrónico ahora se convierte en tu compañero de aprendizaje de idiomas."
+  },
+  "section3": {
+    "title": "Juega el juego de los números",
+    "overTitle": "Enorme exposición al idioma",
+    "description": "Los estudios estiman que el input comprensible necesario para lograr fluidez es de 2.000.000 de palabras. Con una novela promedio que contiene 100.000 palabras y la capacidad de LangoMango para aumentar gradualmente el porcentaje del idioma objetivo, podrás acumular una exposición significativa mientras disfrutas de grandes historias. Sigue una progresión natural a medida que mejoras de A1-15% - A2-30% - B1-60% - B2-90% - C1-100% del contenido en el idioma objetivo a medida que avanzas."
+  },
+  "section4": {
+    "title": "Rentable",
+    "overTitle": "Aprendizaje de idiomas asequible",
+    "description": "LangoMango combina contenido en tu idioma nativo y el idioma objetivo en una proporción que puedes manejar, creando el entorno de aprendizaje perfecto. La traducción de oraciones incorporada y la asistencia palabra por palabra hacen que el idioma objetivo sea fácil de leer, eliminando la necesidad de libros de texto o cursos costosos."
+  },
+  "section5": {
+    "title": "Disfruta mientras lees",
+    "overTitle": "Comprensión profunda con historias",
+    "description": "La mejor parte es que te volverás tan adicto a la lectura que olvidarás que estás recibiendo una cantidad increíble de input en tu idioma objetivo. La novela mejora tu comprensión del idioma de forma natural, ofreciendo un aprendizaje atractivo basado en historias que profundiza la comprensión cultural, las expresiones idiomáticas y el vocabulario con matices."
+  },
+  "waveCta": {
+    "title": "Comienza tu viaje de aprendizaje de idiomas hoy",
+    "description": "Únete a miles de lectores que están aprendiendo idiomas mientras disfrutan de sus libros favoritos",
+    "button": "Comenzar",
+    "secondary": "Conocer más"
+  },
+  "pricing": {
+    "title": "Potencia tu aprendizaje a bajo costo",
+    "beta": {
+      "title": "Fase beta",
+      "description": "Sé parte de nuestra fase beta.",
+      "benefits": [
+        "Sé uno de los primeros usuarios",
+        "asistencia premium en persona",
+        "comunicación directa con el fundador de langomango"
+      ],
+      "price": "$10",
+      "period": "por 3 meses"
+    }
+  },
+  "videoSection": {
+    "title": "Lectura fácil en libros electrónicos"
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "languages": {
+        "title": "¿Qué idiomas están disponibles?",
+        "content": "Actualmente, LangoMango permite aprender español, inglés, francés, alemán, italiano y portugués, con más idiomas próximamente."
+      },
+    "questions": [
+      {
+        "question": "¿Cómo funciona LangoMango?",
+        "answer": "LangoMango utiliza algoritmos inteligentes para mezclar tu idioma nativo con el idioma que estás aprendiendo en una proporción que coincide con tu nivel de competencia. Puedes ajustar esta proporción a medida que mejoras."
+      },
+      {
+        "question": "¿En qué dispositivos puedo usar LangoMango?",
+        "answer": "LangoMango funciona en Kindle, Kobo, smartphones, tablets y computadoras - cualquier dispositivo con un navegador web."
+      },
+      {
+        "question": "¿Qué idiomas están disponibles?",
+        "answer": "Actualmente, LangoMango permite aprender español, inglés, francés, alemán, italiano y portugués, con más idiomas próximamente."
+      }
+    ]
   }
+}
