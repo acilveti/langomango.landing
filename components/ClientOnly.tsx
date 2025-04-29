@@ -10,6 +10,6 @@ export default function ClientOnly<T extends HTMLAttributes<HTMLDivElement>>(
     setHasMounted(true)
   }, [])
   
-  if (!hasMounted) return null
+  if (!hasMounted) return <div {...rest} />
   return <>{children}</>
 }

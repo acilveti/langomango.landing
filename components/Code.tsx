@@ -38,51 +38,49 @@ export default function Code({
   );
 
   return (
-    null
-    // <>
-    //   <Highlight {...defaultProps} code={code} language={language}>
-    //     {({ className, style, tokens, getLineProps, getTokenProps }) => (
-    //       <>
-    //         <CodeWrapper className="code-wrapper" language={language}>
-    //           {withCopyButton && copyButtonMarkup}
-    //           <Pre className={className} style={style}>
-    //             {tokens.map((line, i) => {
-    //               const lineNumber = i + 1;
-    //               const isSelected = selectedLines.includes(lineNumber);
-    //               const lineProps = getLineProps({ line, key: i });
-    //               const className = lineProps.className + (isSelected ? ' selected-line' : '');
+    <>
+      <Highlight {...defaultProps} code={code} language={language}>
+        {({ className, style, tokens, getLineProps, getTokenProps }) => (
+          <>
+            <CodeWrapper className="code-wrapper" language={language}>
+              {withCopyButton && copyButtonMarkup}
+              <Pre className={className} style={style}>
+                {tokens.map((line, i) => {
+                  const lineNumber = i + 1;
+                  const isSelected = selectedLines.includes(lineNumber);
+                  const lineProps = getLineProps({ line, key: i });
+                  const className = lineProps.className + (isSelected ? ' selected-line' : '');
 
-    //               return (
-    //                 <Line key={i} {...{ ...lineProps, className }}>
-    //                   {withLineNumbers && <LineNo>{lineNumber}</LineNo>}
-    //                   <LineContent>
-    //                     {line.map((token, key) => (
-    //                       <span key={key} {...getTokenProps({ token, key })} />
-    //                     ))}
-    //                   </LineContent>
-    //                 </Line>
-    //               );
-    //             })}
-    //           </Pre>
-    //         </CodeWrapper>
-    //         {caption && <Caption>{caption}</Caption>}
-    //       </>
-    //     )}
-    //   </Highlight>
-    // </>
+                  return (
+                    <Line key={i} {...{ ...lineProps, className }}>
+                      {withLineNumbers && <LineNo>{lineNumber}</LineNo>}
+                      <LineContent>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token, key })} />
+                        ))}
+                      </LineContent>
+                    </Line>
+                  );
+                })}
+              </Pre>
+            </CodeWrapper>
+            {caption && <Caption>{caption}</Caption>}
+          </>
+        )}
+      </Highlight>
+    </>
   );
 }
 
 function CopyIcon() {
   return (
-    null
-    // <svg 
-    // viewBox="0 0 24 24" focusable="false" className="chakra-icon css-onkibi">
-    //   <path
-    //     fill="currentColor"
-    //     d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
-    //   ></path>
-    // </svg>
+    <svg 
+    viewBox="0 0 24 24" focusable="false" className="chakra-icon css-onkibi">
+      <path
+        fill="currentColor"
+        d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+      ></path>
+    </svg>
   );
 }
 
