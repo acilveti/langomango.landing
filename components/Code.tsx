@@ -39,7 +39,7 @@ export default function Code({
 
   return (
     <>
-      <Highlight {...defaultProps} theme={undefined} code={code} language={language}>
+      <Highlight {...defaultProps} code={code} language={language}>
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <>
             <CodeWrapper className="code-wrapper" language={language}>
