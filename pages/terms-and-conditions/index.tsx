@@ -63,7 +63,7 @@ export default function TermsAndConditions() {
       <div>
         <h2>5. Prohibited Activities</h2>
         <p>You agree not to:</p>
-        <ol type= a >
+        <ol type= "a" >
           <li>Use the Service for any illegal purpose or in violation of any laws or regulations;</li>
           <li>Upload, transmit, or share content that infringes upon the rights of others;</li>
           <li>Attempt to bypass or circumvent any security features of the Service;</li>
