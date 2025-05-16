@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
       <div>
         <h2>1. Introduction</h2>
         <p>
-          LangoMango.com ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our smart ebook reader service, website, and mobile application (collectively, the "Service").
+          LangoMango.com ( we,   us,  or  our ) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our smart ebook reader service, website, and mobile application (collectively, the  Service ).
         </p>
         <p>
           Please read this Privacy Policy carefully. By accessing or using the Service, you acknowledge that you have read, understood, and agree to be bound by all the terms of this Privacy Policy.
@@ -199,7 +199,7 @@ export default function PrivacyPolicy() {
       <div>
         <h2>10. Changes to This Privacy Policy</h2>
         <p>
-          We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top. You are advised to review this Privacy Policy periodically for any changes.
+          We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the  Last Updated  date at the top. You are advised to review this Privacy Policy periodically for any changes.
         </p>
       </div>
 

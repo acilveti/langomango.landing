@@ -10,7 +10,7 @@ export default function TermsAndConditions() {
       <div>
         <h2>1. Introduction and Acceptance</h2>
         <p>
-          Welcome to LangoMango.com, a smart ebook reader platform designed to enhance your reading experience through intelligent features and language learning tools. These Terms and Conditions ("Terms") constitute a legally binding agreement between you and LangoMango.com ("we," "us," or "our") governing your access to and use of the LangoMango.com website, applications, and services (collectively, the "Service").
+          Welcome to LangoMango.com, a smart ebook reader platform designed to enhance your reading experience through intelligent features and language learning tools. These Terms and Conditions ( Terms ) constitute a legally binding agreement between you and LangoMango.com ( we,   us,  or  our ) governing your access to and use of the LangoMango.com website, applications, and services (collectively, the  Service ).
         </p>
         <p>
           By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, please do not access or use the Service.
@@ -63,7 +63,7 @@ export default function TermsAndConditions() {
       <div>
         <h2>5. Prohibited Activities</h2>
         <p>You agree not to:</p>
-        <ol type="a">
+        <ol type= a >
           <li>Use the Service for any illegal purpose or in violation of any laws or regulations;</li>
           <li>Upload, transmit, or share content that infringes upon the rights of others;</li>
           <li>Attempt to bypass or circumvent any security features of the Service;</li>
@@ -90,7 +90,7 @@ export default function TermsAndConditions() {
       <div>
         <h2>7. Disclaimer of Warranties</h2>
         <p>
-          THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR COURSE OF PERFORMANCE.
+          THE SERVICE IS PROVIDED  AS IS  AND  AS AVAILABLE  WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR COURSE OF PERFORMANCE.
         </p>
         <p>
           LangoMango.com does not warrant that: (a) the Service will function uninterrupted, secure, or available at any particular time or location; (b) any errors or defects will be corrected; (c) the Service is free of viruses or other harmful components; or (d) the results of using the Service will meet your requirements.
@@ -115,7 +115,7 @@ export default function TermsAndConditions() {
         <h2>10. Service-Specific Features</h2>
         <h3>10.1 Smart Reading Features</h3>
         <p>
-          The Service includes smart reading features such as vocabulary tracking, learning tools, reading statistics, and other personalized functionality. These features are provided "as is" and may be modified, updated, or discontinued at any time.
+          The Service includes smart reading features such as vocabulary tracking, learning tools, reading statistics, and other personalized functionality. These features are provided  as is  and may be modified, updated, or discontinued at any time.
         </p>
         <h3>10.2 Language Learning Tools</h3>
         <p>
