@@ -37,7 +37,7 @@ export default function Hero() {
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+    window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
   };
   
   // Mobile content

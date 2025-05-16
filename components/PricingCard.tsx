@@ -18,7 +18,7 @@ export default function PricingCard({ title, description, benefits, isOutlined, 
   // Function to handle button click with proper type annotation for anchor elements
     const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+      window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
     };
 
   return (

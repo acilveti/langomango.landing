@@ -1,4 +1,3 @@
-// components/Footer.tsx
 import NextLink from 'next/link';
 import { FacebookIcon, LinkedinIcon, TwitterIcon } from 'react-share';
 import styled from 'styled-components';
@@ -19,6 +18,13 @@ export default function Footer() {
       title: "Product",
       items: [
         { title: "Languages Offered", href: '/languages' },
+      ],
+    },
+    {
+      title: "Legal",
+      items: [
+        { title: "Terms and Conditions", href: '/terms-and-conditions' },
+        { title: "Privacy Policy", href: '/privacy-policy' },
       ],
     },
   ];

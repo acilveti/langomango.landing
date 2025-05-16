@@ -26,7 +26,7 @@ import { appWithTranslation } from 'next-i18next';
 
 export const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
   e.preventDefault();
-  window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+  window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
 };
 
 // Define a custom nav item type that includes the onClick handler
@@ -38,7 +38,7 @@ type NavItemWithHandler = NavItems[0] & {
 const navItems: NavItemWithHandler[] = [
   { 
     title: 'SignUp/ Login', 
-    href: addReferralToUrl('https://beta-app.langomango.com/beta-phase'), 
+    href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
     outlined: true,
     onClick: handleButtonClick, // Add the onClick handler
   },
