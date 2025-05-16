@@ -11,9 +11,7 @@ export default function PricingTablesSection() {
   
   // Get the pricing benefits from translations
   const benefits = [
-    t('home:pricing.beta.benefits.0'),
     t('home:pricing.beta.benefits.1'),
-    t('home:pricing.beta.benefits.2')
   ];
   
   return (
@@ -21,11 +19,32 @@ export default function PricingTablesSection() {
       <SectionTitle>{t('home:pricing.title')}</SectionTitle>
       <AutofitGrid>
         <PricingCard
-          title={t('home:pricing.beta.title')}
-          description={t('home:pricing.beta.description')}
+          title={t('home:pricing.monthly.title')}
+          description={t('home:pricing.monthly.description')}
           benefits={benefits}
         >
-          {t('home:pricing.beta.price')}<span> {t('home:pricing.beta.period')}</span>
+          {t('home:pricing.monthly.price')}<span> {t('home:pricing.monthly.period')}</span>
+        </PricingCard>
+        <PricingCard
+          title={t('home:pricing.quarterly.title')}
+          description={t('home:pricing.quarterly.description')}
+          benefits={benefits}
+        >
+          {t('home:pricing.quarterly.price')}<span> {t('home:pricing.quarterly.period')}</span>
+        </PricingCard>
+        <PricingCard
+          title={t('home:pricing.yearly.title')}
+          description={t('home:pricing.yearly.description')}
+          benefits={benefits}
+        >
+          {t('home:pricing.yearly.price')}<span> {t('home:pricing.yearly.period')}</span>
+        </PricingCard>
+        <PricingCard
+          title={t('home:pricing.threeyear.title')}
+          description={t('home:pricing.threeyear.description')}
+          benefits={benefits}
+        >
+          {t('home:pricing.threeyear.price')}<span> {t('home:pricing.threeyear.period')}</span>
         </PricingCard>
       </AutofitGrid>
     </Wrapper>

@@ -154,7 +154,7 @@
         <div className="my-6">
           <h2 className="text-2xl font-semibold mb-3">13. Governing Law</h2>
           <p className="mb-3">
-            These Terms shall be governed and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+            These Terms shall be governed and construed in accordance with the laws of Spain, without regard to its conflict of law provisions.
           </p>
         </div>
   

@@ -52,6 +52,30 @@
       ],
       "price": "$10",
       "period": "per 2 months"
+    },
+    "monthly": {
+      "title": "Monthly",
+      "description": "Billed monthly",
+      "price": "€12",
+      "period": "/month"
+    },
+    "quarterly": {
+      "title": "3 Months",
+      "description": "Billed every 3 months",
+      "price": "€24",
+      "period": "/quarter"
+    },
+    "yearly": {
+      "title": "Yearly",
+      "description": "Billed annually",
+      "price": "€72",
+      "period": "/year"
+    },
+    "threeyear": {
+      "title": "3 Years",
+      "description": "Billed every 3 years",
+      "price": "€120",
+      "period": "/3 years"
     }
   },
   "videoSection": {
