@@ -187,9 +187,3 @@ export default function TermsAndConditions() {
     </div>
   );
 }
-
-export async function getStaticProps({ locale }) {
-  return {
-    props: {},
-  };
-}
