@@ -27,6 +27,7 @@ import SectionTitle from 'components/SectionTitle';
 import YoutubeVideo from 'components/YoutubeVideo';
 import { media } from 'utils/media';
 import FaqSection from 'views/PricingPage/FaqSection';
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
@@ -34,6 +35,33 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   useEffect(() => {
     captureReferral();
   }, []);
+
+  useEffect(() => { 
+      if (typeof window !== 'undefined') {
+        // Add logging to verify script execution
+        console.log('Initializing ContentSquare script');
+        
+        try {
+          injectContentsquareScript({ 
+            siteId: "6407230",
+            async: true,
+            defer: false
+          });
+          console.log('ContentSquare script injected successfully');
+        } catch (error) {
+          console.error('Error injecting ContentSquare script:', error);
+        }
+        
+        // Verify if CS object is created
+        setTimeout(() => {
+          if (window._uxa) {
+            console.log('ContentSquare _uxa object exists');
+          } else {
+            console.log('ContentSquare _uxa object not found');
+          }
+        }, 2000);
+      }
+    }, []);
   
   return (
     <>
