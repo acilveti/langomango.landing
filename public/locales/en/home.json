@@ -2,7 +2,7 @@
   "hero": {
     "overTitle": "Learn Languages by Reading Real Novels",
     "heading": "Enjoying eBooks? Use it to learn languages",
-    "description": "Langomango smart reader makes every ebook you read a huge opportunity of getting massive exposure to the language you want to learn, through its language mixing algorithms. Leverage your reading hobby to supercharge your learning ability with low effort."
+    "description": "Langomango smart reader makes every ebook you read a huge opportunity of getting massive exposure to the language you want to learn, through its language mixing algorithms. Try it free for 7 days and leverage your reading hobby to supercharge your learning ability with low effort."
   },
   "section1": {
     "title": "Seamless learning while reading",
@@ -37,7 +37,7 @@
   "waveCta": {
     "title": "Start your language learning journey today",
     "description": "Join thousands of readers who are learning languages while enjoying their favorite books",
-    "button": "Get Started",
+    "button": "Start free trial",
     "secondary": "Learn more"
   },
   "pricing": {

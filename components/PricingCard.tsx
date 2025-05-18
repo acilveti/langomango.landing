@@ -37,7 +37,7 @@ export default function PricingCard({ title, description, benefits, isOutlined, 
           </CustomRichText>
         )}
       </PriceContainer>
-      <CustomButton data-umami-event="pricing button" onClick={handleButtonClick} >Get started</CustomButton>
+      <CustomButton data-umami-event="pricing button" onClick={handleButtonClick} >Start free trial</CustomButton>
     </Wrapper>
   );
 }

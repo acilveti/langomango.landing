@@ -1,9 +1,9 @@
 {
   "title": "LangoMango",
   "description": "Language learning platform, focused on readers and bookworms.",
-  "signUpLogin": "SignUp/ Login",
+  "signUpLogin": "Start free trial",
   "createAccount": "Create an account",
-  "startReading": "Start Reading Smarter Today",
+  "startReading": "Start free trial",
   "areYouAuthor": "Are you an author?",
   "features": {
     "title": "What are the key features of the app?",
@@ -25,14 +25,14 @@
   },
   "cta": {
     "title": "Try the smart reader",
-    "subtitle": "Use the demo",
-    "description": "Get a grasp of the exposure you could achieve reading ebooks with langomango's reader.",
-    "button": "Take a tour"
+    "subtitle": "Start your 7-day free trial",
+    "description": "Experience LangoMango's smart reader with no commitment. Cancel anytime during your trial period.",
+    "button": "Start free trial"
   },
   "waveCta": {
     "title": "Ready to transform your reading experience?",
-    "description": "Join LangoMango today and start learning languages while enjoying your favorite books.",
-    "mainButton": "Get started now",
+    "description": "Join LangoMango today with a 7-day free trial and start learning languages while enjoying your favorite books.",
+    "mainButton": "Start free trial",
     "secondaryButton": "Learn more about our platform"
   },
   "authorCta": {

@@ -37,7 +37,7 @@ type NavItemWithHandler = NavItems[0] & {
 // Create navigation items with the onClick handler
 const navItems: NavItemWithHandler[] = [
   { 
-    title: 'SignUp/ Login', 
+    title: 'free trial', 
     href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
     outlined: true,
     onClick: handleButtonClick, // Add the onClick handler
