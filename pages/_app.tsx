@@ -49,11 +49,28 @@ const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => { 
     if (typeof window !== 'undefined') {
-      injectContentsquareScript({
-        siteId: "6407230",
-        async: true,
-        defer: false
-      });
+      // Add logging to verify script execution
+      console.log('Initializing ContentSquare script');
+      
+      try {
+        injectContentsquareScript({
+          siteId: "6407230",
+          async: true,
+          defer: false
+        });
+        console.log('ContentSquare script injected successfully');
+      } catch (error) {
+        console.error('Error injecting ContentSquare script:', error);
+      }
+      
+      // Verify if CS object is created
+      setTimeout(() => {
+        if (window._uxa) {
+          console.log('ContentSquare _uxa object exists');
+        } else {
+          console.log('ContentSquare _uxa object not found');
+        }
+      }, 2000);
     }
   }, []);
   return (
