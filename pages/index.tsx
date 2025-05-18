@@ -59,7 +59,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       <Head>
         <title>{t('common:title')}</title>
         <meta name="description" content={t('common:description')} />
-        <Analytics/>
       </Head>
       <HomepageWrapper>
         <WhiteBackgroundContainer>

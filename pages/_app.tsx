@@ -81,7 +81,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         /> */}
         {/* <script async src="https://www.google-analytics.com/analytics.js"></script> */}
-        <Analytics/>
       </Head>
       <ColorModeScript />
       <GlobalStyle />
@@ -110,6 +109,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <WaveCta />
         <Footer />
       </Providers>
+      <Analytics/>
     </>
   );
 }
