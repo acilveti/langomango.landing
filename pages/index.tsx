@@ -51,15 +51,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         } catch (error) {
           console.error('Error injecting ContentSquare script:', error);
         }
-        
-        // Verify if CS object is created
-        setTimeout(() => {
-          if (window._uxa) {
-            console.log('ContentSquare _uxa object exists');
-          } else {
-            console.log('ContentSquare _uxa object not found');
-          }
-        }, 2000);
       }
     }, []);
   
