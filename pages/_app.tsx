@@ -8,7 +8,7 @@ import { AppProps } from 'next/dist/shared/lib/router/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { ColorModeScript } from 'nextjs-color-mode';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { TinaEditProvider } from 'tinacms/dist/edit-state';
 
 
@@ -22,7 +22,7 @@ import { NewsletterModalContextProvider, useNewsletterModalContext } from 'conte
 import { NavItems } from 'types';
 import {addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
 import { appWithTranslation } from 'next-i18next';
-
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
 export const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
   e.preventDefault();
@@ -47,6 +47,15 @@ const navItems: NavItemWithHandler[] = [
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => { 
+    if (typeof window !== 'undefined') {
+      injectContentsquareScript({
+        siteId: "6407230",
+        async: true,
+        defer: false
+      });
+    }
+  }, []);
   return (
     <>
       <Head>
@@ -54,6 +63,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
+        
         {/* <link rel="alternate" type="application/rss+xml" href={EnvVars.URL + 'rss'} title="RSS 2.0" /> */}
         {/* <script
           dangerouslySetInnerHTML={{

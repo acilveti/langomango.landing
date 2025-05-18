@@ -2108,6 +2108,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@contentsquare/tag-sdk@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@contentsquare/tag-sdk/-/tag-sdk-1.1.0.tgz#233d7c06783430a6e5a99f08cf61e41dc776b7ae"
+  integrity sha512-cZibHPHEOmNmVG9MqhSGvXAGbjUK4wpGXzNMNbacjxgSrLxe8QziXLNq2ICwj1xww/6/yADjlbij47zqw4xNRw==
+
 "@emotion/is-prop-valid@^1.1.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-1.2.0.tgz#7f2d35c97891669f7e276eb71c83376a5dc44c83"
