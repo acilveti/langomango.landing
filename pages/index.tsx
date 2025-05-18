@@ -1,5 +1,5 @@
 // pages/index.tsx with correctly implemented i18n
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from '@vercel/analytics/next';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import styled from 'styled-components';
