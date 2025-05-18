@@ -16,7 +16,7 @@ export default function Cta() {
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    window.location.href = "https://ebook-beta.langomango.com/demo/reader";
+    window.location.href = "https://beta-app.langomango.com/sign-up";
   };
 
   return (
@@ -59,7 +59,7 @@ export function CtaAuthors() {
           </Description>
   
           <ButtonGroup>
-            <NextLink href="https://ebook-beta.langomango.com/demo/reader" passHref>
+            <NextLink href="https://beta-app.langomango.com/sign-up" passHref>
               <Button data-umami-event="cta button">
                 {t('authorCta.button')} <span>&rarr;</span>
               </Button>
