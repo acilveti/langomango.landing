@@ -20,7 +20,7 @@ import NewsletterModal from 'components/NewsletterModal';
 import WaveCta from 'components/WaveCta';
 import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { NavItems } from 'types';
-import { addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
+import { addReferralToUrl } from 'utils/referral';
 import { appWithTranslation } from 'next-i18next';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
@@ -46,13 +46,16 @@ const navItems: NavItemWithHandler[] = [
 
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 
-// Google Tag Manager ID - you can replace this with your own ID
-const GTM_ID = 'GTM-PWND8SN6'; // Your GTM ID
+// Google Tag Manager ID
+const GTM_ID = 'GTM-PWND8SN6';
+
+// Reddit Pixel ID
+const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => { 
     if (typeof window !== 'undefined') {
-      // Add logging to verify script execution
+      // ContentSquare Script
       console.log('Initializing ContentSquare script');
       
       try {
@@ -70,7 +73,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   
   return (
     <>
-      {/* Google Tag Manager - Script Component (recommended way in Next.js) */}
+      {/* Google Tag Manager Script */}
       <Script
         id="gtm-script"
         strategy="afterInteractive"
@@ -85,6 +88,17 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       
+      {/* Reddit Pixel Base Code */}
+      <Script
+        id="reddit-pixel"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','${REDDIT_PIXEL_ID}');rdt('track', 'PageVisit');
+          `,
+        }}
+      />
+      
       <Head>
         <script defer src="https://cloud.umami.is/script.js" data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -95,7 +109,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ColorModeScript />
       <GlobalStyle />
 
-      {/* Google Tag Manager - No Script (for when JavaScript is disabled) */}
+      {/* Google Tag Manager - No Script */}
       <noscript>
         <iframe
           src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
