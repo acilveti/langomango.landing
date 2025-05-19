@@ -38,7 +38,8 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   useEffect(() => {
     // Initialize Reddit Pixel if not already initialized
     if (typeof window !== 'undefined' && !(window as any).rdt) {
-      !function(w: any, d: Document) {
+      // Fixed IIFE syntax for TypeScript
+      (function(w: any, d: Document) {
         if (!w.rdt) {
           const p = w.rdt = function() {
             p.sendEvent ? p.sendEvent.apply(p, arguments) : p.callQueue.push(arguments);
@@ -50,7 +51,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           const s = d.getElementsByTagName("script")[0];
           s.parentNode?.insertBefore(t, s);
         }
-      }(window, document);
+      })(window, document);
       
       // Initialize with the pixel ID
       (window as any).rdt('init', REDDIT_PIXEL_ID);
