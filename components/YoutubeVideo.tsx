@@ -2,9 +2,10 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 // Import Reddit Pixel tracking
-import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
 
 import playIcon from '../public/play-icon.svg';
+import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
+
 
 interface YoutubeVideoProps {
   title?: string;
@@ -20,7 +21,7 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
   // Track video impression when component mounts
   useEffect(() => {
     if (!hasTrackedImpression.current) {
-      trackRedditConversion(RedditEventTypes.VIEW_CONTENT, {
+      trackRedditConversion(RedditEventTypes.VIEW_CONTENT, { 
         content_type: 'video',
         content_id: videoHash,
         title: title || 'Video Tutorial',

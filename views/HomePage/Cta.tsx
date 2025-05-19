@@ -11,7 +11,7 @@ import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
 import { addReferralToUrl } from 'utils/referral';
 // Import Reddit Pixel tracking
-import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
+import { RedditEventTypes,trackRedditConversion } from 'utils/redditPixel';
 
 // Add onCtaClick prop for external tracking
 interface CtaProps {
