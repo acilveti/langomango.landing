@@ -166,6 +166,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
                 <li>{t('home:section1.bulletPoint.wordByWord')}</li>
               </ul>
             </BasicSection1>
+            <Testimonials/>
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer>

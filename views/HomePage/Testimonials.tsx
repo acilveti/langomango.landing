@@ -10,30 +10,52 @@ import { media } from 'utils/media';
 
 const TESTIMONIALS = [
   {
-    companyLogoUrl: '/testimonials/company-logo-1.svg',
-    content: `Really good. I am so pleased with this product. I didn't even need training.`,
+    content: `I'm really liking this, though! It's exactly what is missing in this space. I can totally see using this a lot.`,
     author: {
-      name: 'Clyde Edwards',
-      title: 'Very Serious Man',
-      avatarUrl: '/testimonials/author-photo-1.jpeg',
+      name: 'kmzafari',
+      title: 'Redditor, reader and language learner',
+      avatarUrl: '/testimonials/kmzafari.png',
     },
   },
   {
-    companyLogoUrl: '/testimonials/company-logo-2.svg',
-    content: `It's really wonderful. I use saas product often. Thank You! Saas product has really helped our business.`,
+    content: `I should not be using it... I kept reading until 3:00 AM and getting up to go to work was just too hard!`,
     author: {
-      name: 'Jimmy Hunter',
-      title: 'Sigma Male University Graduate',
-      avatarUrl: '/testimonials/author-photo-2.jpeg',
+      name: 'Pilar Alvarez',
+      title: 'Reader without self control',
+      avatarUrl: '/testimonials/default-redditor.png',
     },
   },
   {
-    companyLogoUrl: '/testimonials/company-logo-3.svg',
-    content: `Since I invested in saas product I made over 100,000 dollars profits. It really saves me time and effort. saas product is exactly what our business has been lacking.`,
+    content: `I don't think you're overinvested at all! Lol No, this is so useful! Reading is really important for learning, but tbh the content that is offered is either too expensive or uninteresting to me. Kindle does have e.g., a Spanish dictionary if you want to read in Spanish and translate occasionally, but it's been hit or miss for me. Being and to read what I want (which I already do) and lean at the same time is such a fantastic idea.`,
     author: {
-      name: 'Marjorie Morgan',
-      title: 'Chief Chad Officer',
-      avatarUrl: '/testimonials/author-photo-3.jpeg',
+      name: 'kmzafari',
+      title: 'Redditor, reader and language learner',
+      avatarUrl: '/testimonials/kmzafari.png',
+    },
+  },
+  
+  {
+    content: `Besides that, the main selling point for me, for which I’d be down to spent the subscription, is that it runs on e readers. I hate reading on my phone but for language learning there is not really a comfortable and as efficient way to do it compared to any other digital device.`,
+    author: {
+      name: 'kuyikuy81',
+      title: 'Redditor, reader and language learner',
+      avatarUrl: '/testimonials/default-redditor.png',
+    },
+  },
+  {
+    content: `Wow incredible you wrote a tool for this, I often buy books that have two languages on them but theyre very limited and usually only have short stories, not entire books that I actually care to read. Incredible`,
+    author: {
+      name: 'Ok_ant8450',
+      title: 'Redditor and reader',
+      avatarUrl: '/testimonials/default-redditor.png',
+    },
+  },
+  {
+    content: `Euskaraz funtzionatzen du? Hombre take my money eta igorri esteka otoi.  -- it works with basque? Oh man, take me money and let me use it!`,
+    author: {
+      name: 'Hot-Ask-9962',
+      title: 'Redditor and basque learner',
+      avatarUrl: '/testimonials/default-redditor.png',
     },
   },
 ];
@@ -47,12 +69,6 @@ export default function Testimonials() {
           {TESTIMONIALS.map((singleTestimonial, idx) => (
             <SwiperSlide key={idx}>
               <TestimonialCard>
-                <NextImage
-                  src={singleTestimonial.companyLogoUrl}
-                  alt={`${singleTestimonial.author.name}'s company logo`}
-                  width={200}
-                  height={40}
-                />
                 <Content>“{singleTestimonial.content}”</Content>
                 <AuthorContainer>
                   <AuthorImageContainer>
