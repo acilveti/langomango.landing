@@ -1,16 +1,51 @@
-import React from 'react';
+// Updated YoutubeVideo.tsx with Reddit Pixel tracking
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+// Import Reddit Pixel tracking
+import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
 
 import playIcon from '../public/play-icon.svg';
 
 interface YoutubeVideoProps {
   title?: string;
   url: string;
+  onPlay?: () => void; // Optional callback for external tracking
 }
 
 export default function YoutubeVideo(props: YoutubeVideoProps) {
-  const { title, url } = props;
+  const { title, url, onPlay } = props;
   const videoHash = extractVideoHashFromUrl(url);
+  const hasTrackedImpression = useRef(false);
+  
+  // Track video impression when component mounts
+  useEffect(() => {
+    if (!hasTrackedImpression.current) {
+      trackRedditConversion(RedditEventTypes.VIEW_CONTENT, {
+        content_type: 'video',
+        content_id: videoHash,
+        title: title || 'Video Tutorial',
+        engagement_type: 'impression'
+      });
+      hasTrackedImpression.current = true;
+    }
+  }, [videoHash, title]);
+  
+  // Create click handler that tracks play event
+  const handleVideoClick = () => {
+    // Track video play with Reddit Pixel
+    trackRedditConversion(RedditEventTypes.VIEW_CONTENT, {
+      content_type: 'video',
+      content_id: videoHash,
+      title: title || 'Video Tutorial',
+      engagement_type: 'play'
+    });
+    
+    // Call external tracking handler if provided
+    if (onPlay) {
+      onPlay();
+    }
+  };
+  
   const srcDoc = `<style>
   * {
     padding: 0;
@@ -45,10 +80,30 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
     width: 100%;
   }
   </style>
-  <a style="color: rgb(var(--primary))" href=https://www.youtube.com/embed/${videoHash}?autoplay=1>
+  <a style="color: rgb(var(--primary))" href=https://www.youtube.com/embed/${videoHash}?autoplay=1 id="youtube-link">
     <img class="thumbnail" src="https://img.youtube.com/vi/${videoHash}/hqdefault.jpg" alt='${title || ''}'>
     <img class="play" src="${playIcon}" alt="Play the video">
-  </a>`;
+  </a>
+  <script>
+    document.getElementById('youtube-link').addEventListener('click', function() {
+      window.parent.postMessage('video-clicked', '*');
+    });
+  </script>`;
+  
+  // Set up message listener for iframe click
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'video-clicked') {
+        handleVideoClick();
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+  
   return (
     <VideoContainer>
       <VideoFrame
@@ -62,15 +117,43 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
         allowFullScreen
         title={title}
         loading="lazy"
+        onLoad={() => {
+          // Track video loaded as visible
+          if (typeof IntersectionObserver !== 'undefined') {
+            const observer = new IntersectionObserver(
+              (entries) => {
+                entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                    trackRedditConversion(RedditEventTypes.SECTION_VISIBLE, {
+                      section_name: 'Video Player',
+                      content_id: videoHash,
+                      visibility_percent: Math.round(entry.intersectionRatio * 100)
+                    });
+                    observer.disconnect();
+                  }
+                });
+              },
+              { threshold: 0.5 }
+            );
+            
+            observer.observe(document.querySelector('.video-container') as Element);
+          }
+        }}
       />
     </VideoContainer>
   );
 }
 
 function extractVideoHashFromUrl(url: string) {
-  const videoHashQueryParamKey = 'v';
-  const searchParams = new URL(url).search;
-  return new URLSearchParams(searchParams).getAll(videoHashQueryParamKey);
+  try {
+    const videoHashQueryParamKey = 'v';
+    const searchParams = new URL(url).search;
+    const hash = new URLSearchParams(searchParams).get(videoHashQueryParamKey);
+    return hash || '';
+  } catch (error) {
+    console.error('Error extracting video hash:', error);
+    return '';
+  }
 }
 
 export const VideoContainer = styled.div`
@@ -79,6 +162,7 @@ export const VideoContainer = styled.div`
   border-radius: 20px;
   overflow: hidden;
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+  class-name: video-container;
 
   &:before {
     display: block;
