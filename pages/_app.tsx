@@ -52,6 +52,9 @@ const GTM_ID = 'GTM-PWND8SN6';
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 
+// Microsoft Clarity ID
+const CLARITY_ID = 'rm0v2kcv7l';
+
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => { 
     if (typeof window !== 'undefined') {
@@ -95,6 +98,21 @@ function MyApp({ Component, pageProps }: AppProps) {
         dangerouslySetInnerHTML={{
           __html: `
             !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','${REDDIT_PIXEL_ID}');rdt('track', 'PageVisit');
+          `,
+        }}
+      />
+      
+      {/* Microsoft Clarity Code */}
+      <Script
+        id="clarity-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "${CLARITY_ID}");
           `,
         }}
       />
