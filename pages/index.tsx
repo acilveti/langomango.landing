@@ -167,6 +167,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               </ul>
             </BasicSection1>
             <Testimonials/>
+            <div id="cta-section-top">
+            <Cta onCtaClick={handleCtaClick} />
+          </div>
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer>
@@ -209,7 +212,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
               </p>
             </BasicSection>
           </div>
-
+          <div id="cta-section-top">
+            <Cta onCtaClick={handleCtaClick} />
+          </div>
           <div id="section-4">
             <BasicSection 
               reversed 
