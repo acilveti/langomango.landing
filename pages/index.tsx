@@ -15,7 +15,7 @@ import Partners from 'views/HomePage/Partners';
 import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-import { useEffect, useCallback, useRef } from 'react';
+import {useCallback, useEffect, useRef } from 'react';
 import { captureReferral } from 'utils/referral';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
@@ -32,10 +32,10 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 // Import the updated Reddit Pixel utilities with visibility tracking
 import { 
   getRedditPixelScript, 
-  trackRedditConversion, 
-  trackPageVisit,
+  RedditEventTypes, 
   setupAllSectionTracking,
-  RedditEventTypes 
+  trackPageVisit,
+  trackRedditConversion, 
 } from 'utils/redditPixel';
 
 // Reddit Pixel ID
