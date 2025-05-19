@@ -1,6 +1,9 @@
-// pages/index.tsx with Reddit Pixel events
+// Alternative approach: Using Script component instead of inline code
+// pages/index.tsx with Script component for Reddit Pixel
+
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
+import Script from 'next/script';
 import styled from 'styled-components';
 import BasicSection, {BasicSection1} from 'components/BasicSection';
 import Link from 'components/Link';
@@ -31,36 +34,20 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 
+// Define interface for window with rdt property
+interface WindowWithReddit extends Window {
+  rdt?: (...args: any[]) => void;
+}
+
+// Declare global window type
+declare global {
+  interface Window {
+    rdt?: (...args: any[]) => void;
+  }
+}
+
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
-  
-  // Track page view
-  useEffect(() => {
-    // Initialize Reddit Pixel if not already initialized
-    if (typeof window !== 'undefined' && !(window as any).rdt) {
-      // Fixed IIFE syntax for TypeScript
-      (function(w: any, d: Document) {
-        if (!w.rdt) {
-          const p = w.rdt = function() {
-            p.sendEvent ? p.sendEvent.apply(p, arguments) : p.callQueue.push(arguments);
-          };
-          p.callQueue = [];
-          const t = d.createElement("script");
-          t.src = "https://www.redditstatic.com/ads/pixel.js";
-          t.async = true;
-          const s = d.getElementsByTagName("script")[0];
-          s.parentNode?.insertBefore(t, s);
-        }
-      })(window, document);
-      
-      // Initialize with the pixel ID
-      (window as any).rdt('init', REDDIT_PIXEL_ID);
-      
-      // Track PageVisit event
-      (window as any).rdt('track', 'PageVisit');
-      console.log('Reddit Pixel: Tracked PageVisit event');
-    }
-  }, []);
   
   useEffect(() => {
     captureReferral();
@@ -68,7 +55,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   useEffect(() => { 
     if (typeof window !== 'undefined') {
-      // Add logging to verify script execution
       console.log('Initializing ContentSquare script');
       
       try {
@@ -86,13 +72,21 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   // Helper function to track Reddit events
   const trackRedditEvent = useCallback((eventType: string, customData?: any) => {
-    if (typeof window !== 'undefined' && (window as any).rdt) {
+    if (typeof window !== 'undefined' && window.rdt) {
       try {
-        (window as any).rdt('track', eventType, customData);
+        window.rdt('track', eventType, customData);
         console.log(`Reddit Pixel: Tracked ${eventType} event`, customData);
       } catch (error) {
         console.error('Reddit Pixel: Error tracking event', error);
       }
+    }
+  }, []);
+
+  // On load, track page view - this happens after the script loads
+  const handleRedditPixelLoad = useCallback(() => {
+    if (window.rdt) {
+      window.rdt('track', 'PageVisit');
+      console.log('Reddit Pixel: Tracked PageVisit event');
     }
   }, []);
 
@@ -113,7 +107,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   // Track pricing view event
   const handlePricingView = useCallback(() => {
-    // Use Intersection Observer to track when pricing section comes into view
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
       const observer = new IntersectionObserver(
         (entries) => {
@@ -139,12 +132,24 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   // Set up observers for tracking sections when they come into view
   useEffect(() => {
-    // We'll track the pricing section view after component mounts
     handlePricingView();
   }, [handlePricingView]);
   
   return (
     <>
+      {/* Reddit Pixel Base Code - Using Next.js Script component instead of inline code */}
+      <Script
+        id="reddit-pixel-base"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+            rdt('init', '${REDDIT_PIXEL_ID}');
+          `
+        }}
+        onLoad={handleRedditPixelLoad}
+      />
+      
       <Head>
         <title>{t('common:title')}</title>
         <meta name="description" content={t('common:description')} />
@@ -172,10 +177,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
             <YoutubeVideo 
               url="https://www.youtube.com/watch?v=L6JMhu2SrVs" 
-               // Track when video starts playing
             />
           </Wrapper>
-          <Cta /> {/* Pass the tracking handler to CTA component */}
+          <Cta />
           <FeaturesGallery />
           <BasicSection
             reversed
@@ -219,8 +223,8 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             </p>
           </BasicSection>
           
-          <Cta /> {/* Track bottom CTA as well */}
-          <div id="pricing-section"> {/* Add ID for intersection observer */}
+          <Cta />
+          <div id="pricing-section">
             <PricingTablesSection />
           </div>
           <FaqSection/>
@@ -307,13 +311,12 @@ const CustomAutofitGrid = styled(AutofitGrid)`
 `;
 
 export async function getStaticProps({ locale }: { locale: string }) {
-  // This line is essential
   const translations = await serverSideTranslations(locale, ['common', 'home']);
   
   return {
     props: {
       posts: await getAllPosts(),
-      ...translations, // Make sure this spread operator is here
+      ...translations,
     },
   };
 }
