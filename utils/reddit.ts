@@ -1,57 +1,60 @@
-// This can be placed in a utility file like 'utils/redditPixel.ts'
+// utils/redditPixel.ts - Updated to work with Next.js Script component approach
 
-interface RedditConversionEvent {
+// Define types for the Reddit Pixel
+declare global {
+    interface Window {
+      rdt?: (...args: any[]) => void;
+    }
+  }
+  
+  // Define interface for event data
+  export interface RedditConversionEvent {
     value?: number;
     currency?: string;
     transaction_id?: string;
     [key: string]: any; // For custom properties
   }
   
-  // Initialize Reddit Pixel
-  export const initRedditPixel = (pixelId: string): void => {
-    if (typeof window === 'undefined') return;
-    
-    // Check if rdt is already initialized
-    if ((window as any).rdt) return;
-    
-    // Add Reddit Pixel base code
-    !function(w: any, d: Document) {
-      if (!w.rdt) {
-        const p = w.rdt = function() {
-          p.sendEvent ? p.sendEvent.apply(p, arguments) : p.callQueue.push(arguments);
-        };
-        p.callQueue = [];
-        const t = d.createElement("script");
-        t.src = "https://www.redditstatic.com/ads/pixel.js";
-        t.async = true;
-        const s = d.getElementsByTagName("script")[0];
-        s.parentNode?.insertBefore(t, s);
-      }
-    }(window, document);
-    
-    // Initialize with the pixel ID
-    (window as any).rdt('init', pixelId);
-    
-    // Track default PageVisit event
-    (window as any).rdt('track', 'PageVisit');
+  /**
+   * Gets the Reddit Pixel script code as a string
+   * This is used inside a Next.js Script component with dangerouslySetInnerHTML
+   */
+  export const getRedditPixelScript = (pixelId: string): string => {
+    return `
+      !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+      rdt('init', '${pixelId}');
+    `;
   };
   
-  // Track specific Reddit conversion events
+  /**
+   * Tracks an event using the Reddit Pixel
+   * This function is safe to call even if the pixel isn't loaded yet
+   */
   export const trackRedditConversion = (
     eventType: string, 
     customData?: RedditConversionEvent
   ): void => {
-    if (typeof window === 'undefined' || !(window as any).rdt) return;
+    if (typeof window === 'undefined' || !window.rdt) return;
     
     try {
-      (window as any).rdt('track', eventType, customData);
+      window.rdt('track', eventType, customData);
       console.log(`Reddit Pixel: Tracked event ${eventType}`, customData);
     } catch (error) {
       console.error('Reddit Pixel: Error tracking event', error);
     }
   };
   
-  // Common event types you might want to track
+  /**
+   * Initializes tracking PageVisit event
+   * Should be called after the Reddit Pixel script has loaded
+   */
+  export const trackPageVisit = (): void => {
+    trackRedditConversion('PageVisit');
+  };
+  
+  /**
+   * Standard Reddit Pixel event types
+   */
   export const RedditEventTypes = {
     SIGNUP: 'SignUp',
     VIEW_CONTENT: 'ViewContent',
