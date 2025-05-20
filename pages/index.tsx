@@ -28,7 +28,6 @@ import YoutubeVideo from 'components/YoutubeVideo';
 import { media } from 'utils/media';
 import FaqSection from 'views/PricingPage/FaqSection';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
-
 // Import the updated Reddit Pixel utilities with visibility tracking
 import { 
   getRedditPixelScript, 
@@ -37,6 +36,7 @@ import {
   trackPageVisit,
   trackRedditConversion, 
 } from 'utils/redditPixel';
+import HeroSticky from 'views/HomePage/heroSticky';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -145,9 +145,19 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       <Head>
         <title>{t('common:title')}</title>
         <meta name="description" content={t('common:description')} />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
       <HomepageWrapper>
-        <WhiteBackgroundContainer>
+        <div id="hero-sticky-section">
+          <HeroSticky 
+            backgroundImage="/portada2.jpeg" 
+            title="You have just started to learn 28 german words"
+            subtitle="Keep scrolling to discover more"
+            overlayOpacity={0.1}
+          />
+        </div>
+        {/* Add the HeroSticky component at the very beginning */}
+        <WhiteBackgroundContainer className="white-background-container">
           <div id="hero-section">
             <Hero />
           </div>
@@ -253,6 +263,16 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       </HomepageWrapper>
 
       <style jsx global>{`
+        html, body {
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+        }
+        
+        html {
+          scroll-behavior: smooth;
+        }
+        
         span.wordWisePosition::before {
           content: attr(data-translation);
           position: absolute;
@@ -282,6 +302,27 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         span.wordWisePress:active::before {
           opacity: 1;
         }
+
+        /* Add styles to ensure proper spacing after the sticky hero */
+        #hero-sticky-section {
+          margin: 0;
+          padding: 0;
+          position: relative;
+          z-index: 1;
+          width: 100vw;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        
+        /* Add a shadow to create a transition effect */
+        .white-background-container {
+          position: relative;
+          z-index: 2;
+          box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.2);
+          border-top-left-radius: 20px;
+          border-top-right-radius: 20px;
+          margin-top: -20px;
+        }
       `}</style>
     </>
   );
@@ -291,6 +332,11 @@ const HomepageWrapper = styled.div`
   & > :last-child {
     margin-bottom: 15rem;
   }
+  
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
 `;
 
 const DarkerBackgroundContainer = styled.div`
