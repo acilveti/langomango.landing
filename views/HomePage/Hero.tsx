@@ -131,7 +131,7 @@ Hero() {
         <ImageColumn>
           <ImageContainer style={{ padding: '2px' }}>
             <NextImage
-              src={'/portada.jpeg'}
+              src={'/portada2resize.jpeg'}
               alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
               layout="fill"
               objectFit="cover"
