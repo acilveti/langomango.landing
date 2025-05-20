@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
+import AnimatedButton from './animatedButton';
 
 interface HeroStickyProps {
   backgroundImage: string;
@@ -20,11 +21,11 @@ export default function HeroSticky({
       <Overlay opacity={overlayOpacity} />
       <ContentWrapper>
         <Title>{title}</Title>
-        {subtitle && <Subtitle>{subtitle}</Subtitle>}
         <ScrollIndicator>
-          <ScrollText>Scroll Down</ScrollText>
-          <ScrollArrow>↓</ScrollArrow>
+          {/* <ScrollArrow>↓</ScrollArrow> */}
+          {/* <AnimatedButton>Free Trial</AnimatedButton> */}
         </ScrollIndicator>
+        {/* {subtitle && <Subtitle>{subtitle}</Subtitle>} */}
       </ContentWrapper>
     </HeroStickyWrapper>
   );
@@ -44,7 +45,7 @@ const HeroStickyWrapper = styled.div<{ backgroundImage: string }>`
   justify-content: center;
   padding-bottom: 5rem;
   margin: 0;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   overflow: hidden;
 `;
 
