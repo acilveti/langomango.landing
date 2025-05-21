@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
-import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
+import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 interface AnimatedButtonProps {
   text?: string;
@@ -10,7 +10,7 @@ interface AnimatedButtonProps {
   className?: string;
   showArrowAnimation?: boolean;
   trackingData?: {
-    eventType: RedditEventTypes;
+    eventType: typeof RedditEventTypes[keyof typeof RedditEventTypes];
     data: any;
   };
 }
