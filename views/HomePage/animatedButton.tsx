@@ -24,6 +24,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 }) => {
   
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    window.location.href = "https://beta-app.langomango.com/sign-up";
     // Track click with Reddit Pixel if tracking data is provided
     if (trackingData) {
       trackRedditConversion(trackingData.eventType, trackingData.data);
@@ -101,41 +102,5 @@ const Arrow = styled.span`
   }
 `;
 
-const AnimatedArrow = styled.div`
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 15px;
-  animation: bounceArrow 2s infinite;
-  
-  @keyframes bounceArrow {
-    0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0) translateX(-50%);
-    }
-    40% {
-      transform: translateY(10px) translateX(-50%);
-    }
-    60% {
-      transform: translateY(5px) translateX(-50%);
-    }
-  }
-`;
-
-const ArrowLine = styled.div`
-  width: 3px;
-  height: 30px;
-  background-color: rgb(var(--textSecondary));
-  margin: 0 auto;
-`;
-
-const ArrowHead = styled.div`
-  width: 0; 
-  height: 0; 
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid rgb(var(--textSecondary));
-  margin: 0 auto;
-`;
 
 export default AnimatedButton;

@@ -151,7 +151,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         <div id="hero-sticky-section">
           <HeroSticky 
             backgroundImage="/portada2.jpeg" 
-            title="You have just started to learn 28 german words"
+            title="You just started to learn 28 german words"
             subtitle="Keep scrolling to discover more"
             overlayOpacity={0.1}
           />

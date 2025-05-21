@@ -23,7 +23,7 @@ export default function HeroSticky({
         <Title>{title}</Title>
         <ScrollIndicator>
           {/* <ScrollArrow>↓</ScrollArrow> */}
-          {/* <AnimatedButton>Free Trial</AnimatedButton> */}
+          <AnimatedButton>Free Trial</AnimatedButton>
         </ScrollIndicator>
         {/* {subtitle && <Subtitle>{subtitle}</Subtitle>} */}
       </ContentWrapper>
@@ -64,7 +64,7 @@ const ContentWrapper = styled.div`
   text-align: center;
   padding: 0 2rem;
   position: relative;
-  margin-bottom: 1vh;
+  margin-bottom: 3vh;
   width: 100%;
   max-width: 1200px;
 `;
@@ -73,7 +73,7 @@ const Title = styled.h1`
   font-size: 4rem;
   color: white;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
-  margin: 0 0 1rem 0;
+  margin: 0 0 2rem 0;
   font-weight: 700;
   letter-spacing: 0.05em;
   
@@ -100,7 +100,7 @@ const Subtitle = styled.h2`
 
 const ScrollIndicator = styled.div`
   position: absolute;
-  bottom: -5rem;
+  bottom: -10rem;
   left: 50%;
   transform: translateX(-50%);
   color: white;
@@ -108,6 +108,7 @@ const ScrollIndicator = styled.div`
   flex-direction: column;
   align-items: center;
   animation: bounce 2s infinite;
+  margin: 2rem 0 2rem 0;
   
   @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {
@@ -120,16 +121,4 @@ const ScrollIndicator = styled.div`
       transform: translateY(-5px) translateX(-50%);
     }
   }
-`;
-
-const ScrollText = styled.span`
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.8;
-`;
-
-const ScrollArrow = styled.span`
-  font-size: 1.5rem;
 `;
