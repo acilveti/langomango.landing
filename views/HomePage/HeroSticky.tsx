@@ -26,13 +26,6 @@ export default function HeroSticky({
      
     // Set height on component mount
     setInitialHeight();
-    
-    // Prevent resize on scroll (browser UI appearance/disappearance)
-    window.addEventListener('resize', setInitialHeight);
-    
-    return () => {
-      window.removeEventListener('resize', setInitialHeight);
-    };
   }, []);
   return (
     <HeroStickyWrapper backgroundImage={backgroundImage} height={heroHeight}>
