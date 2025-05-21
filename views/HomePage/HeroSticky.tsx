@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import AnimatedButton from './animatedButton';
@@ -10,76 +10,114 @@ interface HeroStickyProps {
   overlayOpacity?: number;
 }
 
-export default function HeroSticky({ 
-  backgroundImage, 
-  title, 
+export default function HeroSticky({
+  backgroundImage,
+  title,
   subtitle,
-  overlayOpacity = 0.4 
+  overlayOpacity = 0.4
 }: HeroStickyProps) {
-  const [heroHeight, setHeroHeight] = useState('100vh'); 
-  
-  useEffect(() => { 
+  const [heroHeight, setHeroHeight] = useState('100vh');
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const secondTitleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
     // Set initial height
     const setInitialHeight = () => {
       const height = window.innerHeight;
       setHeroHeight(`${height}px`);
+      
+      // Calculate content height including the second title
+      if (contentRef.current && secondTitleRef.current) {
+        const contentHeight = contentRef.current.offsetHeight + secondTitleRef.current.offsetHeight + 40; // Add some padding
+        setContentHeight(contentHeight);
+      }
     };
-     
+
     // Set height on component mount
     setInitialHeight();
+
+    // Handle scroll events
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setScrollProgress(scrollPosition);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', setInitialHeight);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', setInitialHeight);
+    };
   }, []);
 
+  // Calculate whether to show the trial text based on scroll position
+  const shouldShowTrialText = scrollProgress > 50; // Show text after 50px of scrolling
+  
+  // Calculate dynamic overlay opacity based on scroll position
+  // Start with the initial overlayOpacity and increase to a maximum of 0.8
+  const dynamicOverlayOpacity = Math.min(overlayOpacity + (scrollProgress * 0.001), 0.8);
+
   return (
-    <HeroStickyWrapper height={heroHeight}>
+    <HeroContainer height={heroHeight} contentHeight={contentHeight} ref={heroRef}>
+      {/* Fixed background image and overlay */}
       <BackgroundImage backgroundImage={backgroundImage} />
-      <Overlay opacity={overlayOpacity} />
-      <ContentWrapper>
+      <Overlay opacity={dynamicOverlayOpacity} />
+      
+      {/* Scrollable content */}
+      <ContentWrapper ref={contentRef}>
         <Title>{title}</Title>
         <ScrollIndicator>
           <AnimatedButton>Free Trial</AnimatedButton>
         </ScrollIndicator>
-        {/* {subtitle && <Subtitle>{subtitle}</Subtitle>} */}
       </ContentWrapper>
-    </HeroStickyWrapper>
+      
+      {/* Second title that appears after scrolling */}
+      <SecondTitleWrapper visible={shouldShowTrialText} ref={secondTitleRef}>
+        <Title>
+          And when you finish the free trial, you will have read 30.000
+        </Title>
+      </SecondTitleWrapper>
+    </HeroContainer>
   );
 }
 
-const HeroStickyWrapper = styled.div<{ height: string }>`
+// Updated HeroContainer to account for content height
+const HeroContainer = styled.div<{ height: string; contentHeight: number }>`
   position: relative;
-  height: ${props => props.height};
+  min-height: ${props => `calc(${props.height} + ${props.contentHeight}px)`};
   width: 100%;
+  overflow: visible;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 5rem;
-  margin: 0;
-  margin-bottom: 10px;
-  overflow: hidden;
+  flex-direction: column;
 `;
 
 const BackgroundImage = styled.div<{ backgroundImage: string }>`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-image: url(${props => props.backgroundImage});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
-  /* Remove background-attachment: fixed */
 `;
 
 const Overlay = styled.div<{ opacity: number }>`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-color: #000;
   opacity: ${props => props.opacity};
   z-index: 1;
+  transition: opacity 0.3s ease;
 `;
 
 const ContentWrapper = styled.div`
@@ -87,9 +125,29 @@ const ContentWrapper = styled.div`
   text-align: center;
   padding: 0 2rem;
   position: relative;
-  margin-bottom: 5vh;
+  margin-top: calc(100vh - 30vh); /* Position at bottom as in original */
   width: 100%;
   max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+// New wrapper for the second title with visibility control
+const SecondTitleWrapper = styled.div<{ visible: boolean }>`
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto 0;
+  padding: 0 2rem;
+  text-align: center;
+  opacity: ${props => (props.visible ? 1 : 0)};
+  transform: translateY(${props => (props.visible ? 0 : '20px')});
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  height: ${props => (props.visible ? 'auto' : '0')};
+  overflow: ${props => (props.visible ? 'visible' : 'hidden')};
 `;
 
 const Title = styled.h1`
@@ -109,39 +167,23 @@ const Title = styled.h1`
   }
 `;
 
-const Subtitle = styled.h2`
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  margin: 0 0 2rem 0;
-  font-weight: 400;
-  
-  ${media('<=tablet')} {
-    font-size: 1.2rem;
-  }
-`;
-
 const ScrollIndicator = styled.div`
-  position: absolute;
-  bottom: -10rem;
-  left: 50%;
-  transform: translateX(-50%);
   color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   animation: bounce 2s infinite;
-  margin: 2rem 0 2rem 0;
+  margin: 2rem 0;
   
   @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0) translateX(-50%);
+      transform: translateY(0);
     }
     40% {
-      transform: translateY(-10px) translateX(-50%);
+      transform: translateY(-10px);
     }
     60% {
-      transform: translateY(-5px) translateX(-50%);
+      transform: translateY(-5px);
     }
   }
 `;
