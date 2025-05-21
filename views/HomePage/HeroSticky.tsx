@@ -17,6 +17,7 @@ export default function HeroSticky({
   overlayOpacity = 0.4 
 }: HeroStickyProps) {
   const [heroHeight, setHeroHeight] = useState('100vh'); 
+  
   useEffect(() => { 
     // Set initial height
     const setInitialHeight = () => {
@@ -28,13 +29,12 @@ export default function HeroSticky({
     setInitialHeight();
   }, []);
 
-  console.log("heroHeight", heroHeight)
   return (
-    <HeroStickyWrapper backgroundImage={backgroundImage} height={heroHeight}>
+    <HeroStickyWrapper height={heroHeight}>
+      <BackgroundImage backgroundImage={backgroundImage} />
       <Overlay opacity={overlayOpacity} />
       <ContentWrapper>
-      <Title>{title}</Title>
-      <Title>{heroHeight}</Title>
+        <Title>{title}</Title>
         <ScrollIndicator>
           <AnimatedButton>Free Trial</AnimatedButton>
         </ScrollIndicator>
@@ -44,15 +44,10 @@ export default function HeroSticky({
   );
 }
 
-const HeroStickyWrapper = styled.div<{ backgroundImage: string; height: string }>`
+const HeroStickyWrapper = styled.div<{ height: string }>`
   position: relative;
   height: ${props => props.height};
   width: 100%;
-  background-image: url(${props => props.backgroundImage});
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* This makes the background stay in place when scrolling */
-  background-repeat: no-repeat;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -60,6 +55,20 @@ const HeroStickyWrapper = styled.div<{ backgroundImage: string; height: string }
   margin: 0;
   margin-bottom: 10px;
   overflow: hidden;
+`;
+
+const BackgroundImage = styled.div<{ backgroundImage: string }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(${props => props.backgroundImage});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  /* Remove background-attachment: fixed */
 `;
 
 const Overlay = styled.div<{ opacity: number }>`
@@ -70,10 +79,11 @@ const Overlay = styled.div<{ opacity: number }>`
   height: 100%;
   background-color: #000;
   opacity: ${props => props.opacity};
+  z-index: 1;
 `;
 
 const ContentWrapper = styled.div`
-  z-index: 1;
+  z-index: 2;
   text-align: center;
   padding: 0 2rem;
   position: relative;
