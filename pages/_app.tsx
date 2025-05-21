@@ -117,8 +117,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       
+      {/* Umami Analytics */}
+      <Script
+        id="umami-analytics"
+        src="https://cloud.umami.is/script.js"
+        data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"
+        strategy="afterInteractive"
+      />
+      
       <Head>
-        <script defer src="https://cloud.umami.is/script.js" data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />

@@ -1,4 +1,4 @@
-// pages/index.tsx - Updated with component visibility tracking and time tracking
+// pages/index.tsx - Updated with conditional page visit tracking
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -15,7 +15,7 @@ import Partners from 'views/HomePage/Partners';
 import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-import {useCallback, useEffect, useRef } from 'react';
+import {useCallback, useEffect, useRef, useState } from 'react';
 import { captureReferral } from 'utils/referral';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
@@ -45,6 +45,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
   
+  // New state variables to track our conditions
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [pageVisitTracked, setPageVisitTracked] = useState(false);
+  const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
   useEffect(() => {
     captureReferral();
   }, []);
@@ -65,6 +71,53 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       }
     }
   }, []);
+
+  // Track scroll and set hasScrolled when any scroll occurs
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleScroll = () => {
+      if (!hasScrolled) {
+        setHasScrolled(true);
+        console.log('User has scrolled');
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasScrolled]);
+
+  // Timer to track time spent on page
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Set up a timer that increments every second
+    timeIntervalRef.current = setInterval(() => {
+      setTimeSpent(prevTime => prevTime + 1);
+    }, 1000);
+    
+    return () => {
+      if (timeIntervalRef.current) {
+        clearInterval(timeIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Check conditions and track page visit when both are met
+  useEffect(() => {
+    // Only proceed if we haven't already tracked the visit
+    if (!pageVisitTracked && hasScrolled && timeSpent >= 5) {
+      console.log('Both conditions met: tracked page visit after 5s and scroll');
+      trackPageVisit();
+      setPageVisitTracked(true);
+      
+      // Now that we've tracked the visit, we can initialize section tracking
+      if (!sectionsInitialized.current) {
+        setupAllSectionTracking();
+        sectionsInitialized.current = true;
+      }
+    }
+  }, [hasScrolled, timeSpent, pageVisitTracked]);
 
   // Track scroll depth for engagement
   useEffect(() => {
@@ -100,18 +153,10 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
     return () => window.removeEventListener('scroll', trackScrollDepth);
   }, []);
 
-  // On load, track page visit and set up visibility tracking
+  // Reddit Pixel load handler - now we DON'T track page visit here
   const handleRedditPixelLoad = useCallback(() => {
-    // Track page visit
-    trackPageVisit();
-    
-    // Initialize section tracking after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      if (!sectionsInitialized.current) {
-        setupAllSectionTracking();
-        sectionsInitialized.current = true;
-      }
-    }, 1000);
+    console.log('Reddit Pixel loaded - waiting for conditions to track page visit');
+    // We no longer track page visit immediately, but wait for conditions
   }, []);
 
   // Track video view event
