@@ -16,29 +16,12 @@ export default function HeroSticky({
   subtitle,
   overlayOpacity = 0.4
 }: HeroStickyProps) {
-  const [heroHeight, setHeroHeight] = useState('100vh');
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [contentHeight, setContentHeight] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const secondTitleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    // Set initial height
-    const setInitialHeight = () => {
-      const height = window.innerHeight;
-      setHeroHeight(`${height}px`);
-      
-      // Calculate content height including the second title
-      if (contentRef.current && secondTitleRef.current) {
-        const contentHeight = contentRef.current.offsetHeight + secondTitleRef.current.offsetHeight + 40; // Add some padding
-        setContentHeight(contentHeight);
-      }
-    };
-
-    // Set height on component mount
-    setInitialHeight();
-
     // Handle scroll events
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -46,11 +29,9 @@ export default function HeroSticky({
     };
 
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', setInitialHeight);
-
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', setInitialHeight);
     };
   }, []);
 
@@ -62,12 +43,14 @@ export default function HeroSticky({
   const dynamicOverlayOpacity = Math.min(overlayOpacity + (scrollProgress * 0.001), 0.8);
 
   return (
-    <HeroContainer height={heroHeight} contentHeight={contentHeight} ref={heroRef}>
+    <HeroWrapper ref={heroRef}>
       {/* Fixed background image and overlay */}
-      <BackgroundImage backgroundImage={backgroundImage} />
-      <Overlay opacity={dynamicOverlayOpacity} />
+      <BackgroundContainer>
+        <BackgroundImage backgroundImage={backgroundImage} />
+        <Overlay opacity={dynamicOverlayOpacity} />
+      </BackgroundContainer>
       
-      {/* Scrollable content */}
+      {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>{title}</Title>
         <ScrollIndicator>
@@ -81,51 +64,57 @@ export default function HeroSticky({
           And when you finish the free trial, you will have read 30.000
         </Title>
       </SecondTitleWrapper>
-    </HeroContainer>
+    </HeroWrapper>
   );
 }
 
-// Updated HeroContainer to account for content height
-const HeroContainer = styled.div<{ height: string; contentHeight: number }>`
+// Main wrapper that contains everything
+const HeroWrapper = styled.div`
   position: relative;
-  min-height: ${props => `calc(${props.height} + ${props.contentHeight}px)`};
   width: 100%;
-  overflow: visible;
   display: flex;
   flex-direction: column;
 `;
 
-const BackgroundImage = styled.div<{ backgroundImage: string }>`
+// Container for fixed background elements
+const BackgroundContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
+  z-index: 0;
+`;
+
+const BackgroundImage = styled.div<{ backgroundImage: string }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-image: url(${props => props.backgroundImage});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0;
 `;
 
 const Overlay = styled.div<{ opacity: number }>`
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #000;
   opacity: ${props => props.opacity};
-  z-index: 1;
   transition: opacity 0.3s ease;
 `;
 
 const ContentWrapper = styled.div`
+  position: relative;
   z-index: 2;
   text-align: center;
   padding: 0 2rem;
-  position: relative;
-  margin-top: calc(100vh - 30vh); /* Position at bottom as in original */
+  margin-top: 70vh; /* Position content 70% down the viewport */
   width: 100%;
   max-width: 1200px;
   margin-left: auto;
@@ -135,19 +124,20 @@ const ContentWrapper = styled.div`
   align-items: center;
 `;
 
-// New wrapper for the second title with visibility control
+// Second title with visibility control
 const SecondTitleWrapper = styled.div<{ visible: boolean }>`
+  position: relative;
   z-index: 2;
   width: 100%;
   max-width: 1200px;
-  margin: 2rem auto 0;
+  margin: 2rem auto 4rem; /* Add bottom margin to ensure space after this element */
   padding: 0 2rem;
   text-align: center;
   opacity: ${props => (props.visible ? 1 : 0)};
   transform: translateY(${props => (props.visible ? 0 : '20px')});
   transition: opacity 0.6s ease, transform 0.6s ease;
-  height: ${props => (props.visible ? 'auto' : '0')};
-  overflow: ${props => (props.visible ? 'visible' : 'hidden')};
+  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
+  pointer-events: ${props => (props.visible ? 'auto' : 'none')};
 `;
 
 const Title = styled.h1`

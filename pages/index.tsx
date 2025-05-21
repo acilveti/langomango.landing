@@ -227,7 +227,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
           </div>
         </WhiteBackgroundContainer>
-        <DarkerBackgroundContainer>
+        <DarkerBackgroundContainer className="front-element">
           <div id="video-section">
             <Wrapper>
               <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
@@ -353,7 +353,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           margin: 0;
           padding: 0;
           position: relative;
-          z-index: 1;
+          z-index: -99;
           width: 100vw;
           max-width: 100%;
           overflow: hidden;
@@ -368,6 +368,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           border-top-right-radius: 20px;
           margin-top: -20px;
         }
+
+        .front-element {
+          position: relative;
+          z-index: 2;
+         
+        }
       `}</style>
     </>
   );
@@ -375,7 +381,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
 const HomepageWrapper = styled.div`
   & > :last-child {
-    margin-bottom: 15rem;
+    margin-bottom: 0rem;
   }
   
   margin: 0;
@@ -388,7 +394,7 @@ const DarkerBackgroundContainer = styled.div`
   background: rgb(var(--background));
 
   & > *:not(:first-child) {
-    margin-top: 15rem;
+    padding-top: 5rem;
   }
 `;
 
