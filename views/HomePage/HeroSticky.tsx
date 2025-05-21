@@ -27,11 +27,14 @@ export default function HeroSticky({
     // Set height on component mount
     setInitialHeight();
   }, []);
+
+  console.log("heroHeight", heroHeight)
   return (
     <HeroStickyWrapper backgroundImage={backgroundImage} height={heroHeight}>
       <Overlay opacity={overlayOpacity} />
       <ContentWrapper>
-        <Title>{title}</Title>
+      <Title>{title}</Title>
+      <Title>{heroHeight}</Title>
         <ScrollIndicator>
           <AnimatedButton>Free Trial</AnimatedButton>
         </ScrollIndicator>
