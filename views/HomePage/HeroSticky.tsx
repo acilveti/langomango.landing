@@ -23,7 +23,7 @@ export default function HeroSticky({
       const height = window.innerHeight;
       setHeroHeight(`${height}px`);
     };
-    
+     
     // Set height on component mount
     setInitialHeight();
     
@@ -35,12 +35,11 @@ export default function HeroSticky({
     };
   }, []);
   return (
-    <HeroStickyWrapper backgroundImage={backgroundImage}>
+    <HeroStickyWrapper backgroundImage={backgroundImage} height={heroHeight}>
       <Overlay opacity={overlayOpacity} />
       <ContentWrapper>
         <Title>{title}</Title>
         <ScrollIndicator>
-          {/* <ScrollArrow>↓</ScrollArrow> */}
           <AnimatedButton>Free Trial</AnimatedButton>
         </ScrollIndicator>
         {/* {subtitle && <Subtitle>{subtitle}</Subtitle>} */}
@@ -49,9 +48,9 @@ export default function HeroSticky({
   );
 }
 
-const HeroStickyWrapper = styled.div<{ backgroundImage: string }>`
+const HeroStickyWrapper = styled.div<{ backgroundImage: string; height: string }>`
   position: relative;
-  height: 100vh ;
+  height: ${props => props.height};
   width: 100%;
   background-image: url(${props => props.backgroundImage});
   background-size: cover;
