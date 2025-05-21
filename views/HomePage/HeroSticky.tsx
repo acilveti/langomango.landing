@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import AnimatedButton from './animatedButton';
@@ -16,6 +16,24 @@ export default function HeroSticky({
   subtitle,
   overlayOpacity = 0.4 
 }: HeroStickyProps) {
+  const [heroHeight, setHeroHeight] = useState('100vh'); 
+  useEffect(() => { 
+    // Set initial height
+    const setInitialHeight = () => {
+      const height = window.innerHeight;
+      setHeroHeight(`${height}px`);
+    };
+    
+    // Set height on component mount
+    setInitialHeight();
+    
+    // Prevent resize on scroll (browser UI appearance/disappearance)
+    window.addEventListener('resize', setInitialHeight);
+    
+    return () => {
+      window.removeEventListener('resize', setInitialHeight);
+    };
+  }, []);
   return (
     <HeroStickyWrapper backgroundImage={backgroundImage}>
       <Overlay opacity={overlayOpacity} />
@@ -33,7 +51,7 @@ export default function HeroSticky({
 
 const HeroStickyWrapper = styled.div<{ backgroundImage: string }>`
   position: relative;
-  height: 100vh;
+  height: 100vh ;
   width: 100%;
   background-image: url(${props => props.backgroundImage});
   background-size: cover;
