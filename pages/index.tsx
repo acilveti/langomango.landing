@@ -36,7 +36,7 @@ import {
   trackPageVisit,
   trackRedditConversion, 
 } from 'utils/redditPixel';
-import HeroSticky from 'views/HomePage/heroSticky';
+import HeroSticky from 'views/HomePage/HeroSticky';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
