@@ -7,20 +7,32 @@ import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
-import { useTranslation } from 'next-i18next'; // Import the translation hook
+import { useTranslation } from 'next-i18next';
+
+// Define the proper type for objectFit
+type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+
+interface TabItem {
+  titleKey: string;
+  descriptionKey: string;
+  imageUrl: string | null;
+  baseColor: string;
+  secondColor: string;
+  objectFit: ObjectFit | null;
+}
 
 export default function FeaturesGallery() {
-  const { t } = useTranslation(); // Initialize the translation hook
+  const { t } = useTranslation();
   
-  // Define tabs with translation keys instead of hardcoded text
-  const TABS = [
+  // Define tabs with proper typing
+  const TABS: TabItem[] = [
     {
       titleKey: 'features.tabs.smart_assistance.title',
       descriptionKey: 'features.tabs.smart_assistance.description',
       imageUrl: '/feature2.jpeg',
       baseColor: '249,82,120',
       secondColor: '221,9,57',
-      objectFit: 'cover', // First image will be covered
+      objectFit: 'cover' as ObjectFit, // Explicitly type as ObjectFit
     },
     {
       titleKey: 'features.tabs.instant_translation.title',
@@ -28,7 +40,7 @@ export default function FeaturesGallery() {
       imageUrl: '/wordwise-text.jpeg',
       baseColor: '57,148,224',
       secondColor: '99,172,232',
-      objectFit: 'contain', // Second image will contain
+      objectFit: 'contain' as ObjectFit, // Explicitly type as ObjectFit
     },
     {
       titleKey: 'features.tabs.adjustable_language.title',
@@ -36,12 +48,12 @@ export default function FeaturesGallery() {
       imageUrl: '/translated-text.jpeg',
       baseColor: '88,193,132',
       secondColor: '124,207,158',
-      objectFit: 'contain', // Third image will contain
+      objectFit: 'contain' as ObjectFit, // Explicitly type as ObjectFit
     },
     {
       titleKey: 'features.tabs.fourth_feature.title',
       descriptionKey: 'features.tabs.fourth_feature.description',
-      imageUrl: null, // No image for the fourth tab
+      imageUrl: null,
       baseColor: '156,39,176',
       secondColor: '186,104,200',
       objectFit: null, // No object fit needed since there's no image
@@ -60,7 +72,6 @@ export default function FeaturesGallery() {
   const featuresMarkup = translatedTabs.map((singleTab, idx) => {
     const isActive = singleTab.title === currentTab.title;
     const isFirst = idx === 0;
-    const isLast = idx === translatedTabs.length - 1;
 
     return (
       <FeatureItem key={singleTab.title}>
@@ -78,8 +89,8 @@ export default function FeaturesGallery() {
           </Collapse>
         </Tab>
         
-        {/* Show image for tabs that have imageUrl (first 3 tabs) */}
-        {singleTab.imageUrl && (
+        {/* Show image for tabs that have imageUrl and objectFit */}
+        {singleTab.imageUrl && singleTab.objectFit && (
           <ImageContainer>
             <NextImage 
               src={singleTab.imageUrl} 
