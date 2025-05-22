@@ -144,7 +144,7 @@ const Description = styled.div`
 const Stack = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 12.5rem 0;
+  padding: 4rem 0;
   color: rgb(var(--textSecondary));
   text-align: center;
   align-items: center;

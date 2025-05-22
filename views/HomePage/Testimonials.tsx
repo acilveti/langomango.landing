@@ -25,14 +25,14 @@ const TESTIMONIALS = [
       avatarUrl: '/testimonials/default-redditor.png',
     },
   },
-  {
-    content: `I don't think you're overinvested at all! Lol No, this is so useful! Reading is really important for learning, but tbh the content that is offered is either too expensive or uninteresting to me. Kindle does have e.g., a Spanish dictionary if you want to read in Spanish and translate occasionally, but it's been hit or miss for me. Being and to read what I want (which I already do) and lean at the same time is such a fantastic idea.`,
-    author: {
-      name: 'kmzafari',
-      title: 'Redditor, reader and language learner',
-      avatarUrl: '/testimonials/kmzafari.png',
-    },
-  },
+  // {
+  //   content: `This is so useful! Reading is really important for learning, but tbh the content that is offered is either too expensive or uninteresting to me. Kindle does have e.g., a Spanish dictionary if you want to read in Spanish and translate occasionally, but it's been hit or miss for me. Being and to read what I want (which I already do) and lean at the same time is such a fantastic idea.`,
+  //   author: {
+  //     name: 'kmzafari',
+  //     title: 'Redditor, reader and language learner',
+  //     avatarUrl: '/testimonials/kmzafari.png',
+  //   },
+  // },
   
   {
     content: `Besides that, the main selling point for me, for which I’d be down to spent the subscription, is that it runs on e readers. I hate reading on my phone but for language learning there is not really a comfortable and as efficient way to do it compared to any other digital device.`,
