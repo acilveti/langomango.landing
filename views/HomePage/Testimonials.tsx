@@ -184,11 +184,7 @@ const Title = styled.h1`
   line-height: 1.1;
   margin-bottom: 4rem;
   letter-spacing: -0.03em;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
   max-width: 100%;
-  word-break: break-all;
 
   ${media('<=tablet')} {
     font-size: 4.6rem;
