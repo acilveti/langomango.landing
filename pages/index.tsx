@@ -203,6 +203,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
           <div id="section-1">
             {/* Pass the title and overTitle to Testimonials */}
+          <div id="features-section">
+            <FeaturesGallery />
+          </div>
             <Testimonials title={t('home:section1.title')} overTitle={t('home:section1.overTitle')} />
 
             <div id="cta-section-top">
@@ -211,10 +214,10 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer className="front-element">
-          <div id="features-section">
-            <FeaturesGallery />
-          </div>
           <div id="video-section">
+          <div id="section-5">
+            <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
+          </div>
             <Wrapper>
               <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
               <YoutubeVideo url="https://www.youtube.com/watch?v=L6JMhu2SrVs" onPlay={handleVideoPlay} />
@@ -222,34 +225,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
           <div id="cta-section-top">
             <Cta onCtaClick={handleCtaClick} />
-          </div>
-          {/* <div id="section-2">
-            <BasicSection reversed imageUrl="/smart-reading.svg" title={t('home:section2.title')} overTitle={t('home:section2.overTitle')}>
-              <p>{t('home:section2.description')}</p>
-            </BasicSection>
-          </div>
-
-          <div id="section-3">
-            <BasicSection imageUrl="/smart-chat.svg" title={t('home:section3.title')} overTitle={t('home:section3.overTitle')}>
-              <p>{t('home:section3.description')}</p>
-            </BasicSection>
-          </div>
-          <div id="cta-section-top">
-            <Cta onCtaClick={handleCtaClick} />
-          </div>
-          <div id="section-4">
-            <BasicSection
-              reversed
-              imageUrl="/smart-reading-news.svg"
-              title={t('home:section4.title')}
-              overTitle={t('home:section4.overTitle')}
-            >
-              <p>{t('home:section4.description')}</p>
-            </BasicSection>
-          </div> */}
-
-          <div id="section-5">
-            <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
           </div>
 
           {/* <div id="cta-section-bottom">

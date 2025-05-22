@@ -17,6 +17,7 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
   const { title, url, onPlay } = props;
   const videoHash = extractVideoHashFromUrl(url);
   const hasTrackedImpression = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Track video impression when component mounts
   useEffect(() => {
@@ -105,8 +106,35 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
     };
   }, []);
   
+  // Set up intersection observer for visibility tracking
+  useEffect(() => {
+    if (containerRef.current && typeof IntersectionObserver !== 'undefined') {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              trackRedditConversion(RedditEventTypes.SECTION_VISIBLE, {
+                section_name: 'Video Player',
+                content_id: videoHash,
+                visibility_percent: Math.round(entry.intersectionRatio * 100)
+              });
+              observer.disconnect();
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+      
+      observer.observe(containerRef.current);
+      
+      return () => {
+        observer.disconnect();
+      };
+    }
+  }, [videoHash]);
+  
   return (
-    <VideoContainer>
+    <VideoContainer ref={containerRef} className="video-container">
       <VideoFrame
         className=""
         width="100%"
@@ -118,28 +146,6 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
         allowFullScreen
         title={title}
         loading="lazy"
-        onLoad={() => {
-          // Track video loaded as visible
-          if (typeof IntersectionObserver !== 'undefined') {
-            const observer = new IntersectionObserver(
-              (entries) => {
-                entries.forEach(entry => {
-                  if (entry.isIntersecting) {
-                    trackRedditConversion(RedditEventTypes.SECTION_VISIBLE, {
-                      section_name: 'Video Player',
-                      content_id: videoHash,
-                      visibility_percent: Math.round(entry.intersectionRatio * 100)
-                    });
-                    observer.disconnect();
-                  }
-                });
-              },
-              { threshold: 0.5 }
-            );
-            
-            observer.observe(document.querySelector('.video-container') as Element);
-          }
-        }}
       />
     </VideoContainer>
   );
@@ -163,7 +169,6 @@ export const VideoContainer = styled.div`
   border-radius: 20px;
   overflow: hidden;
   -webkit-mask-image: -webkit-radial-gradient(white, black);
-  class-name: video-container;
 
   &:before {
     display: block;

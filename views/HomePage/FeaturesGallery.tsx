@@ -151,7 +151,8 @@ const Content = styled.div`
   & > *:not(:first-child) {
     margin-top: 1rem;
   }
-  text-align: center;
+  text-align: left;
+  width: 100%;
 `;
 
 const ImageContainer = styled.div`
@@ -201,6 +202,8 @@ const TabTitleContainer = styled.div`
 
   h4 {
     flex: 1;
+    text-align: left;
+    margin: 0;
   }
 `;
 
