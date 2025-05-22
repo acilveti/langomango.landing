@@ -221,7 +221,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             </Wrapper>
           </div>
           <div id="cta-section-top">
-            <Cta onCtaClick={handleCtaClick} />
+            <Cta imageSrc="/drake.jpeg" imageAlt="Sign up illustration"onCtaClick={handleCtaClick} />
           </div>
           {/* <div id="section-2">
             <BasicSection reversed imageUrl="/smart-reading.svg" title={t('home:section2.title')} overTitle={t('home:section2.overTitle')}>
