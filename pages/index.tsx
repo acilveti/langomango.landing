@@ -31,6 +31,7 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 // Import the updated Reddit Pixel utilities with visibility tracking
 import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
+import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -210,6 +211,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer className="front-element">
+          <div id="features-section">
+            <FeaturesGallery />
+          </div>
           <div id="video-section">
             <Wrapper>
               <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
@@ -219,10 +223,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="cta-section-top">
             <Cta onCtaClick={handleCtaClick} />
           </div>
-          <div id="features-section">
-            <FeaturesGallery />
-          </div>
-          <div id="section-2">
+          {/* <div id="section-2">
             <BasicSection reversed imageUrl="/smart-reading.svg" title={t('home:section2.title')} overTitle={t('home:section2.overTitle')}>
               <p>{t('home:section2.description')}</p>
             </BasicSection>
@@ -245,17 +246,15 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             >
               <p>{t('home:section4.description')}</p>
             </BasicSection>
-          </div>
+          </div> */}
 
           <div id="section-5">
-            <BasicSection imageUrl="/smart-reading-novels.svg" title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}>
-              <p>{t('home:section5.description')}</p>
-            </BasicSection>
+            <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
           </div>
 
-          <div id="cta-section-bottom">
+          {/* <div id="cta-section-bottom">
             <Cta onCtaClick={handleCtaClick} />
-          </div>
+          </div> */}
           <div id="pricing-section">
             <PricingTablesSection />
           </div>

@@ -17,23 +17,34 @@ export default function FeaturesGallery() {
     {
       titleKey: 'features.tabs.smart_assistance.title',
       descriptionKey: 'features.tabs.smart_assistance.description',
-      imageUrl: '/feature1.jpeg',
+      imageUrl: '/feature2.jpeg',
       baseColor: '249,82,120',
       secondColor: '221,9,57',
+      objectFit: 'cover', // First image will be covered
     },
     {
       titleKey: 'features.tabs.instant_translation.title',
       descriptionKey: 'features.tabs.instant_translation.description',
-      imageUrl: '/feature3.jpeg',
+      imageUrl: '/wordwise-text.jpeg',
       baseColor: '57,148,224',
       secondColor: '99,172,232',
+      objectFit: 'contain', // Second image will contain
     },
     {
       titleKey: 'features.tabs.adjustable_language.title',
       descriptionKey: 'features.tabs.adjustable_language.description',
-      imageUrl: '/feature2.jpeg',
+      imageUrl: '/translated-text.jpeg',
       baseColor: '88,193,132',
       secondColor: '124,207,158',
+      objectFit: 'contain', // Third image will contain
+    },
+    {
+      titleKey: 'features.tabs.fourth_feature.title',
+      descriptionKey: 'features.tabs.fourth_feature.description',
+      imageUrl: null, // No image for the fourth tab
+      baseColor: '156,39,176',
+      secondColor: '186,104,200',
+      objectFit: null, // No object fit needed since there's no image
     },
   ];
 
@@ -46,34 +57,40 @@ export default function FeaturesGallery() {
 
   const [currentTab, setCurrentTab] = useState(translatedTabs[0]);
 
-  const imagesMarkup = translatedTabs.map((singleTab, idx) => {
+  const featuresMarkup = translatedTabs.map((singleTab, idx) => {
     const isActive = singleTab.title === currentTab.title;
     const isFirst = idx === 0;
+    const isLast = idx === translatedTabs.length - 1;
 
     return (
-      <ImageContainer key={singleTab.title} isActive={isActive}>
-        <NextImage src={singleTab.imageUrl} alt={singleTab.title} layout="fill" objectFit="cover" priority={isFirst} />
-      </ImageContainer>
-    );
-  });
-
-  const tabsMarkup = translatedTabs.map((singleTab, idx) => {
-    const isActive = singleTab.title === currentTab.title;
-
-    return (
-      <Tab isActive={isActive} key={idx} onClick={() => handleTabClick(idx)}>
-        <TabTitleContainer>
-          <CircleContainer>
-            <ThreeLayersCircle baseColor={isActive ? 'transparent' : singleTab.baseColor} secondColor={singleTab.secondColor} />
-          </CircleContainer>
-          <h4>{singleTab.title}</h4>
-        </TabTitleContainer>
-        <Collapse isOpen={isActive} duration={300}>
-          <TabContent>
-            <div dangerouslySetInnerHTML={{ __html: singleTab.description }}></div>
-          </TabContent>
-        </Collapse>
-      </Tab>
+      <FeatureItem key={singleTab.title}>
+        <Tab isActive={isActive} onClick={() => handleTabClick(idx)}>
+          <TabTitleContainer>
+            <CircleContainer>
+              <ThreeLayersCircle baseColor={isActive ? 'transparent' : singleTab.baseColor} secondColor={singleTab.secondColor} />
+            </CircleContainer>
+            <h4>{singleTab.title}</h4>
+          </TabTitleContainer>
+          <Collapse isOpen={true} duration={300}>
+            <TabContent>
+              <div dangerouslySetInnerHTML={{ __html: singleTab.description }}></div>
+            </TabContent>
+          </Collapse>
+        </Tab>
+        
+        {/* Show image for tabs that have imageUrl (first 3 tabs) */}
+        {singleTab.imageUrl && (
+          <ImageContainer>
+            <NextImage 
+              src={singleTab.imageUrl} 
+              alt={singleTab.title} 
+              layout="fill" 
+              objectFit={singleTab.objectFit} 
+              priority={isFirst} 
+            />
+          </ImageContainer>
+        )}
+      </FeatureItem>
     );
   });
 
@@ -87,10 +104,9 @@ export default function FeaturesGallery() {
         <OverTitle>{t('features.overTitle')}</OverTitle>
         <SectionTitle>{t('features.title')}</SectionTitle>
       </Content>
-      <GalleryWrapper>
-        <TabsContainer>{tabsMarkup}</TabsContainer>
-        {imagesMarkup}
-      </GalleryWrapper>
+      <FeaturesContainer>
+        {featuresMarkup}
+      </FeaturesContainer>
     </FeaturesGalleryWrapper>
   );
 }
@@ -102,14 +118,22 @@ const FeaturesGalleryWrapper = styled(Container)`
   justify-content: center;
 `;
 
-const GalleryWrapper = styled.div`
+const FeaturesContainer = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  width: 100%;
   margin-top: 4rem;
+  gap: 3rem;
 
   ${media('<=desktop')} {
-    flex-direction: column;
+    gap: 2rem;
   }
+`;
+
+const FeatureItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `;
 
 const Content = styled.div`
@@ -119,27 +143,16 @@ const Content = styled.div`
   text-align: center;
 `;
 
-const TabsContainer = styled.div`
-  flex: 1;
-  margin-right: 4rem;
-
-  & > *:not(:first-child) {
-    margin-top: 2rem;
-  }
-
-  ${media('<=desktop')} {
-    margin-right: 0;
-    margin-bottom: 4rem;
-    width: 100%;
-  }
-`;
-
-const ImageContainer = styled.div<{ isActive: boolean }>`
+const ImageContainer = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 0.8rem;
-  flex: ${(p) => (p.isActive ? '2' : '0')};
+  border: 2px solid #d1d5db; /* Light grey border */
+  background: #f3f4f6; /* Light grey background */
+  padding: 10px;
   box-shadow: var(--shadow-md);
+  margin-top: 2rem;
+  width: 100%;
 
   &:before {
     display: block;
@@ -155,10 +168,6 @@ const ImageContainer = styled.div<{ isActive: boolean }>`
     bottom: 0;
     left: 0;
   }
-
-  ${media('<=desktop')} {
-    width: ${(p) => (p.isActive ? '100%' : '0')};
-  }
 `;
 
 const Tab = styled.div<{ isActive: boolean }>`
@@ -167,17 +176,12 @@ const Tab = styled.div<{ isActive: boolean }>`
   padding: 2rem 1.5rem;
   background: rgb(var(--cardBackground));
   box-shadow: var(--shadow-md);
-  opacity: ${(p) => (p.isActive ? 1 : 0.6)};
   cursor: pointer;
   border-radius: 0.6rem;
   transition: opacity 0.2s;
 
   font-size: 1.6rem;
   font-weight: bold;
-
-  ${media('<=desktop')} {
-    width: 100%;
-  }
 `;
 
 const TabTitleContainer = styled.div`

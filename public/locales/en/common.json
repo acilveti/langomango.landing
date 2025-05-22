@@ -6,20 +6,24 @@
   "startReading": "Start free trial",
   "areYouAuthor": "Are you an author?",
   "features": {
-    "title": "What are the key features of the app?",
+    "title": "How does it work?",
     "overTitle": "key features",
     "tabs": {
       "smart_assistance": {
-        "title": "Smart assistance for easy learning",
-        "description": "Get in text assistance for reading in your target learning for an easy learning language experience. Get a fluent reading even in not learned parts."
+        "title": "Get an ebook you want to read and start reading",
+        "description": "Choose a book of your liking, upload to the app, get confortable, and start reading."
       },
       "instant_translation": {
-        "title": "Whole sentences instant translation in just one tap",
-        "description": "Sometimes you just do not understand a sentence or word. Get immediate translations to make the term association and learning possible almost instantly."
+        "title": "While you read, you will encounter sentences in both languages",
+        "description": "Congrats!, your mind is starting to memorize and stablishing relations between words, sentences, meanings and contexts after each encounter."
       },
       "adjustable_language": {
-        "title": "Adjustable target language presence in your text",
-        "description": "Control how much exposure you have to your learning target language to adapt to fit your level. Achieve a point to enjoy and learn at the same time."
+        "title": "You will continue reading, and will also find sentences only in your learning language",
+        "description": "The algorithm is pushing you, but if you do not understand the sentence, with just a long press you will translate it at the moment. This will help to reinforce the learning. Think in a flashcard"
+      },
+      "fourth_feature": {
+        "title": "That's it! After the first 5 minutes, it will become second nature to you",
+        "description": "Just enjoy the reading, build the habit, and have fun during the process. No effort required!"
       }
     }
   },
@@ -75,9 +79,9 @@
       "description": "Access comprehensive statistics about how readers engage with your books. See which titles are most popular, track reading completion rates, and understand how your content is being used for language learning."
     },
     "section5": {
-      "title": "Supporting authors globally",
-      "overTitle": "International author community",
-      "description": "Join authors from around the world who are part of the LangoMango ecosystem. We support multiple languages and provide resources to help you succeed in the global language learning market."
+      "title": "This could be your success story",
+      "overTitle": "What will be like after 1 year",
+      "description": "As every night, I took my kindle to enjoy during an hour, when I realize that I was reading Game of Thrones almost everything in swedish. I had been so used to read like this, that it was the new normal for me."
     },
     "videoSection": {
       "title": "How LangoMango works for authors"
