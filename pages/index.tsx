@@ -205,7 +205,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             <Testimonials title={t('home:section1.title')} overTitle={t('home:section1.overTitle')} />
 
             <div id="cta-section-top">
-              <Cta onCtaClick={handleCtaClick} />
+              <Cta imageSrc="/smart-guy.jpeg" imageAlt="Sign up illustration" onCtaClick={handleCtaClick} />
             </div>
           </div>
         </WhiteBackgroundContainer>

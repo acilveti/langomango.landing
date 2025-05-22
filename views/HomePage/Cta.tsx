@@ -1,4 +1,4 @@
-// views/HomePage/Cta.tsx - Enhanced with Reddit Pixel tracking
+// views/HomePage/Cta.tsx - Enhanced with Reddit Pixel tracking and image
 import NextLink from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
@@ -16,9 +16,11 @@ import { RedditEventTypes,trackRedditConversion } from 'utils/redditPixel';
 // Add onCtaClick prop for external tracking
 interface CtaProps {
   onCtaClick?: () => void;
+  imageSrc?: string; // Optional image source prop
+  imageAlt?: string; // Optional image alt text prop
 }
 
-export default function Cta({ onCtaClick }: CtaProps) {
+export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: CtaProps) {
   const { t } = useTranslation(['common', 'home']);
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -59,6 +61,13 @@ export default function Cta({ onCtaClick }: CtaProps) {
             {t('common:cta.description')}
           </Description>
 
+          {/* Image placement between text and buttons */}
+          {imageSrc && (
+            <ImageContainer>
+              <CtaImage src={imageSrc} alt={imageAlt} />
+            </ImageContainer>
+          )}
+
           <ButtonGroup>
             <Button 
               data-umami-event="cta button" 
@@ -81,7 +90,7 @@ export default function Cta({ onCtaClick }: CtaProps) {
   );
 }
 
-export function CtaAuthors() {
+export function CtaAuthors({ imageSrc, imageAlt = "Author CTA Image" }: { imageSrc?: string; imageAlt?: string; }) {
   const { t } = useTranslation(['common', 'home']);
   
   const handleAuthorButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -111,6 +120,13 @@ export function CtaAuthors() {
           <Description>
             {t('authorCta.description')}
           </Description>
+
+          {/* Image placement between text and buttons */}
+          {imageSrc && (
+            <ImageContainer>
+              <CtaImage src={imageSrc} alt={imageAlt} />
+            </ImageContainer>
+          )}
   
           <ButtonGroup>
             <NextLink href={addReferralToUrl("https://beta-app.langomango.com/sign-up")} passHref>
@@ -135,6 +151,27 @@ export function CtaAuthors() {
     </CtaWrapper>
   );
 }
+
+// New styled components for the image
+const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 2rem 0;
+`;
+
+const CtaImage = styled.img`
+  max-width: 100%;
+  height: auto;
+  max-height: 300px; // Adjust as needed
+  border-radius: 8px; // Optional: rounded corners
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); // Optional: subtle shadow
+  
+  ${media('<=tablet')} {
+    max-height: 200px; // Smaller on mobile
+  }
+`;
 
 const Description = styled.div`
   font-size: 1.8rem;
