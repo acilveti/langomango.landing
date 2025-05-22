@@ -5,8 +5,15 @@ import styled from 'styled-components';
 import { A11y, Autoplay, Navigation } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Container from 'components/Container';
+import OverTitle from 'components/OverTitle';
 import Separator from 'components/Separator';
 import { media } from 'utils/media';
+
+// Add props interface
+interface TestimonialsProps {
+  title?: string;
+  overTitle?: string;
+}
 
 const TESTIMONIALS = [
   {
@@ -25,17 +32,8 @@ const TESTIMONIALS = [
       avatarUrl: '/testimonials/default-redditor.png',
     },
   },
-  // {
-  //   content: `This is so useful! Reading is really important for learning, but tbh the content that is offered is either too expensive or uninteresting to me. Kindle does have e.g., a Spanish dictionary if you want to read in Spanish and translate occasionally, but it's been hit or miss for me. Being and to read what I want (which I already do) and lean at the same time is such a fantastic idea.`,
-  //   author: {
-  //     name: 'kmzafari',
-  //     title: 'Redditor, reader and language learner',
-  //     avatarUrl: '/testimonials/kmzafari.png',
-  //   },
-  // },
-  
   {
-    content: `Besides that, the main selling point for me, for which I’d be down to spent the subscription, is that it runs on e readers. I hate reading on my phone but for language learning there is not really a comfortable and as efficient way to do it compared to any other digital device.`,
+    content: `Besides that, the main selling point for me, for which I'd be down to spent the subscription, is that it runs on e readers. I hate reading on my phone but for language learning there is not really a comfortable and as efficient way to do it compared to any other digital device.`,
     author: {
       name: 'kuyikuy81',
       title: 'Redditor, reader and language learner',
@@ -51,7 +49,7 @@ const TESTIMONIALS = [
     },
   },
   {
-    content: `Euskaraz funtzionatzen du? Hombre take my money eta igorri esteka otoi.  -- it works with basque? Oh man, take me money and let me use it!`,
+    content: `it works with basque? Oh man, take me money and let me use it! --Euskaraz funtzionatzen du? Hombre take my money eta igorri esteka otoi.`,
     author: {
       name: 'Hot-Ask-9962',
       title: 'Redditor and basque learner',
@@ -60,16 +58,22 @@ const TESTIMONIALS = [
   },
 ];
 
-export default function Testimonials() {
+export default function Testimonials({ title, overTitle }: TestimonialsProps) {
   return (
     <div>
       <Separator />
+      <Container>
+        <HeaderContainer>
+          {overTitle && <CustomOverTitle>{overTitle}</CustomOverTitle>}
+          {title && <Title>{title}</Title>}
+        </HeaderContainer>
+      </Container>
       <TestimonialsWrapper>
         <Swiper modules={[Navigation, Autoplay, A11y]} slidesPerView={1} autoplay={{ delay: 2500 }} centeredSlides navigation loop>
           {TESTIMONIALS.map((singleTestimonial, idx) => (
             <SwiperSlide key={idx}>
               <TestimonialCard>
-                <Content>“{singleTestimonial.content}”</Content>
+                <Content>"{singleTestimonial.content}"</Content>
                 <AuthorContainer>
                   <AuthorImageContainer>
                     <NextImage src={singleTestimonial.author.avatarUrl} alt={singleTestimonial.author.name} width={48} height={48} />
@@ -88,6 +92,19 @@ export default function Testimonials() {
     </div>
   );
 }
+
+const HeaderContainer = styled.div`
+  margin-bottom: 6rem;
+  overflow: hidden; /* Prevents content overflow */
+
+  ${media('<=tablet')} {
+    margin-bottom: 4rem;
+  }
+`;
+
+const CustomOverTitle = styled(OverTitle)`
+  margin-bottom: 2rem;
+`;
 
 const TestimonialsWrapper = styled(Container)`
   position: relative;
@@ -159,4 +176,22 @@ const AuthorImageContainer = styled.div`
   border-radius: 10rem;
   margin-right: 1rem;
   overflow: hidden;
+`;
+
+const Title = styled.h1`
+  font-size: 5.2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 4rem;
+  letter-spacing: -0.03em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+  word-break: break-all;
+
+  ${media('<=tablet')} {
+    font-size: 4.6rem;
+    margin-bottom: 2rem;
+  }
 `;

@@ -3,7 +3,7 @@ import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
 import styled from 'styled-components';
-import BasicSection, {BasicSection1} from 'components/BasicSection';
+import BasicSection, { BasicSection1 } from 'components/BasicSection';
 import Link from 'components/Link';
 import { EnvVars } from 'env.production';
 import { getAllPosts } from 'utils/postsFetcher';
@@ -15,7 +15,7 @@ import Partners from 'views/HomePage/Partners';
 import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-import {useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { captureReferral } from 'utils/referral';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
@@ -29,13 +29,7 @@ import { media } from 'utils/media';
 import FaqSection from 'views/PricingPage/FaqSection';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 // Import the updated Reddit Pixel utilities with visibility tracking
-import { 
-  getRedditPixelScript, 
-  RedditEventTypes, 
-  setupAllSectionTracking,
-  trackPageVisit,
-  trackRedditConversion, 
-} from 'utils/redditPixel';
+import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 
 // Reddit Pixel ID
@@ -44,26 +38,26 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
-  
+
   // New state variables to track our conditions
   const [hasScrolled, setHasScrolled] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   useEffect(() => {
     captureReferral();
   }, []);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       console.log('Initializing ContentSquare script');
-      
+
       try {
-        injectContentsquareScript({ 
-          siteId: "6407230",
+        injectContentsquareScript({
+          siteId: '6407230',
           async: true,
-          defer: false
+          defer: false,
         });
         console.log('ContentSquare script injected successfully');
       } catch (error) {
@@ -75,14 +69,14 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   // Track scroll and set hasScrolled when any scroll occurs
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const handleScroll = () => {
       if (!hasScrolled) {
         setHasScrolled(true);
         console.log('User has scrolled');
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasScrolled]);
@@ -90,12 +84,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   // Timer to track time spent on page
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     // Set up a timer that increments every second
     timeIntervalRef.current = setInterval(() => {
-      setTimeSpent(prevTime => prevTime + 1);
+      setTimeSpent((prevTime) => prevTime + 1);
     }, 1000);
-    
+
     return () => {
       if (timeIntervalRef.current) {
         clearInterval(timeIntervalRef.current);
@@ -110,7 +104,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       console.log('Both conditions met: tracked page visit after 5s and scroll');
       trackPageVisit();
       setPageVisitTracked(true);
-      
+
       // Now that we've tracked the visit, we can initialize section tracking
       if (!sectionsInitialized.current) {
         setupAllSectionTracking();
@@ -122,33 +116,33 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   // Track scroll depth for engagement
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     let maxScrollPercent = 0;
     const trackScrollDepth = () => {
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
       const clientHeight = window.innerHeight;
-      
+
       const scrollPercent = Math.floor((scrollTop / (scrollHeight - clientHeight)) * 100);
-      
+
       // Only track if we've scrolled further than before
       if (scrollPercent > maxScrollPercent) {
         // Track at specific thresholds: 25%, 50%, 75%, 90%
         const thresholds = [25, 50, 75, 90];
-        
+
         for (const threshold of thresholds) {
           if (scrollPercent >= threshold && maxScrollPercent < threshold) {
             trackRedditConversion(RedditEventTypes.SCROLL_DEPTH, {
-              scroll_percent: threshold
+              scroll_percent: threshold,
             });
             break;
           }
         }
-        
+
         maxScrollPercent = scrollPercent;
       }
     };
-    
+
     window.addEventListener('scroll', trackScrollDepth);
     return () => window.removeEventListener('scroll', trackScrollDepth);
   }, []);
@@ -161,20 +155,20 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   // Track video view event
   const handleVideoPlay = useCallback(() => {
-    trackRedditConversion(RedditEventTypes.VIEW_CONTENT, { 
+    trackRedditConversion(RedditEventTypes.VIEW_CONTENT, {
       content_type: 'video',
       content_id: 'tutorial-video',
-      engagement_type: 'play'
+      engagement_type: 'play',
     });
   }, []);
 
   // Track CTA click event
   const handleCtaClick = useCallback(() => {
     trackRedditConversion(RedditEventTypes.LEAD, {
-      lead_type: 'CTA button click'
+      lead_type: 'CTA button click',
     });
   }, []);
-  
+
   return (
     <>
       {/* Reddit Pixel Base Code - Using Next.js Script component */}
@@ -182,11 +176,11 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         id="reddit-pixel-base"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: getRedditPixelScript(REDDIT_PIXEL_ID)
+          __html: getRedditPixelScript(REDDIT_PIXEL_ID),
         }}
         onLoad={handleRedditPixelLoad}
       />
-      
+
       <Head>
         <title>{t('common:title')}</title>
         <meta name="description" content={t('common:description')} />
@@ -194,8 +188,8 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       </Head>
       <HomepageWrapper>
         <div id="hero-sticky-section">
-          <HeroSticky 
-            backgroundImage="/portada2.jpeg" 
+          <HeroSticky
+            backgroundImage="/portada2.jpeg"
             title="You just started to learn 28 german words"
             subtitle="Keep scrolling to discover more"
             overlayOpacity={0.1}
@@ -207,34 +201,19 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             <Hero />
           </div>
           <div id="section-1">
-            <BasicSection1 
-              imageUrl="/multiplatform.jpeg" 
-              title={t('home:section1.title')} 
-              overTitle={t('home:section1.overTitle')}
-            >
-              <p>
-                {t('home:section1.description')}
-              </p>
-              <ul>
-                <li>{t('home:section1.bulletPoint.adjustable')}</li>
-                <li>{t('home:section1.bulletPoint.instant')}</li>
-                <li>{t('home:section1.bulletPoint.wordByWord')}</li>
-              </ul>
-            </BasicSection1>
-            <Testimonials/>
+            {/* Pass the title and overTitle to Testimonials */}
+            <Testimonials title={t('home:section1.title')} overTitle={t('home:section1.overTitle')} />
+
             <div id="cta-section-top">
-            <Cta onCtaClick={handleCtaClick} />
-          </div>
+              <Cta onCtaClick={handleCtaClick} />
+            </div>
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer className="front-element">
           <div id="video-section">
             <Wrapper>
               <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
-              <YoutubeVideo 
-                url="https://www.youtube.com/watch?v=L6JMhu2SrVs" 
-                onPlay={handleVideoPlay}
-              />
+              <YoutubeVideo url="https://www.youtube.com/watch?v=L6JMhu2SrVs" onPlay={handleVideoPlay} />
             </Wrapper>
           </div>
           <div id="cta-section-top">
@@ -244,57 +223,36 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             <FeaturesGallery />
           </div>
           <div id="section-2">
-            <BasicSection
-              reversed
-              imageUrl="/smart-reading.svg"
-              title={t('home:section2.title')}
-              overTitle={t('home:section2.overTitle')}
-            >
-              <p>
-                {t('home:section2.description')}
-              </p>
+            <BasicSection reversed imageUrl="/smart-reading.svg" title={t('home:section2.title')} overTitle={t('home:section2.overTitle')}>
+              <p>{t('home:section2.description')}</p>
             </BasicSection>
           </div>
 
           <div id="section-3">
-            <BasicSection 
-              imageUrl="/smart-chat.svg" 
-              title={t('home:section3.title')} 
-              overTitle={t('home:section3.overTitle')}
-            >
-              <p>
-                {t('home:section3.description')}
-              </p>
+            <BasicSection imageUrl="/smart-chat.svg" title={t('home:section3.title')} overTitle={t('home:section3.overTitle')}>
+              <p>{t('home:section3.description')}</p>
             </BasicSection>
           </div>
           <div id="cta-section-top">
             <Cta onCtaClick={handleCtaClick} />
           </div>
           <div id="section-4">
-            <BasicSection 
-              reversed 
-              imageUrl="/smart-reading-news.svg" 
-              title={t('home:section4.title')} 
+            <BasicSection
+              reversed
+              imageUrl="/smart-reading-news.svg"
+              title={t('home:section4.title')}
               overTitle={t('home:section4.overTitle')}
             >
-              <p>
-                {t('home:section4.description')}
-              </p>
+              <p>{t('home:section4.description')}</p>
             </BasicSection>
           </div>
 
           <div id="section-5">
-            <BasicSection 
-              imageUrl="/smart-reading-novels.svg" 
-              title={t('home:section5.title')} 
-              overTitle={t('home:section5.overTitle')}
-            >
-              <p>
-                {t('home:section5.description')}
-              </p>
+            <BasicSection imageUrl="/smart-reading-novels.svg" title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}>
+              <p>{t('home:section5.description')}</p>
             </BasicSection>
           </div>
-          
+
           <div id="cta-section-bottom">
             <Cta onCtaClick={handleCtaClick} />
           </div>
@@ -302,22 +260,23 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             <PricingTablesSection />
           </div>
           <div id="faq-section">
-            <FaqSection/>
+            <FaqSection />
           </div>
         </DarkerBackgroundContainer>
       </HomepageWrapper>
 
       <style jsx global>{`
-        html, body {
+        html,
+        body {
           margin: 0;
           padding: 0;
           overflow-x: hidden;
         }
-        
+
         html {
           scroll-behavior: smooth;
         }
-        
+
         span.wordWisePosition::before {
           content: attr(data-translation);
           position: absolute;
@@ -329,7 +288,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           line-height: 0.8 !important;
           font-weight: 600;
         }
-        
+
         span.wordWisePress::before {
           content: attr(data-translation);
           position: absolute;
@@ -343,7 +302,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           opacity: 0;
           transition: opacity 0.2s ease;
         }
-        
+
         span.wordWisePress:active::before {
           opacity: 1;
         }
@@ -358,7 +317,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           max-width: 100%;
           overflow: hidden;
         }
-        
+
         /* Add a shadow to create a transition effect */
         .white-background-container {
           position: relative;
@@ -372,7 +331,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         .front-element {
           position: relative;
           z-index: 2;
-         
         }
       `}</style>
     </>
@@ -383,7 +341,7 @@ const HomepageWrapper = styled.div`
   & > :last-child {
     margin-bottom: 0rem;
   }
-  
+
   margin: 0;
   padding: 0;
   width: 100%;
@@ -430,7 +388,7 @@ const CustomAutofitGrid = styled(AutofitGrid)`
 
 export async function getStaticProps({ locale }: { locale: string }) {
   const translations = await serverSideTranslations(locale, ['common', 'home']);
-  
+
   return {
     props: {
       posts: await getAllPosts(),
