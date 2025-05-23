@@ -46,12 +46,12 @@ const getBaseURL = () => {
     return process.env.NODE_ENV === 'development'
       ? process.env.NGROK || 'http://192.168.0.14:8080/'
       // : 'https://api-bk.langomango.com/';
-      : 'https://staging.langomango.com';
+      : 'https://staging.langomango.com/';
   }
   
   // Server-side fallback
   // return 'https://api-bk.langomango.com/';
-  return 'https://staging.langomango.com';
+  return 'https://staging.langomango.com/';
 };
 
 const API_CONFIG = {
@@ -64,7 +64,7 @@ const API_CONFIG = {
     timeout: 120000,
   },
   production: {
-    baseURL: 'https://staging.langomango.com',
+    baseURL: 'https://staging.langomango.com/',
     // baseURL: 'https://api-bk.langomango.com/',
     timeout: 120000,
   },
