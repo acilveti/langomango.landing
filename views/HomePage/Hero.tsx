@@ -60,7 +60,7 @@ export default function Hero() {
             />
           </MobileImageContainer>
           <MobileButtonGroup>
-            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
+            <VibratingButton data-umami-event="Hero button" onClick={() => setIsModalOpened(true)}>
               {t('common:startReading')} <span>&rarr;</span>
             </VibratingButton>
             {/* <NextLink href="/authors" passHref>
