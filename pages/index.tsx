@@ -32,8 +32,7 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
-import SimpleCta from 'components/SimpleCta';
-
+import SimpleCta from 'components/simpleCta';
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 
