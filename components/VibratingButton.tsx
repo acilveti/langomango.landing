@@ -62,7 +62,7 @@ const vibrateWithIntervals = keyframes`
 
 // Animated button component with intermittent vibration
 const AnimatedButton = styled(Button)`
-  animation: ${vibrateWithIntervals} 12s infinite;
+  animation: ${vibrateWithIntervals} 6s infinite;
   animation-delay: 2s; /* Start after 2 seconds */
   
   &:hover {
