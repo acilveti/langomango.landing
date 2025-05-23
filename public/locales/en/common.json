@@ -1,9 +1,9 @@
 {
   "title": "LangoMango",
   "description": "Language learning platform, focused on readers and bookworms.",
-  "signUpLogin": "Start free trial",
+  "signUpLogin": "Use the demo",
   "createAccount": "Create an account",
-  "startReading": "Start free trial",
+  "startReading": "Use the demo",
   "areYouAuthor": "Are you an author?",
   "features": {
     "title": "How does it work?",
@@ -31,12 +31,12 @@
     "title": "Try the smart reader",
     "subtitle": "Start your free trial",
     "description": "It takes less time to jump straight to the free trial than to keep wondering what it will be like",
-    "button": "Start free trial"
+    "button": "Use the demo"
   },
   "waveCta": {
     "title": "Ready to transform your reading experience?",
     "description": "Join LangoMango today with a 7-day free trial and start learning languages while enjoying your favorite books.",
-    "mainButton": "Start free trial",
+    "mainButton": "Use the demo",
     "secondaryButton": "Learn more about our platform"
   },
   "authorCta": {

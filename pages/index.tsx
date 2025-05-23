@@ -1,4 +1,4 @@
-// pages/index.tsx - Updated with SimpleCta component
+// pages/index.tsx - Updated with fixed video section and corrected styling
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -24,6 +24,8 @@ import AutofitGrid from 'components/AutofitGrid';
 import BasicCard from 'components/BasicCard';
 import Page from 'components/Page';
 import SectionTitle from 'components/SectionTitle';
+import OverTitle from 'components/OverTitle';
+import Container from 'components/Container';
 import YoutubeVideo from 'components/YoutubeVideo';
 import { media } from 'utils/media';
 import FaqSection from 'views/PricingPage/FaqSection';
@@ -219,7 +221,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer className="front-element">
-          <div id="video-section">
           <div id="section-5">
             <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
           </div>
@@ -227,11 +228,18 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
             trackingEvent="testimonial section cta" 
             location="after testimonial"
           />
-            <Wrapper>
-              <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
+          
+          {/* Fixed Video Section with proper Container and styling */}
+          <VideoSectionWrapper id="video-section">
+            <Container>
+              <HeaderContainer>
+                {/* <CustomOverTitle>{t('home:videoSection.overTitle')}</CustomOverTitle> */}
+                <VideoTitle>{t('home:videoSection.title')}</VideoTitle>
+              </HeaderContainer>
               <YoutubeVideo url="https://www.youtube.com/watch?v=L6JMhu2SrVs" onPlay={handleVideoPlay} />
-            </Wrapper>
-          </div>
+            </Container>
+          </VideoSectionWrapper>
+          
           <div id="cta-section-top">
             <Cta onCtaClick={handleCtaClick} />
           </div>
@@ -351,9 +359,36 @@ const WhiteBackgroundContainer = styled.div`
   }
 `;
 
-const Wrapper = styled.div`
-  & > *:not(:first-child) {
-    margin-top: 10rem;
+/* Fixed Video Section Styling */
+const VideoSectionWrapper = styled.div`
+  padding-top: 5rem;
+`;
+
+const HeaderContainer = styled.div`
+  margin-bottom: 6rem;
+  overflow: hidden;
+
+  ${media('<=tablet')} {
+    margin-bottom: 4rem;
+  }
+`;
+
+const CustomOverTitle = styled(OverTitle)`
+  margin-bottom: 2rem;
+`;
+
+const VideoTitle = styled.h1`
+  font-size: 5.2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 4rem;
+  letter-spacing: -0.03em;
+  max-width: 100%;
+  text-align: center;
+
+  ${media('<=tablet')} {
+    font-size: 4.6rem;
+    margin-bottom: 2rem;
   }
 `;
 

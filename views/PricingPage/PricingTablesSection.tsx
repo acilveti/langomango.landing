@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import AutofitGrid from 'components/AutofitGrid';
 import PricingCard from 'components/PricingCard';
 import SectionTitle from 'components/SectionTitle';
+import OverTitle from 'components/OverTitle';
+import Container from 'components/Container';
 import { useTranslation } from 'next-i18next';
+import { media } from 'utils/media';
 
 export default function PricingTablesSection() {
   const { t } = useTranslation(['common', 'home']);
@@ -16,62 +19,92 @@ export default function PricingTablesSection() {
   ];
   
   return (
-    <Wrapper>
-      <SectionTitle>{t('home:pricing.title')}</SectionTitle>
-      
-      {/* Market Context Info */}
-      <MarketContextText>
-        Average private language tutoring rates: $25-35/hour (US), £20-30/hour (UK), €20-30/hour (Europe)
-      </MarketContextText>
-      
-      {/* Pricing Toggle */}
-      <ToggleWrapper>
-        <ToggleLabel isActive={!isYearly}>Monthly</ToggleLabel>
-        <ToggleSwitch>
-          <ToggleInput
-            type="checkbox"
-            checked={isYearly}
-            onChange={() => setIsYearly(!isYearly)}
-          />
-          <ToggleSlider />
-        </ToggleSwitch>
-        <ToggleLabel isActive={isYearly}>
-          Yearly
-          <DiscountBadge>50% OFF</DiscountBadge>
-        </ToggleLabel>
-      </ToggleWrapper>
-      
-      <AutofitGrid>
-        {!isYearly ? (
-          <PricingCard
-            title={t('home:pricing.monthly.title')}
-            description={t('home:pricing.monthly.description')}
-            benefits={benefits}
-          >
-            {t('home:pricing.monthly.price')}<span> {t('home:pricing.monthly.period')}</span>
-          </PricingCard>
-        ) : (
-          <PricingCard
-            title={t('home:pricing.yearly.title')}
-            description={t('home:pricing.yearly.description')}
-            benefits={benefits}
-          >
-            <PriceWithDiscount>
-              <OriginalPrice>{t('home:pricing.monthly.price')} × 12 = 144</OriginalPrice>
-              <DiscountedPrice>
-                {t('home:pricing.yearly.price')}<span> {t('home:pricing.yearly.period')}</span>
-              </DiscountedPrice>
-            </PriceWithDiscount>
-          </PricingCard>
-        )}
-      </AutofitGrid>
-    </Wrapper>
+    <PricingSectionWrapper>
+      <Container>
+        <HeaderContainer>
+          {/* <CustomOverTitle>{t('home:pricing.overTitle')}</CustomOverTitle> */}
+          <Title>{t('home:pricing.title')}</Title>
+        </HeaderContainer>
+        
+        {/* Market Context Info */}
+        <MarketContextText>
+          Average private language tutoring rates: $25-35/hour (US), £20-30/hour (UK), €20-30/hour (Europe)
+        </MarketContextText>
+        
+        {/* Pricing Toggle */}
+        <ToggleWrapper>
+          <ToggleLabel isActive={!isYearly}>Monthly</ToggleLabel>
+          <ToggleSwitch>
+            <ToggleInput
+              type="checkbox"
+              checked={isYearly}
+              onChange={() => setIsYearly(!isYearly)}
+            />
+            <ToggleSlider />
+          </ToggleSwitch>
+          <ToggleLabel isActive={isYearly}>
+            Yearly
+            <DiscountBadge>50% OFF</DiscountBadge>
+          </ToggleLabel>
+        </ToggleWrapper>
+        
+        <AutofitGrid>
+          {!isYearly ? (
+            <PricingCard
+              title={t('home:pricing.monthly.title')}
+              description={t('home:pricing.monthly.description')}
+              benefits={benefits}
+            >
+              {t('home:pricing.monthly.price')}<span> {t('home:pricing.monthly.period')}</span>
+            </PricingCard>
+          ) : (
+            <PricingCard
+              title={t('home:pricing.yearly.title')}
+              description={t('home:pricing.yearly.description')}
+              benefits={benefits}
+            >
+              <PriceWithDiscount>
+                <OriginalPrice>{t('home:pricing.monthly.price')} × 12 = 144</OriginalPrice>
+                <DiscountedPrice>
+                  {t('home:pricing.yearly.price')}<span> {t('home:pricing.yearly.period')}</span>
+                </DiscountedPrice>
+              </PriceWithDiscount>
+            </PricingCard>
+          )}
+        </AutofitGrid>
+      </Container>
+    </PricingSectionWrapper>
   );
 }
 
-const Wrapper = styled.div`
-  & > *:not(:first-child) {
-    margin-top: 3rem;
+const PricingSectionWrapper = styled.div`
+  padding-top: 5rem;
+`;
+
+const HeaderContainer = styled.div`
+  margin-bottom: 6rem;
+  overflow: hidden;
+
+  ${media('<=tablet')} {
+    margin-bottom: 4rem;
+  }
+`;
+
+const CustomOverTitle = styled(OverTitle)`
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: 5.2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 4rem;
+  letter-spacing: -0.03em;
+  max-width: 100%;
+
+  ${media('<=tablet')} {
+    font-size: 4.6rem;
+    margin-bottom: 2rem;
   }
 `;
 
