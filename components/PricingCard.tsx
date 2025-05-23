@@ -4,6 +4,7 @@ import { media } from 'utils/media';
 import Button from './Button';
 import RichText from './RichText';
 import { addReferralToUrl } from 'utils/referral';
+import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 interface PricingCardProps {
   title: string;
@@ -14,11 +15,13 @@ interface PricingCardProps {
 
 export default function PricingCard({ title, description, benefits, isOutlined, children }: PropsWithChildren<PricingCardProps>) {
   const isAnyBenefitPresent = benefits?.length;
+  const { setIsModalOpened } = useNewsletterModalContext(); 
   
   // Function to handle button click with proper type annotation for anchor elements
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    setIsModalOpened(true)
+    // window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
   };
 
   return (

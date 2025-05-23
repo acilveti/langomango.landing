@@ -38,7 +38,8 @@ export default function Hero() {
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    setIsModalOpened(true)
+    // window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
   };
   
   // Mobile content
@@ -60,7 +61,7 @@ export default function Hero() {
             />
           </MobileImageContainer>
           <MobileButtonGroup>
-            <VibratingButton data-umami-event="Hero button" onClick={() => setIsModalOpened(true)}>
+            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
               {t('common:startReading')} <span>&rarr;</span>
             </VibratingButton>
             {/* <NextLink href="/authors" passHref>

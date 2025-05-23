@@ -13,6 +13,7 @@ import { useTranslation } from 'next-i18next';
 import { addReferralToUrl } from 'utils/referral';
 // Import Reddit Pixel tracking
 import { RedditEventTypes,trackRedditConversion } from 'utils/redditPixel';
+import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 // Add onCtaClick prop for external tracking
 interface CtaProps {
@@ -23,7 +24,8 @@ interface CtaProps {
 
 export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: CtaProps) {
   const { t } = useTranslation(['common', 'home']);
-  
+  const { setIsModalOpened } = useNewsletterModalContext();
+
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     
@@ -39,8 +41,9 @@ export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: Ct
       onCtaClick();
     }
     
+    setIsModalOpened(true)
     // Navigate to sign-up
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    // window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
   };
 
   const handleSecondaryButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -72,7 +75,7 @@ export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: Ct
           <ButtonGroup>
             <ExpandingButton 
               data-umami-event="cta button" 
-              onClick={handleButtonClick}
+              onClick={(handleButtonClick)}
             >
               {t('common:cta.button')} <span>&rarr;</span>
             </ExpandingButton>

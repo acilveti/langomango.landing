@@ -5,6 +5,7 @@ import VibratingButton from 'components/VibratingButton';
 import { useTranslation } from 'next-i18next';
 import { addReferralToUrl } from 'utils/referral';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
+import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 interface SimpleCtaProps {
   buttonText?: string; // Optional custom button text
@@ -20,7 +21,8 @@ export default function SimpleCta({
   className 
 }: SimpleCtaProps) {
   const { t } = useTranslation(['common']);
-  
+  const { setIsModalOpened } = useNewsletterModalContext(); 
+
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     
@@ -32,7 +34,8 @@ export default function SimpleCta({
     });
     
     // Navigate to sign-up
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    // window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    setIsModalOpened(true)
   };
 
   return (
