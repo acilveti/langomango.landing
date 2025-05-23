@@ -45,11 +45,13 @@ const getBaseURL = () => {
     
     return process.env.NODE_ENV === 'development'
       ? process.env.NGROK || 'http://192.168.0.14:8080/'
-      : 'https://api-bk.langomango.com/';
+      // : 'https://api-bk.langomango.com/';
+      : 'https://staging.langomango.com';
   }
   
   // Server-side fallback
-  return 'https://api-bk.langomango.com/';
+  // return 'https://api-bk.langomango.com/';
+  return 'https://staging.langomango.com';
 };
 
 const API_CONFIG = {
@@ -62,7 +64,8 @@ const API_CONFIG = {
     timeout: 120000,
   },
   production: {
-    baseURL: 'https://api-bk.langomango.com/',
+    baseURL: 'https://staging.langomango.com',
+    // baseURL: 'https://api-bk.langomango.com/',
     timeout: 120000,
   },
 };
@@ -154,7 +157,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           await SimpleAuthService.clearAuth();
           if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+            window.location.href = 'https://beta-app.langomango.com/login';
           }
           return Promise.reject(new Error('Authentication required'));
         }
@@ -520,7 +523,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
                     onClick={() => {
                       onClose();
                       // Navigate to login page
-                      window.location.href = '/login';
+                      window.location.href = 'https://beta-app.langomango.com/login';
                     }}
                   >
                     Log in
