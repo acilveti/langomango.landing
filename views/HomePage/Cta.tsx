@@ -1,4 +1,4 @@
-// views/HomePage/Cta.tsx - Enhanced with Reddit Pixel tracking and image
+// views/HomePage/Cta.tsx - Enhanced with ExpandingButton component and Reddit Pixel tracking
 import NextLink from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
@@ -7,6 +7,7 @@ import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
+import ExpandingButton from 'components/ExpandingButton';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
 import { addReferralToUrl } from 'utils/referral';
@@ -69,20 +70,20 @@ export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: Ct
           )}
 
           <ButtonGroup>
-            <Button 
+            <ExpandingButton 
               data-umami-event="cta button" 
               onClick={handleButtonClick}
             >
               {t('common:cta.button')} <span>&rarr;</span>
-            </Button>
-            <NextLink href="/authors" passHref>
+            </ExpandingButton>
+            {/* <NextLink href="/authors" passHref>
               <OutlinedButton 
                 transparent
                 onClick={handleSecondaryButtonClick}
               >
                 {t('common:areYouAuthor')} <span>&rarr;</span>
               </OutlinedButton>
-            </NextLink>
+            </NextLink> */}
           </ButtonGroup>
         </Stack>
       </Container>
@@ -130,21 +131,21 @@ export function CtaAuthors({ imageSrc, imageAlt = "Author CTA Image" }: { imageS
   
           <ButtonGroup>
             <NextLink href={addReferralToUrl("https://beta-app.langomango.com/sign-up")} passHref>
-              <Button 
+              <ExpandingButton 
                 data-umami-event="cta button"
                 onClick={handleAuthorButtonClick}
               >
                 {t('authorCta.button')} <span>&rarr;</span>
-              </Button>
+              </ExpandingButton>
             </NextLink>
-            <NextLink href="/" passHref>
+            {/* <NextLink href="/" passHref>
               <OutlinedButton 
                 transparent
                 onClick={handleSecondaryButtonClick}
               >
                 {t('authorCta.secondaryButton')} <span>&rarr;</span>
               </OutlinedButton>
-            </NextLink>
+            </NextLink> */}
           </ButtonGroup>
         </Stack>
       </Container>

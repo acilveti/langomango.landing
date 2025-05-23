@@ -1,4 +1,4 @@
-// pages/index.tsx - Updated with conditional page visit tracking
+// pages/index.tsx - Updated with SimpleCta component
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -32,6 +32,7 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
+import SimpleCta from 'components/SimpleCta';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -206,6 +207,10 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="features-section">
             <FeaturesGallery />
           </div>
+          <SimpleCta 
+            trackingEvent="features section cta" 
+            location="after features"
+          />
             <Testimonials title={t('home:section1.title')} overTitle={t('home:section1.overTitle')} />
 
             <div id="cta-section-top">
@@ -218,6 +223,10 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="section-5">
             <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
           </div>
+          <SimpleCta 
+            trackingEvent="testimonial section cta" 
+            location="after testimonial"
+          />
             <Wrapper>
               <SectionTitle>{t('home:videoSection.title')}</SectionTitle>
               <YoutubeVideo url="https://www.youtube.com/watch?v=L6JMhu2SrVs" onPlay={handleVideoPlay} />

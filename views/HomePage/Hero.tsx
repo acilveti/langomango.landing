@@ -1,19 +1,19 @@
 // views/HomePage/Hero.tsx
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
+import VibratingButton from 'components/VibratingButton';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { addReferralToUrl } from 'utils/referral';
 import { useTranslation } from 'next-i18next';
 
-export default function 
-Hero() {
+export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [isMobile, setIsMobile] = useState(false);
@@ -60,14 +60,14 @@ Hero() {
             />
           </MobileImageContainer>
           <MobileButtonGroup>
-            <Button data-umami-event="Hero button" onClick={handleButtonClick}>
+            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
               {t('common:startReading')} <span>&rarr;</span>
-            </Button>
-            <NextLink href="/authors" passHref>
+            </VibratingButton>
+            {/* <NextLink href="/authors" passHref>
               <Button transparent>
                 {t('common:areYouAuthor')} <span>&rarr;</span>
               </Button>
-            </NextLink>
+            </NextLink> */}
           </MobileButtonGroup>
         </MobileContents>
 
@@ -117,9 +117,9 @@ Hero() {
             {t('home:hero.description')}
           </Description>
           <CustomButtonGroup>
-            <Button data-umami-event="Hero button" onClick={handleButtonClick}>
+            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
               {t('common:startReading')} <span>&rarr;</span>
-            </Button>
+            </VibratingButton>
             <NextLink href="/authors" passHref>
               <Button transparent>
                 {t('common:areYouAuthor')} <span>&rarr;</span>

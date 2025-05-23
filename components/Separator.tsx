@@ -7,7 +7,7 @@ const Separator = styled.div`
   height: 0px;
 
   ${media('<=tablet')} {
-    padding: 4rem 0;
+    padding: 2rem 0;
   }
 `;
 

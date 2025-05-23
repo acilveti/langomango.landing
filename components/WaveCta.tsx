@@ -1,4 +1,3 @@
-// components/WaveCta.tsx
 'use client';
 import NextLink from 'next/link';
 import styled from 'styled-components';
@@ -6,6 +5,7 @@ import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import SectionTitle from 'components/SectionTitle';
+import ExpandingButton from 'components/ExpandingButton';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { addReferralToUrl } from 'utils/referral';
@@ -43,15 +43,15 @@ export default function WaveCta() {
             <Title>{t('common:waveCta.title')}</Title>
             <Description>{t('common:waveCta.description')}</Description>
             <CustomButtonGroup>
-              <Button data-umami-event="wave cta button" onClick={handleButtonClick}>
+              <ExpandingButton data-umami-event="wave cta button" onClick={handleButtonClick}>
                 {t('common:waveCta.mainButton')} <span>&rarr;</span>
-              </Button>
+              </ExpandingButton>
 
-              <NextLink href="/authors" passHref>
+              {/* <NextLink href="/authors" passHref>
                 <OutlinedButton transparent>
                   {t('common:areYouAuthor')} <span>&rarr;</span>
                 </OutlinedButton>
-              </NextLink>
+              </NextLink> */}
             </CustomButtonGroup>
           </Container>
         </CtaWrapper>
@@ -98,4 +98,12 @@ const OutlinedButton = styled(Button)`
 
 const CustomButtonGroup = styled(ButtonGroup)`
   justify-content: center;
+  
+  /* Match the Cta component button styling */
+  & > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 `;
