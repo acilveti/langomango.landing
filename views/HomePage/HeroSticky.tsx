@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
-import AnimatedButton from './animatedButton';
+import JumpingButton from 'components/JumpingButton';
 
 interface HeroStickyProps {
   backgroundImage: string;
@@ -53,9 +53,16 @@ export default function HeroSticky({
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>{title}</Title>
-        <ScrollIndicator>
-          <AnimatedButton>Free Trial</AnimatedButton>
-        </ScrollIndicator>
+        <JumpingButton
+          trackingEvent="hero sticky demo button"
+          location="hero sticky section"
+          style={{ 
+            zIndex: 999,
+            position: 'relative'
+          }}
+        >
+          Use the demo
+        </JumpingButton>
       </ContentWrapper>
       
       {/* Second title that appears after scrolling */}
@@ -83,7 +90,7 @@ const BackgroundContainer = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: 0;
+  z-index: -1; /* Changed to negative z-index to ensure it stays behind content */
 `;
 
 const BackgroundImage = styled.div<{ backgroundImage: string }>`
@@ -111,7 +118,7 @@ const Overlay = styled.div<{ opacity: number }>`
 
 const ContentWrapper = styled.div`
   position: relative;
-  z-index: 2;
+  z-index: 10; /* Increased z-index to ensure it's above everything */
   text-align: center;
   padding: 0 2rem;
   margin-top: 70vh; /* Position content 70% down the viewport */
@@ -122,12 +129,13 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  pointer-events: auto; /* Ensure pointer events work */
 `;
 
 // Second title with visibility control
 const SecondTitleWrapper = styled.div<{ visible: boolean }>`
   position: relative;
-  z-index: 2;
+  z-index: 10; /* Increased z-index to match ContentWrapper */
   width: 100%;
   max-width: 1200px;
   margin: 2rem auto 4rem; /* Add bottom margin to ensure space after this element */
@@ -154,26 +162,5 @@ const Title = styled.h1`
   
   ${media('<=phone')} {
     font-size: 2.5rem;
-  }
-`;
-
-const ScrollIndicator = styled.div`
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: bounce 2s infinite;
-  margin: 2rem 0;
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0);
-    }
-    40% {
-      transform: translateY(-10px);
-    }
-    60% {
-      transform: translateY(-5px);
-    }
   }
 `;

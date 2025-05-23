@@ -32,7 +32,8 @@ import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
-import SimpleCta from 'components/simpleCta';
+import SimpleCta from 'components/SimpleCta';
+
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 
@@ -294,7 +295,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           margin: 0;
           padding: 0;
           position: relative;
-          z-index: -99;
+          z-index: 0; /* Changed back to 0 to allow proper stacking */
           width: 100vw;
           max-width: 100%;
           overflow: hidden;
@@ -303,7 +304,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         /* Add a shadow to create a transition effect */
         .white-background-container {
           position: relative;
-          z-index: 2;
+          z-index: 10; /* Increased to ensure it's above hero sticky background */
           box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.2);
           border-top-left-radius: 20px;
           border-top-right-radius: 20px;
@@ -312,7 +313,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
         .front-element {
           position: relative;
-          z-index: 2;
+          z-index: 10; /* Increased to match white background */
         }
       `}</style>
     </>
