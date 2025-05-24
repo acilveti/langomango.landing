@@ -212,6 +212,8 @@ const validationSchema = Yup.object({
     .min(6, 'Password must be at least 6 characters')
     .matches(/[0-9]/, 'Passwords must have at least one digit (\'0\'-\'9\')')
     .matches(/[A-Z]/, 'Passwords must have at least one uppercase (\'A\'-\'Z\')')
+    .matches(/[a-z]/, 'Passwords must have at least one lowercase (\'a\'-\'z\')')
+    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Passwords must have at least one special character')
     .required('Password is required'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords must match')
@@ -377,6 +379,17 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
 
   // Real-time validation function
   const validateField = async (fieldName: string, fieldValue: string, allValues: typeof values) => {
+    try {
+      // Use validateAt to validate a specific field with proper typing
+      await validationSchema.validateAt(fieldName, { ...allValues, [fieldName]: fieldValue });
+      // If validation passes, clear the error
+      setErrors(prev => ({ ...prev, [fieldName]: '' }));
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        setErrors(prev => ({ ...prev, [fieldName]: error.message }));
+      }
+    }
+
     // Special case for confirmPassword - validate against current password
     if (fieldName === 'confirmPassword' || fieldName === 'password') {
       try {
@@ -385,7 +398,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
           confirmPassword: fieldName === 'confirmPassword' ? fieldValue : allValues.confirmPassword
         });
         setErrors(prev => ({ ...prev, confirmPassword: '' }));
-      } catch (error: unknown) {
+      } catch (error) {
         if (error instanceof Yup.ValidationError) {
           setErrors(prev => ({ ...prev, confirmPassword: error.message }));
         }
