@@ -418,7 +418,7 @@ export default function LanguageRegistrationModal({
               </LanguageConfirmation>
               <SuccessMessage>Your account has been created successfully!</SuccessMessage>
               <SuccessMessage>
-                You're all set to start learning <strong>{selectedLanguage.name}</strong>!
+                You `&apos;`re all set to start learning <strong>{selectedLanguage.name}</strong>!
               </SuccessMessage>
               <SuccessMessage>Redirecting you to login...</SuccessMessage>
             </SuccessContainer>

@@ -49,6 +49,7 @@ export default function FeaturesGallery() {
     { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
     { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
     { code: 'da', name: 'Danish', flag: '🇩🇰' },
+
     { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
     { code: 'pl', name: 'Polish', flag: '🇵🇱' },
     { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
@@ -194,7 +195,7 @@ export default function FeaturesGallery() {
                     <ProcessingMessage>
                       <ProcessingIcon>⏳</ProcessingIcon>
                       <ProcessingText>
-                        Setting up <strong>{selectedLanguage.name}</strong> for you...
+                        Verification of <strong>{selectedLanguage.name}</strong> availability for you...
                       </ProcessingText>
                     </ProcessingMessage>
                   )}
@@ -204,7 +205,7 @@ export default function FeaturesGallery() {
                     <ConfirmationMessage>
                       <ConfirmationIcon>🎉</ConfirmationIcon>
                       <ConfirmationText>
-                        Great choice! <strong>{selectedLanguage.name}</strong> is now available for your learning journey.
+                        Great choice! <strong>{selectedLanguage.name}</strong> is available for your learning journey.
                       </ConfirmationText>
                     </ConfirmationMessage>
                   )}
