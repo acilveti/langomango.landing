@@ -366,7 +366,7 @@ export default function LanguageRegistrationModal({
           confirmPassword: fieldName === 'confirmPassword' ? fieldValue : allValues.confirmPassword
         });
         setErrors(prev => ({ ...prev, confirmPassword: '' }));
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof Yup.ValidationError) {
           setErrors(prev => ({ ...prev, confirmPassword: error.message }));
         }
