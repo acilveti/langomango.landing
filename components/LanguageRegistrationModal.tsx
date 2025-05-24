@@ -233,15 +233,6 @@ async function registerUser(values: ISignUpJson) {
   }
 }
 
-// Google Auth interfaces
-interface IGoogleAuthResponse {
-  redirectUrl: string;
-}
-
-interface IGoogleAuthRequest {
-  referralCode?: string;
-}
-
 // Google Auth functions
 function handleGoogleAuthCallback(): boolean {
   try {
@@ -321,31 +312,24 @@ async function initiateGoogleAuth(referralCode?: string, returnUrl: string = "/t
   }
 }
 
-// Referral utilities (optional - uncomment if you want referral support)
-/*
-function captureReferral() {
-  if (typeof window === 'undefined') return;
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const referralCode = urlParams.get('ref');
-  
-  if (referralCode) {
-    localStorage.setItem('referralCode', referralCode);
-  }
+// Language interface (matching the one from FeaturesGallery)
+interface Language {
+  code: string;
+  name: string;
+  flag: string;
 }
 
-function getReferral(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('referralCode');
-}
-*/
-
-export interface RegistrationModalProps {
+export interface LanguageRegistrationModalProps {
+  selectedLanguage: Language;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export default function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps) {
+export default function LanguageRegistrationModal({ 
+  selectedLanguage, 
+  onClose, 
+  onSuccess 
+}: LanguageRegistrationModalProps) {
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -360,9 +344,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
 
   // Check for Google auth callback on component mount
   React.useEffect(() => {
-    // Capture referral when component mounts and check for Google auth callback
-    // captureReferral(); // Uncomment if using referrals
-    
     // Check if this is a return from Google authentication
     if (handleGoogleAuthCallback()) {
       // If we got a token, show success and redirect to beta-app login
@@ -455,9 +436,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
     setIsLoading(true);
 
     try {
-      // Get referral code if you have that functionality
-      // const referralCode = getReferral();
-      
       const response = await registerUser({ 
         email: values.email, 
         password: values.password,
@@ -486,9 +464,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
   // Handle Google Sign Up
   const handleGoogleSignUp = React.useCallback(async () => {
     try {
-      // Get referral code if you have that functionality
-      // const referralCode = getReferral();
-      
       // Directly redirect to Google login with referral code (empty string since backend requires it)
       await initiateGoogleAuth("", "/sign-up"); // Pass empty string for referralCode
       
@@ -498,6 +473,11 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       setErrors({ submit: 'An error occurred during Google sign-up.' });
     }
   }, []);
+
+  const handleSkip = () => {
+    onSuccess?.();
+    onClose();
+  };
 
   return (
     <Overlay>
@@ -510,14 +490,35 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
           {isSuccess ? (
             <SuccessContainer>
               <Title>Welcome aboard! 🎉</Title>
+              <LanguageConfirmation>
+                <LanguageFlag>{selectedLanguage.flag}</LanguageFlag>
+                <LanguageName>{selectedLanguage.name}</LanguageName>
+                <ConfirmationMark>✓</ConfirmationMark>
+              </LanguageConfirmation>
               <SuccessMessage>Your account has been created successfully!</SuccessMessage>
+              <SuccessMessage>
+                You're all set to start learning <strong>{selectedLanguage.name}</strong>!
+              </SuccessMessage>
               <SuccessMessage>Redirecting you to login...</SuccessMessage>
             </SuccessContainer>
           ) : (
             <>
-              <Title>Create your account</Title>
-              <SubTitle>Join us to leverage your reading hobby</SubTitle>
+              <SubTitle>Ready to learn {selectedLanguage.name}?</SubTitle>
               
+              <Title>
+                Give it a try using our free demo in {selectedLanguage.name}
+              </Title>
+              <LanguageDisplayContainer>
+                <LanguageDisplay>
+                  <LanguageFlag>{selectedLanguage.flag}</LanguageFlag>
+                  <LanguageName>{selectedLanguage.name}</LanguageName>
+                  <AvailableBadge>
+                    <ConfirmationMark>✓</ConfirmationMark>
+                    <BadgeText>Available</BadgeText>
+                  </AvailableBadge>
+                </LanguageDisplay>
+              </LanguageDisplayContainer>
+
               <FormContainer>
                 <InputContainer>
                   <CustomInput
@@ -626,6 +627,17 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
                     Log in
                   </LoginButton>
                 </LoginSection>
+
+                {/* Skip Section */}
+                <SkipSection>
+                  <SkipButton 
+                    type="button"
+                    onClick={handleSkip}
+                    disabled={isLoading}
+                  >
+                    Skip for now
+                  </SkipButton>
+                </SkipSection>
               </FormContainer>
             </>
           )}
@@ -636,6 +648,58 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
 }
 
 // Animations
+const bounceIn = keyframes`
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+const checkmarkBounce = keyframes`
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+`;
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const shake = keyframes`
   0%, 100% {
     transform: translateX(0);
@@ -648,21 +712,25 @@ const shake = keyframes`
   }
 `;
 
+// Styled Components
 const Card = styled.form`
   display: flex;
   position: relative;
   flex-direction: column;
   margin: auto;
-  padding: 5rem 4rem;
+  padding: 3rem 3rem;
   background: rgb(var(--modalBackground));
   border-radius: 0.6rem;
-  max-width: 50rem;
-  overflow: hidden;
+  max-width: 45rem;
+  max-height: 90vh;
+  overflow-y: auto;
   color: rgb(var(--text));
 
   ${media('<=tablet')} {
-    padding: 4rem 2.5rem;
+    padding: 2.5rem 2rem;
     max-width: 90vw;
+    max-height: 90vh;
+    margin-top:10rem
   }
 `;
 
@@ -678,34 +746,91 @@ const CloseIconContainer = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: bold;
   line-height: 1.1;
   letter-spacing: -0.03em;
   text-align: center;
   color: rgb(var(--text));
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 
   ${media('<=tablet')} {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 `;
 
-const SubTitle = styled.div`
+const LanguageDisplayContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+`;
+
+const LanguageDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+  border: 2px solid rgba(255, 152, 0, 0.2);
+  border-radius: 0.8rem;
+  animation: ${bounceIn} 0.6s ease-out;
+  gap: 0.8rem;
+`;
+
+const LanguageFlag = styled.span`
+  font-size: 1.8rem;
+  line-height: 1;
+`;
+
+const LanguageName = styled.span`
   font-size: 1.6rem;
-  text-align: center;
-  color: rgb(var(--textSecondary));
-  margin-bottom: 3rem;
+  font-weight: 600;
+  color: rgb(var(--text));
 
   ${media('<=tablet')} {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+  }
+`;
+
+const AvailableBadge = styled.div`
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 1.5rem;
+  padding: 0.3rem 0.8rem;
+  gap: 0.4rem;
+  animation: ${pulse} 2s infinite;
+`;
+
+const ConfirmationMark = styled.span`
+  color: #22c55e;
+  font-size: 1.1rem;
+  font-weight: bold;
+  animation: ${checkmarkBounce} 0.5s ease-out 0.3s both;
+`;
+
+const BadgeText = styled.span`
+  color: #059669;
+  font-size: 1rem;
+  font-weight: 600;
+`;
+
+const SubTitle = styled.div`
+  font-size: 1.4rem;
+  text-align: center;
+  text-color: rgb(var(--textSecondary));
+  margin-bottom: 2rem;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 1.3rem;
   }
 `;
 
 const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
 `;
 
@@ -717,8 +842,8 @@ const InputContainer = styled.div`
 
 const CustomInput = styled(Input)<{ hasError?: boolean }>`
   width: 100%;
-  padding: 1.5rem;
-  font-size: 1.6rem;
+  padding: 1.2rem;
+  font-size: 1.4rem;
   border: 2px solid ${props => props.hasError ? 'rgb(var(--errorColor))' : 'rgb(var(--inputBorder, 226, 232, 240))'};
   transition: all 0.2s ease;
   animation: ${props => props.hasError ? shake : 'none'} 0.5s ease;
@@ -738,9 +863,8 @@ const ErrorText = styled.span`
 
 const CustomButton = styled(Button)`
   width: 100%;
-  padding: 1.8rem;
-  margin-top: 1rem;
-  font-size: 1.6rem;
+  padding: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 600;
   background: rgb(var(--primary));
   color: white;
@@ -749,6 +873,7 @@ const CustomButton = styled(Button)`
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
 
   &:hover:not(:disabled) {
     background: rgb(var(--primaryDark, --primary));
@@ -767,32 +892,36 @@ const CustomButton = styled(Button)`
   }
 `;
 
-const ErrorMessage = styled.p`
-  color: rgb(var(--errorColor));
-  font-size: 1.4rem;
-  text-align: center;
-  margin: 0;
-  padding: 0.5rem;
-  background: rgba(var(--errorColor), 0.1);
-  border-radius: 0.5rem;
-  border: 1px solid rgba(var(--errorColor), 0.2);
-`;
-
-const SuccessContainer = styled.div`
-  text-align: center;
-  padding: 2rem 0;
-`;
-
-const SuccessMessage = styled.p`
-  color: rgb(var(--primary));
-  font-size: 1.6rem;
+const SkipSection = styled.div`
   margin-top: 1rem;
+  text-align: center;
+`;
+
+const SkipButton = styled.button`
+  background: transparent;
+  border: none;
+  color: rgb(var(--textSecondary));
+  padding: 1rem;
+  font-size: 1.4rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+
+  &:hover:not(:disabled) {
+    color: rgb(var(--text));
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const DividerContainer = styled.div`
   display: flex;
   align-items: center;
-  margin: 2rem 0;
+  margin: 1.5rem 0;
 `;
 
 const DividerLine = styled.div`
@@ -803,9 +932,9 @@ const DividerLine = styled.div`
 `;
 
 const DividerText = styled.span`
-  margin: 0 1.5rem;
+  margin: 0 1.2rem;
   color: rgb(var(--textSecondary));
-  font-size: 1.4rem;
+  font-size: 1.3rem;
 `;
 
 const GoogleButton = styled.button`
@@ -813,11 +942,11 @@ const GoogleButton = styled.button`
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1.8rem;
+  padding: 1.4rem;
   background: white;
   border: 2px solid #e1e5e9;
   border-radius: 0.6rem;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 500;
   color: #374151;
   cursor: pointer;
@@ -843,7 +972,7 @@ const GoogleButton = styled.button`
 `;
 
 const GoogleIconContainer = styled.div`
-  margin-right: 1rem;
+  margin-right: 0.8rem;
   display: flex;
   align-items: center;
 `;
@@ -852,13 +981,13 @@ const LoginSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
+  margin-top: 1.5rem;
+  gap: 0.8rem;
 `;
 
 const LoginText = styled.p`
   color: rgb(var(--textSecondary));
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin: 0;
 `;
 
@@ -866,9 +995,9 @@ const LoginButton = styled.button`
   background: transparent;
   border: 2px solid rgb(var(--primary));
   color: rgb(var(--primary));
-  padding: 1.2rem 2.4rem;
+  padding: 1rem 2rem;
   border-radius: 0.6rem;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -883,5 +1012,47 @@ const LoginButton = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+`;
+
+const ErrorMessage = styled.p`
+  color: rgb(var(--errorColor));
+  font-size: 1.4rem;
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem;
+  background: rgba(var(--errorColor), 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(var(--errorColor), 0.2);
+`;
+
+const SuccessContainer = styled.div`
+  text-align: center;
+  padding: 2rem 0;
+`;
+
+const LanguageConfirmation = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  border-radius: 1rem;
+  animation: ${bounceIn} 0.6s ease-out;
+  gap: 1rem;
+`;
+
+const SuccessMessage = styled.p`
+  color: rgb(var(--text));
+  font-size: 1.6rem;
+  margin-top: 1rem;
+  line-height: 1.4;
+  animation: ${fadeInUp} 0.5s ease-out;
+
+  strong {
+    color: rgb(var(--primary));
+    font-weight: 600;
   }
 `;

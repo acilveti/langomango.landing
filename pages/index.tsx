@@ -209,10 +209,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="features-section">
             <FeaturesGallery />
           </div>
-          <SimpleCta 
-            trackingEvent="features section cta" 
-            location="after features"
-          />
             <Testimonials title={t('home:section1.title')} overTitle={t('home:section1.overTitle')} />
 
             <div id="cta-section-top">
