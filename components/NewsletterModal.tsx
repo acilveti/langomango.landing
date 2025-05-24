@@ -377,18 +377,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
 
   // Real-time validation function
   const validateField = async (fieldName: string, fieldValue: string, allValues: typeof values) => {
-    try {
-      // Create a validation object for the specific field
-      const fieldSchema = validationSchema.fields[fieldName as keyof typeof validationSchema.fields];
-      if (fieldSchema) {
-        // If validation passes, clear the error
-        setErrors(prev => ({ ...prev, [fieldName]: '' }));
-      }
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setErrors(prev => ({ ...prev, [fieldName]: error.message }));
-      }
-    }
 
     // Special case for confirmPassword - validate against current password
     if (fieldName === 'confirmPassword' || fieldName === 'password') {
