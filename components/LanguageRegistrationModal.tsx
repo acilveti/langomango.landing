@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { Formik, FormikHelpers } from 'formik';
+import * as Yup from 'yup';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import Button from './Button';
@@ -7,7 +9,6 @@ import CloseIcon from './CloseIcon';
 import Container from './Container';
 import Input from './Input';
 import Overlay from './Overlay';
-import * as Yup from 'yup';
 
 // Axios imports
 import axios, {
@@ -46,12 +47,10 @@ const getBaseURL = () => {
     
     return process.env.NODE_ENV === 'development'
       ? process.env.NGROK || 'http://192.168.0.14:8080/'
-      // : 'https://api-bk.langomango.com/';
       : 'https://staging.langomango.com/';
   }
   
   // Server-side fallback
-  // return 'https://api-bk.langomango.com/';
   return 'https://staging.langomango.com/';
 };
 
@@ -66,7 +65,6 @@ const API_CONFIG = {
   },
   production: {
     baseURL: 'https://staging.langomango.com/',
-    // baseURL: 'https://api-bk.langomango.com/',
     timeout: 120000,
   },
 };
@@ -203,23 +201,6 @@ function getErrorMessage(error: unknown): string {
   return 'An unexpected error occurred';
 }
 
-// Yup validation schema with enhanced password requirements
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .email('Invalid email format')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .matches(/[0-9]/, 'Passwords must have at least one digit (\'0\'-\'9\')')
-    .matches(/[A-Z]/, 'Passwords must have at least one uppercase (\'A\'-\'Z\')')
-    .matches(/[a-z]/, 'Passwords must have at least one lowercase (\'a\'-\'z\')')
-    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Passwords must have at least one special character')
-    .required('Password is required'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
-});
-
 // API functions
 async function registerUser(values: ISignUpJson) {
   try {
@@ -327,20 +308,30 @@ export interface LanguageRegistrationModalProps {
   onSuccess?: () => void;
 }
 
+// Simplified Yup validation schema
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .matches(/[0-9]/, 'Passwords must have at least one digit (\'0\'-\'9\')')
+    .matches(/[A-Z]/, 'Passwords must have at least one uppercase (\'A\'-\'Z\')')
+    .matches(/[a-z]/, 'Passwords must have at least one lowercase (\'a\'-\'z\')')
+    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Passwords must have at least one special character')
+    .required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Passwords must match')
+    .required('Confirm password is required'),
+});
+
 export default function LanguageRegistrationModal({ 
   selectedLanguage, 
   onClose, 
   onSuccess 
 }: LanguageRegistrationModalProps) {
-  const [values, setValues] = useState({
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [apiError, setApiError] = useState<string>('');
 
   useEscClose({ onClose });
 
@@ -358,83 +349,13 @@ export default function LanguageRegistrationModal({
     }
   }, [onSuccess, onClose]);
 
-  // Real-time validation function
-  const validateField = async (fieldName: string, fieldValue: string, allValues: typeof values) => {
+  // Handle form submission
+  const handleSubmit = async (
+    values: { email: string; password: string; confirmPassword: string },
+    { setSubmitting }: FormikHelpers<{ email: string; password: string; confirmPassword: string }>
+  ) => {
     try {
-      // Use validateAt to validate a specific field with proper typing
-      await validationSchema.validateAt(fieldName, { ...allValues, [fieldName]: fieldValue });
-      // If validation passes, clear the error
-      setErrors(prev => ({ ...prev, [fieldName]: '' }));
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setErrors(prev => ({ ...prev, [fieldName]: error.message }));
-      }
-    }
-
-    // Special case for confirmPassword - validate against current password
-    if (fieldName === 'confirmPassword' || fieldName === 'password') {
-      try {
-        await validationSchema.validateAt('confirmPassword', {
-          password: fieldName === 'password' ? fieldValue : allValues.password,
-          confirmPassword: fieldName === 'confirmPassword' ? fieldValue : allValues.confirmPassword
-        });
-        setErrors(prev => ({ ...prev, confirmPassword: '' }));
-      } catch (error) {
-        if (error instanceof Yup.ValidationError) {
-          setErrors(prev => ({ ...prev, confirmPassword: error.message }));
-        }
-      }
-    }
-  };
-
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const newValues = { ...values, [field]: value };
-    setValues(newValues);
-    
-    // If field has been touched, validate it in real-time
-    if (touched[field]) {
-      validateField(field, value, newValues);
-    }
-  };
-
-  const handleBlur = (field: string) => async () => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-    
-    // Validate the field when it loses focus
-    await validateField(field, values[field as keyof typeof values], values);
-  };
-
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    
-    // Mark all fields as touched
-    setTouched({
-      email: true,
-      password: true,
-      confirmPassword: true
-    });
-
-    // Validate all fields using Yup
-    try {
-      await validationSchema.validate(values, { abortEarly: false });
-      setErrors({}); // Clear all errors if validation passes
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        const formErrors: Record<string, string> = {};
-        error.inner.forEach(err => {
-          if (err.path) {
-            formErrors[err.path] = err.message;
-          }
-        });
-        setErrors(formErrors);
-        return; // Don't submit if there are validation errors
-      }
-    }
-
-    setIsLoading(true);
-
-    try {
+      setApiError('');
       const response = await registerUser({ 
         email: values.email, 
         password: values.password,
@@ -450,26 +371,27 @@ export default function LanguageRegistrationModal({
           window.location.href = 'https://beta-app.langomango.com/login';
         }, 2000);
       } else {
-        setErrors({ submit: 'Registration failed' });
+        setApiError('Registration failed');
       }
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
-      setErrors({ submit: errorMessage });
+      setApiError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
-  }
+  };
 
   // Handle Google Sign Up
   const handleGoogleSignUp = React.useCallback(async () => {
     try {
+      setApiError('');
       // Directly redirect to Google login with referral code (empty string since backend requires it)
       await initiateGoogleAuth("", "/sign-up"); // Pass empty string for referralCode
       
       // No need for further redirect handling here as the browser will navigate
     } catch (error) {
       console.error('Error during Google sign-up:', error);
-      setErrors({ submit: 'An error occurred during Google sign-up.' });
+      setApiError('An error occurred during Google sign-up.');
     }
   }, []);
 
@@ -481,7 +403,7 @@ export default function LanguageRegistrationModal({
   return (
     <Overlay>
       <Container>
-        <Card onSubmit={onSubmit}>
+        <Card>
           <CloseIconContainer>
             <CloseIcon onClick={onClose} />
           </CloseIconContainer>
@@ -518,126 +440,134 @@ export default function LanguageRegistrationModal({
                 </LanguageDisplay>
               </LanguageDisplayContainer>
 
-              <FormContainer>
-                <InputContainer>
-                  <CustomInput
-                    type="email"
-                    value={values.email}
-                    onChange={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    placeholder="Enter your email"
-                    required
-                    disabled={isLoading}
-                    hasError={touched.email && !!errors.email}
-                  />
-                  {touched.email && errors.email && (
-                    <ErrorText>{errors.email}</ErrorText>
-                  )}
-                </InputContainer>
-                
-                <InputContainer>
-                  <CustomInput
-                    type="password"
-                    value={values.password}
-                    onChange={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    placeholder="Create a password"
-                    required
-                    disabled={isLoading}
-                    hasError={touched.password && !!errors.password}
-                  />
-                  {touched.password && errors.password && (
-                    <ErrorText>{errors.password}</ErrorText>
-                  )}
-                </InputContainer>
-                
-                <InputContainer>
-                  <CustomInput
-                    type="password"
-                    value={values.confirmPassword}
-                    onChange={handleChange('confirmPassword')}
-                    onBlur={handleBlur('confirmPassword')}
-                    placeholder="Confirm your password"
-                    required
-                    disabled={isLoading}
-                    hasError={touched.confirmPassword && !!errors.confirmPassword}
-                  />
-                  {touched.confirmPassword && errors.confirmPassword && (
-                    <ErrorText>{errors.confirmPassword}</ErrorText>
-                  )}
-                </InputContainer>
-
-                {errors.submit && <ErrorMessage>{errors.submit}</ErrorMessage>}
-
-                <CustomButton 
-                  as="button" 
-                  type="submit" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Creating account...' : 'Create account'}
-                </CustomButton>
-
-                {/* Google Sign Up Section */}
-                <DividerContainer>
-                  <DividerLine />
-                  <DividerText>or</DividerText>
-                  <DividerLine />
-                </DividerContainer>
-                
-                <GoogleButton 
-                  type="button"
-                  onClick={handleGoogleSignUp}
-                  disabled={isLoading}
-                >
-                  <GoogleIconContainer>
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              <Formik
+                initialValues={{ email: '', password: '', confirmPassword: '' }}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+              >
+                {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+                  <FormContainer as="form" onSubmit={handleSubmit}>
+                    <InputContainer>
+                      <CustomInput
+                        type="email"
+                        name="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Enter your email"
+                        disabled={isSubmitting}
+                        hasError={touched.email && !!errors.email}
                       />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      {touched.email && errors.email && (
+                        <ErrorText>{errors.email}</ErrorText>
+                      )}
+                    </InputContainer>
+                    
+                    <InputContainer>
+                      <CustomInput
+                        type="password"
+                        name="password"
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Create a password"
+                        disabled={isSubmitting}
+                        hasError={touched.password && !!errors.password}
                       />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      {touched.password && errors.password && (
+                        <ErrorText>{errors.password}</ErrorText>
+                      )}
+                    </InputContainer>
+                    
+                    <InputContainer>
+                      <CustomInput
+                        type="password"
+                        name="confirmPassword"
+                        value={values.confirmPassword}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Confirm your password"
+                        disabled={isSubmitting}
+                        hasError={touched.confirmPassword && !!errors.confirmPassword}
                       />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
-                  </GoogleIconContainer>
-                  Sign up with Google
-                </GoogleButton>
+                      {touched.confirmPassword && errors.confirmPassword && (
+                        <ErrorText>{errors.confirmPassword}</ErrorText>
+                      )}
+                    </InputContainer>
 
-                {/* Login Section */}
-                <LoginSection>
-                  <LoginText>Already have an account?</LoginText>
-                  <LoginButton 
-                    type="button"
-                    onClick={() => {
-                      onClose();
-                      // Navigate to login page
-                      window.location.href = 'https://beta-app.langomango.com/login';
-                    }}
-                  >
-                    Log in
-                  </LoginButton>
-                </LoginSection>
+                    {apiError && <ErrorMessage>{apiError}</ErrorMessage>}
 
-                {/* Skip Section */}
-                <SkipSection>
-                  <SkipButton 
-                    type="button"
-                    onClick={handleSkip}
-                    disabled={isLoading}
-                  >
-                    Skip for now
-                  </SkipButton>
-                </SkipSection>
-              </FormContainer>
+                    <CustomButton 
+                      as="button" 
+                      type="submit" 
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Creating account...' : 'Create account'}
+                    </CustomButton>
+
+                    {/* Google Sign Up Section */}
+                    <DividerContainer>
+                      <DividerLine />
+                      <DividerText>or</DividerText>
+                      <DividerLine />
+                    </DividerContainer>
+                    
+                    <GoogleButton 
+                      type="button"
+                      onClick={handleGoogleSignUp}
+                      disabled={isSubmitting}
+                    >
+                      <GoogleIconContainer>
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          />
+                        </svg>
+                      </GoogleIconContainer>
+                      Sign up with Google
+                    </GoogleButton>
+
+                    {/* Login Section */}
+                    <LoginSection>
+                      <LoginText>Already have an account?</LoginText>
+                      <LoginButton 
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          // Navigate to login page
+                          window.location.href = 'https://beta-app.langomango.com/login';
+                        }}
+                      >
+                        Log in
+                      </LoginButton>
+                    </LoginSection>
+
+                    {/* Skip Section */}
+                    <SkipSection>
+                      <SkipButton 
+                        type="button"
+                        onClick={handleSkip}
+                        disabled={isSubmitting}
+                      >
+                        Skip for now
+                      </SkipButton>
+                    </SkipSection>
+                  </FormContainer>
+                )}
+              </Formik>
             </>
           )}
         </Card>
@@ -712,7 +642,7 @@ const shake = keyframes`
 `;
 
 // Styled Components
-const Card = styled.form`
+const Card = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;
@@ -883,85 +813,6 @@ const CustomButton = styled(Button)`
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const SkipSection = styled.div`
-  margin-top: 1rem;
-  text-align: center;
-`;
-
-const SkipButton = styled.button`
-  background: transparent;
-  border: none;
-  color: rgb(var(--textSecondary));
-  padding: 1rem;
-  font-size: 1.4rem;
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: underline;
-
-  &:hover:not(:disabled) {
-    color: rgb(var(--text));
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const DividerContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 1.5rem 0;
-`;
-
-const DividerLine = styled.div`
-  flex: 1;
-  height: 1px;
-  background-color: rgb(var(--textSecondary));
-  opacity: 0.3;
-`;
-
-const DividerText = styled.span`
-  margin: 0 1.2rem;
-  color: rgb(var(--textSecondary));
-  font-size: 1.3rem;
-`;
-
-const GoogleButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 1.4rem;
-  background: white;
-  border: 2px solid #e1e5e9;
-  border-radius: 0.6rem;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  
-  &:hover:not(:disabled) {
-    background: #f8f9fa;
-    border-color: #d1d5db;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
   
   &:disabled {
     opacity: 0.6;
@@ -1055,3 +906,76 @@ const SuccessMessage = styled.p`
     font-weight: 600;
   }
 `;
+
+
+const SkipSection = styled.div`
+  margin-top: 1rem;
+  text-align: center;
+`;
+
+const SkipButton = styled.button`
+  background: transparent;
+  border: none;
+  color: rgb(var(--textSecondary));
+  padding: 1rem;
+  font-size: 1.4rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+
+  &:hover:not(:disabled) {
+    color: rgb(var(--text));
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const DividerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+`;
+
+const DividerLine = styled.div`
+  flex: 1;
+  height: 1px;
+  background-color: rgb(var(--textSecondary));
+  opacity: 0.3;
+`;
+
+const DividerText = styled.span`
+  margin: 0 1.2rem;
+  color: rgb(var(--textSecondary));
+  font-size: 1.3rem;
+`;
+
+const GoogleButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1.4rem;
+  background: white;
+  border: 2px solid #e1e5e9;
+  border-radius: 0.6rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }`;
