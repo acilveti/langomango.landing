@@ -12,6 +12,7 @@ import Container from './Container';
 import Drawer from './Drawer';
 import { HamburgerIcon } from './HamburgerIcon';
 import Logo from './Logo2Lines';
+import ExpandingButton from './ExpandingButton';
 
 const ColorSwitcher = dynamic(() => import('../components/ColorSwitcher'), { ssr: false });
 
@@ -36,7 +37,7 @@ export default function Navbar({ items }: NavbarProps) {
       if (heroSection) {
         const heroHeight = heroSection.offsetHeight;
         const scrollPosition = window.scrollY;
-        
+
         // If scroll position is less than hero height, we're over the hero
         setIsOverHero(scrollPosition < heroHeight - 100); // Subtract navbar height for smoother transition
       }
@@ -44,10 +45,10 @@ export default function Navbar({ items }: NavbarProps) {
 
     // Run on initial load
     checkIfOverHero();
-    
+
     // Add scroll event listener
     window.addEventListener('scroll', checkIfOverHero);
-    
+
     // Cleanup
     return () => {
       window.removeEventListener('scroll', checkIfOverHero);
@@ -113,9 +114,11 @@ function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem &
 
   return (
     <NavItemWrapper outlined={outlined} isOverHero={isOverHero}>
-      <NextLink href={href} passHref>
-        <a data-umami-event="navbar button" onClick={handleClick}>{title}</a>
-      </NextLink>
+      <ExpandingButton style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }} data-umami-event="cta button" onClick={handleClick}>
+        <a data-umami-event="navbar button" onClick={handleClick}>
+          {title}
+        </a>
+      </ExpandingButton>
     </NavItemWrapper>
   );
 }
@@ -141,7 +144,7 @@ const NavItemWrapper = styled.li<Partial<SingleNavItem> & { isOverHero?: boolean
   text-transform: uppercase;
   line-height: 2;
   margin-left: 1.25em;
-  
+
   &:hover {
     background-color: ${(p) => (p.outlined ? 'rgb(var(--primary), 0.8)' : 'transparent')};
     transition: background-color 0.2s;
@@ -149,7 +152,7 @@ const NavItemWrapper = styled.li<Partial<SingleNavItem> & { isOverHero?: boolean
 
   a {
     display: flex;
-    color: ${(p) => (p.isOverHero ? 'white' : (p.outlined ? 'rgb(var(--textSecondary))' : 'rgb(var(--text), 0.75)'))};
+    color: ${(p) => (p.isOverHero ? 'white' : p.outlined ? 'rgb(var(--textSecondary))' : 'rgb(var(--text), 0.75)')};
     letter-spacing: 0.025em;
     text-decoration: none;
     padding: 0.75rem 1.5rem;
@@ -187,4 +190,12 @@ const Content = styled(Container)`
   display: flex;
   justify-content: flex-end;
   align-items: center;
+`;
+
+const SmallButtonWrapper = styled.div`
+  button {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.9rem !important;
+    transform: scale(0.8); /* Scale down the entire button */
+  }
 `;

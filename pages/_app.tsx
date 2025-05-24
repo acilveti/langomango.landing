@@ -24,25 +24,10 @@ import { addReferralToUrl } from 'utils/referral';
 import { appWithTranslation } from 'next-i18next';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
-export const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  e.preventDefault();
-  window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
-};
-
 // Define a custom nav item type that includes the onClick handler
 type NavItemWithHandler = NavItems[0] & {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
-
-// Create navigation items with the onClick handler
-const navItems: NavItemWithHandler[] = [
-  { 
-    title: 'USE DEMO', 
-    href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
-    outlined: true,
-    onClick: handleButtonClick, // Add the onClick handler
-  },
-];
 
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 
@@ -146,24 +131,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <Providers>
         <Modals />
-        <Navbar items={navItems} />
-        <TinaEditProvider
-          editMode={
-            <TinaCMS
-              query={pageProps.query}
-              variables={pageProps.variables}
-              data={pageProps.data}
-              isLocalClient={!process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-              branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-              clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-              {...pageProps}
-            >
-              {(livePageProps: any) => <Component {...livePageProps} />}
-            </TinaCMS>
-          }
-        >
-          <Component {...pageProps} />
-        </TinaEditProvider>
+        <AppContent Component={Component} pageProps={pageProps} />
         <WaveCta />
         <Footer />
       </Providers>
@@ -172,10 +140,57 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
+function AppContent({ Component, pageProps }: { Component: any; pageProps: any }) {
+  const { setIsModalOpened } = useNewsletterModalContext();
+
+  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsModalOpened(true);
+    // Uncomment if you also want to redirect after opening modal
+    // setTimeout(() => {
+    //   window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    // }, 100);
+  };
+
+  // Create navigation items with the onClick handler
+  const navItems: NavItemWithHandler[] = [
+    { 
+      title: 'USE DEMO', 
+      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
+      outlined: true,
+      onClick: handleButtonClick,
+    },
+  ];
+
+  return (
+    <>
+      <Navbar items={navItems} />
+      <TinaEditProvider
+        editMode={
+          <TinaCMS
+            query={pageProps.query}
+            variables={pageProps.variables}
+            data={pageProps.data}
+            isLocalClient={!process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
+            branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
+            clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
+            {...pageProps}
+          >
+            {(livePageProps: any) => <Component {...livePageProps} />}
+          </TinaCMS>
+        }
+      >
+        <Component {...pageProps} />
+      </TinaEditProvider>
+      <NavigationDrawer items={navItems} />
+    </>
+  );
+}
+
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
     <NewsletterModalContextProvider>
-      <NavigationDrawer items={navItems}>{children}</NavigationDrawer>
+      {children}
     </NewsletterModalContextProvider>
   );
 }
