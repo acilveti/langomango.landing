@@ -381,7 +381,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       // Create a validation object for the specific field
       const fieldSchema = validationSchema.fields[fieldName as keyof typeof validationSchema.fields];
       if (fieldSchema) {
-        await fieldSchema.validate(fieldValue);
         // If validation passes, clear the error
         setErrors(prev => ({ ...prev, [fieldName]: '' }));
       }
