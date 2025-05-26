@@ -35,6 +35,7 @@ import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackP
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
+import LanguageSelector, { Language } from 'components/LanguageSelector'; // Import the new component
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
