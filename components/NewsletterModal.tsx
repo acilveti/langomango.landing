@@ -31,8 +31,19 @@ interface ApiError {
 
 interface ISignUpJson {
   email: string;
-  password: string;
   referralCode?: string;
+}
+
+// Request DTO to match backend
+interface RegisterWithoutPassDTO {
+  Email: string;
+  ReferralCode?: string;
+}
+
+// Response type for registration
+interface RegisterResponse {
+  token: string;  // lowercase to match actual response
+  message: string; // lowercase to match actual response
 }
 
 // Environment and URL Configuration
@@ -154,7 +165,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           await SimpleAuthService.clearAuth();
           if (typeof window !== 'undefined') {
-            window.location.href = 'https://beta-app.langomango.com/login';
+            window.location.href = 'https://localhost:3000/login';
           }
           return Promise.reject(new Error('Authentication required'));
         }
@@ -202,12 +213,15 @@ function getErrorMessage(error: unknown): string {
 // API functions
 async function registerUser(values: ISignUpJson) {
   try {
-    return await apiClient.post('/auth/register', {
-      email: values.email,
-      password: values.password,
-      confirmPassword: values.password,
-      referralCode: values.referralCode || "", // Always send a string, empty if no referral
-    });
+    const requestData: RegisterWithoutPassDTO = {
+      Email: values.email,
+      ReferralCode: values.referralCode || "", // Always send a string, empty if no referral
+    };
+
+    return await apiClient.post<RegisterResponse, RegisterWithoutPassDTO>(
+      '/auth/register-withoutpass', 
+      requestData
+    );
   } catch (error) {
     console.error('Error during registration:', error);
     throw error;
@@ -312,21 +326,11 @@ function getReferral(): string | null {
 }
 */
 
-// Simplified Yup validation schema
+// Simplified Yup validation schema - only email now
 const validationSchema = Yup.object({
   email: Yup.string()
     .email('Invalid email format')
     .required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .matches(/[0-9]/, 'Passwords must have at least one digit (\'0\'-\'9\')')
-    .matches(/[A-Z]/, 'Passwords must have at least one uppercase (\'A\'-\'Z\')')
-    .matches(/[a-z]/, 'Passwords must have at least one lowercase (\'a\'-\'z\')')
-    .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, 'Passwords must have at least one special character')
-    .required('Password is required'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
 });
 
 export interface RegistrationModalProps {
@@ -347,20 +351,21 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
     
     // Check if this is a return from Google authentication
     if (handleGoogleAuthCallback()) {
-      // If we got a token, show success and redirect to beta-app login
+      // If we got a token, show success and redirect to beta-app login with token
       setIsSuccess(true);
       onSuccess?.();
       setTimeout(() => {
         onClose();
-        window.location.href = 'https://beta-app.langomango.com/login';
+        const token = localStorage.getItem('auth_token');
+        window.location.href = `http://localhost:3000/login?token=${encodeURIComponent(token || '')}&type=google`;
       }, 2000);
     }
   }, [onSuccess, onClose]);
 
   // Handle form submission
   const handleSubmit = async (
-    values: { email: string; password: string; confirmPassword: string },
-    { setSubmitting }: FormikHelpers<{ email: string; password: string; confirmPassword: string }>
+    values: { email: string },
+    { setSubmitting }: FormikHelpers<{ email: string }>
   ) => {
     try {
       setApiError('');
@@ -369,23 +374,31 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       // const referralCode = getReferral();
       
       const response = await registerUser({ 
-        email: values.email, 
-        password: values.password,
+        email: values.email,
         referralCode: "" // Always send empty string since backend requires it
       });
 
-      if (response.status === 200) {
+      console.log('Registration response:', response.data); // Debug log
+
+      if (response.status === 200 && response.data?.token) {
+        // Store the token for backup
+        await SimpleAuthService.setToken(response.data.token);
+        console.log('Token stored, redirecting to set-password with token'); // Debug log
+        
         setIsSuccess(true);
         onSuccess?.();
-        // Auto-redirect to beta-app login after 2 seconds
+        
+        // Auto-redirect to /set-password with token in URL after 2 seconds
         setTimeout(() => {
           onClose();
-          window.location.href = 'https://beta-app.langomango.com/login';
+          window.location.href = `http://localhost:3000/login?token=${encodeURIComponent(response.data.token)}&type=email`;
         }, 2000);
       } else {
-        setApiError('Registration failed');
+        console.error('Registration failed - no token in response:', response.data); // Debug log
+        setApiError('Registration failed - no authentication token received');
       }
     } catch (error: unknown) {
+      console.error('Registration error:', error); // Debug log
       const errorMessage = getErrorMessage(error);
       setApiError(errorMessage);
     } finally {
@@ -422,7 +435,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
             <SuccessContainer>
               <Title>Welcome aboard! 🎉</Title>
               <SuccessMessage>Your account has been created successfully!</SuccessMessage>
-              <SuccessMessage>Redirecting you to login...</SuccessMessage>
+              <SuccessMessage>Redirecting you to set up your password...</SuccessMessage>
             </SuccessContainer>
           ) : (
             <>
@@ -430,7 +443,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
               <SubTitle>Join us to leverage your reading hobby</SubTitle>
               
               <Formik
-                initialValues={{ email: '', password: '', confirmPassword: '' }}
+                initialValues={{ email: '' }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
@@ -449,38 +462,6 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
                       />
                       {touched.email && errors.email && (
                         <ErrorText>{errors.email}</ErrorText>
-                      )}
-                    </InputContainer>
-                    
-                    <InputContainer>
-                      <CustomInput
-                        type="password"
-                        name="password"
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder="Create a password"
-                        disabled={isSubmitting}
-                        hasError={touched.password && !!errors.password}
-                      />
-                      {touched.password && errors.password && (
-                        <ErrorText>{errors.password}</ErrorText>
-                      )}
-                    </InputContainer>
-                    
-                    <InputContainer>
-                      <CustomInput
-                        type="password"
-                        name="confirmPassword"
-                        value={values.confirmPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder="Confirm your password"
-                        disabled={isSubmitting}
-                        hasError={touched.confirmPassword && !!errors.confirmPassword}
-                      />
-                      {touched.confirmPassword && errors.confirmPassword && (
-                        <ErrorText>{errors.confirmPassword}</ErrorText>
                       )}
                     </InputContainer>
 
