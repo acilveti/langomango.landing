@@ -165,7 +165,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           await SimpleAuthService.clearAuth();
           if (typeof window !== 'undefined') {
-            window.location.href = 'https://localhost:3000/login';
+            window.location.href = 'https://beta-app.langomango.com/login';
           }
           return Promise.reject(new Error('Authentication required'));
         }
@@ -357,7 +357,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       setTimeout(() => {
         onClose();
         const token = localStorage.getItem('auth_token');
-        window.location.href = `http://localhost:3000/login?token=${encodeURIComponent(token || '')}&type=google`;
+        window.location.href = `https://beta-app.langomango.com/login?token=${encodeURIComponent(token || '')}&type=google`;
       }, 2000);
     }
   }, [onSuccess, onClose]);
@@ -391,7 +391,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
         // Auto-redirect to /set-password with token in URL after 2 seconds
         setTimeout(() => {
           onClose();
-          window.location.href = `http://localhost:3000/login?token=${encodeURIComponent(response.data.token)}&type=email`;
+          window.location.href = `https://beta-app.langomango.com/login?token=${encodeURIComponent(response.data.token)}&type=email`;
         }, 2000);
       } else {
         console.error('Registration failed - no token in response:', response.data); // Debug log
