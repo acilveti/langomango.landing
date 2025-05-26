@@ -271,7 +271,7 @@ function handleGoogleAuthCallback(): boolean {
   }
 }
 
-async function initiateGoogleAuth(referralCode?: string, returnUrl: string = "/thank-you"): Promise<void> {
+async function initiateGoogleAuth(referralCode?: string, returnUrl: string = "/login"): Promise<void> {
   console.log("initiateGoogleAuth");
   try {
     // Get the base URL
