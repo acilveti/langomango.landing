@@ -4,6 +4,7 @@ import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
+import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
 import Button from './Button';
 import CloseIcon from './CloseIcon';
 import Container from './Container';
@@ -368,6 +369,13 @@ export default function LanguageRegistrationModal({
       console.log('Registration response:', response.data); // Debug log
 
       if (response.status === 200 && response.data?.token) {
+        // Track Reddit Pixel SignUp event for email registration
+        trackRedditConversion(RedditEventTypes.SIGNUP, {
+          signup_method: 'email',
+          language: selectedLanguage.code,
+          language_name: selectedLanguage.name
+        });
+        
         // Store the token for backup
         await SimpleAuthService.setToken(response.data.token);
         console.log('Token stored, redirecting to login with token'); // Debug log
@@ -398,6 +406,13 @@ export default function LanguageRegistrationModal({
     try {
       setApiError('');
       
+      // Track Reddit Pixel SignUp event for Google registration
+      trackRedditConversion(RedditEventTypes.SIGNUP, {
+        signup_method: 'google',
+        language: selectedLanguage.code,
+        language_name: selectedLanguage.name
+      });
+      
       // Directly redirect to Google login with referral code (empty string since backend requires it)
       await initiateGoogleAuth("", "/sign-up"); // Pass empty string for referralCode
       
@@ -406,7 +421,7 @@ export default function LanguageRegistrationModal({
       console.error('Error during Google sign-up:', error);
       setApiError('An error occurred during Google sign-up.');
     }
-  }, []);
+  }, [selectedLanguage]);
 
   const handleSkip = () => {
     onSuccess?.();

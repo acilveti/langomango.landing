@@ -4,6 +4,7 @@ import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
+import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
 import Button from './Button';
 import CloseIcon from './CloseIcon';
 import Container from './Container';
@@ -381,6 +382,12 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       console.log('Registration response:', response.data); // Debug log
 
       if (response.status === 200 && response.data?.token) {
+        // Track Reddit Pixel SignUp event for email registration
+        trackRedditConversion(RedditEventTypes.SIGNUP, {
+          signup_method: 'email',
+          source: 'newsletter_modal'
+        });
+        
         // Store the token for backup
         await SimpleAuthService.setToken(response.data.token);
         console.log('Token stored, redirecting to set-password with token'); // Debug log
@@ -412,6 +419,12 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       setApiError('');
       // Get referral code if you have that functionality
       // const referralCode = getReferral();
+      
+      // Track Reddit Pixel SignUp event for Google registration
+      trackRedditConversion(RedditEventTypes.SIGNUP, {
+        signup_method: 'google',
+        source: 'newsletter_modal'
+      });
       
       // Directly redirect to Google login with referral code (empty string since backend requires it)
       await initiateGoogleAuth("", "/sign-up"); // Pass empty string for referralCode
