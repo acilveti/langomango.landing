@@ -4,7 +4,7 @@ import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
-import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
+import {RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import Button from './Button';
 import CloseIcon from './CloseIcon';
 import Container from './Container';
