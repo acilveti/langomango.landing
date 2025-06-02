@@ -15,16 +15,22 @@ export default function Footer() {
   
   const footerItems: FooterItems = [
     {
-      title: "Product",
+      title: t('common:footer.sections.product'),
       items: [
-        { title: "Languages Offered", href: '/languages' },
+        { title: t('common:footer.links.languagesOffered'), href: '/languages' },
       ],
     },
     {
-      title: "Legal",
+      title: t('common:footer.sections.company'),
       items: [
-        { title: "Terms and Conditions", href: '/terms-and-conditions' },
-        { title: "Privacy Policy", href: '/privacy-policy' },
+        { title: t('common:footer.links.wallOfThanks'), href: '/acknowledgments' },
+      ],
+    },
+    {
+      title: t('common:footer.sections.legal'),
+      items: [
+        { title: t('common:footer.links.termsAndConditions'), href: '/terms-and-conditions' },
+        { title: t('common:footer.links.privacyPolicy'), href: '/privacy-policy' },
       ],
     },
   ];

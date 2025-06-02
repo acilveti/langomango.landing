@@ -99,7 +99,18 @@
     "about": "Sobre nosotros",
     "contact": "Contacto",
     "privacy": "Política de privacidad",
-    "terms": "Términos del servicio"
+    "terms": "Términos del servicio",
+    "sections": {
+      "product": "Producto",
+      "company": "Empresa",
+      "legal": "Legal"
+    },
+    "links": {
+      "languagesOffered": "Idiomas disponibles",
+      "wallOfThanks": "Muro de Agradecimientos",
+      "termsAndConditions": "Términos y Condiciones",
+      "privacyPolicy": "Política de Privacidad"
+    }
   },
   "faq": {
     "sectionTitle": "Preguntas frecuentes",

@@ -103,7 +103,18 @@
     "about": "About Us",
     "contact": "Contact",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "sections": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "links": {
+      "languagesOffered": "Languages Offered",
+      "wallOfThanks": "Wall of Thanks",
+      "termsAndConditions": "Terms and Conditions",
+      "privacyPolicy": "Privacy Policy"
+    }
   },
   "authorCta": {
   "title": "Join Langomango Authors",
