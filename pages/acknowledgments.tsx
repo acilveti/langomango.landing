@@ -318,6 +318,10 @@ export default function Acknowledgments() {
                   {t('acknowledgments:preface.paragraph3')} <strong>{t('acknowledgments:preface.thanksNote')}</strong>
                   {t('acknowledgments:preface.paragraph3End')}
                 </p>
+            <ClosingNote>
+              <p>{t('acknowledgments:closingNote.text')}</p>
+              <Heart>❤️</Heart>
+            </ClosingNote>
                 <Signature>{t('acknowledgments:preface.signature')}</Signature>
               </Preface>
             </HeaderSection>
@@ -328,10 +332,6 @@ export default function Acknowledgments() {
               ))}
             </AcknowledgmentsGrid>
 
-            <ClosingNote>
-              <p>{t('acknowledgments:closingNote.text')}</p>
-              <Heart>❤️</Heart>
-            </ClosingNote>
           </Container>
         </AcknowledgmentsWrapper>
       </Page>
