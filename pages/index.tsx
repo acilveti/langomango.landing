@@ -36,6 +36,7 @@ import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector, { Language } from 'components/LanguageSelector'; // Import the new component
+import ReaderDemoModal from 'components/ReaderDemo';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -49,6 +50,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [timeSpent, setTimeSpent] = useState(0);
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showReaderDemo, setShowReaderDemo] = useState(false);
 
   useEffect(() => {
     captureReferral();
@@ -205,6 +207,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="hero-section">
             <Hero />
           </div>
+          {/* Reader Demo Button */}
+          <ReaderDemoButtonContainer>
+            <ReaderDemoButton onClick={() => setShowReaderDemo(true)}>
+              📖 Try Interactive Reader Demo
+            </ReaderDemoButton>
+          </ReaderDemoButtonContainer>
           <div id="section-1">
             {/* Pass the title and overTitle to Testimonials */}
           <div id="features-section">
@@ -252,6 +260,11 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
         </DarkerBackgroundContainer>
       </HomepageWrapper>
+
+      {/* Reader Demo Modal */}
+      {showReaderDemo && (
+        <ReaderDemoModal onClose={() => setShowReaderDemo(false)} />
+      )}
 
       <style jsx global>{`
         html,
@@ -341,6 +354,43 @@ const DarkerBackgroundContainer = styled.div`
 
   & > *:not(:first-child) {
     padding-top: 5rem;
+  }
+`;
+
+const ReaderDemoButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+  background: rgb(var(--secondBackground));
+`;
+
+const ReaderDemoButton = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1.8rem 3.6rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+    padding: 1.4rem 2.8rem;
   }
 `;
 
