@@ -37,6 +37,7 @@ import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector, { Language } from 'components/LanguageSelector';
 import ReaderDemoModal from 'components/ReaderDemo';
+import ReaderDemoSection from 'components/ReaderDemoSection';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -219,29 +220,11 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="hero-section">
             <Hero />
           </div>
+          {/* Reader Demo Section */}
+          <div id="reader-demo-section">
+            <ReaderDemoSection selectedLanguage={selectedLanguage} />
+          </div>
           
-          {/* Language Selector Section */}
-          <LanguageSelectorSection>
-            <SelectorTitle>Choose a language to start learning</SelectorTitle>
-            <LanguageSelector
-              ref={languageSelectorRef}
-              onLanguageSelect={handleLanguageSelect}
-              onProcessingComplete={handleLanguageProcessingComplete}
-              placeholder="Select your target language"
-              processingDuration={1200}
-              confirmationDuration={1000}
-              showProcessingMessage={true}
-              showConfirmationMessage={true}
-              maxWidth="400px"
-            />
-          </LanguageSelectorSection>
-          
-          {/* Reader Demo Button */}
-          <ReaderDemoButtonContainer>
-            <ReaderDemoButton onClick={() => setShowReaderDemo(true)}>
-              📖 Try Interactive Reader Demo
-            </ReaderDemoButton>
-          </ReaderDemoButtonContainer>
           <div id="section-1">
             {/* Pass the title and overTitle to Testimonials */}
           <div id="features-section">
