@@ -8,7 +8,7 @@ const Overlay = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: var(--z-modal);
+  z-index: 99999; /* Increased z-index to ensure it's above everything */
   color: rgb(var(--textSecondary));
 `;
 

@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { media } from 'utils/media';
 import LanguageSelector from 'components/LanguageSelector';
 import type { Language } from 'components/LanguageSelector';
+import ReaderDemo from 'components/ReaderDemo';
+import Portal from 'components/Portal';
 
 interface HeroStickyProps {
   backgroundImage: string;
@@ -11,6 +13,25 @@ interface HeroStickyProps {
   overlayOpacity?: number;
 }
 
+const ROTATING_LANGUAGES = [
+  { code: 'en', name: 'English', word: 'English', font: 'Georgia, serif' },
+  { code: 'es', name: 'Spanish', word: 'Español', font: 'Arial, sans-serif' },
+  { code: 'de', name: 'German', word: 'Deutsch', font: 'Helvetica, sans-serif' },
+  { code: 'fr', name: 'French', word: 'Français', font: 'Garamond, serif' },
+  { code: 'it', name: 'Italian', word: 'Italiano', font: 'Baskerville, serif' },
+  { code: 'pt', name: 'Portuguese', word: 'Português', font: 'Verdana, sans-serif' },
+  { code: 'nl', name: 'Dutch', word: 'Nederlands', font: 'Arial, sans-serif' },
+  { code: 'ru', name: 'Russian', word: 'Русский', font: 'Times New Roman, serif' },
+  { code: 'ja', name: 'Japanese', word: '日本語', font: 'MS Mincho, serif' },
+  { code: 'zh', name: 'Chinese', word: '中文', font: 'SimSun, serif' },
+  { code: 'ko', name: 'Korean', word: '한국어', font: 'Batang, serif' },
+  { code: 'ar', name: 'Arabic', word: 'العربية', font: 'Traditional Arabic, serif' },
+  { code: 'hi', name: 'Hindi', word: 'हिन्दी', font: 'Devanagari, serif' },
+  { code: 'tr', name: 'Turkish', word: 'Türkçe', font: 'Arial, sans-serif' },
+  { code: 'pl', name: 'Polish', word: 'Polski', font: 'Arial, sans-serif' },
+  { code: 'sv', name: 'Swedish', word: 'Svenska', font: 'Helvetica, sans-serif' }
+];
+
 export default function HeroSticky({
   backgroundImage,
   title,
@@ -18,6 +39,9 @@ export default function HeroSticky({
   overlayOpacity = 0.4
 }: HeroStickyProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [currentLanguageIndex, setCurrentLanguageIndex] = useState(0);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const [isReaderDemoOpened, setIsReaderDemoOpened] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const secondTitleRef = useRef<HTMLHeadingElement>(null);
@@ -34,6 +58,17 @@ export default function HeroSticky({
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+  }, []);
+
+  // Rotate languages effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentLanguageIndex((prevIndex) => 
+        (prevIndex + 1) % ROTATING_LANGUAGES.length
+      );
+    }, 2000); // Change language every 2 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   // Calculate whether to show the trial text based on scroll position
@@ -53,15 +88,27 @@ export default function HeroSticky({
       
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
-        <Title>{title}</Title>
+        <Title>
+          You just started to learn 28 <LanguageWordContainer>
+            <LanguageWord 
+              fontFamily={ROTATING_LANGUAGES[currentLanguageIndex].font}
+              key={currentLanguageIndex}
+            >
+              {ROTATING_LANGUAGES[currentLanguageIndex].word}
+            </LanguageWord>
+          </LanguageWordContainer> words.
+        </Title>
+        <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
           onLanguageSelect={(language: Language) => {
             console.log('Language selected:', language);
-            // You can add additional logic here for when a language is selected
+            setSelectedLanguage(language);
+            // Store the full language object with all properties
           }}
           onProcessingComplete={(language: Language) => {
             console.log('Processing complete for:', language);
-            // You can add logic here for after processing is complete
+            // Open the reader demo modal after processing
+            setIsReaderDemoOpened(true);
           }}
           placeholder="Select your target language"
           maxWidth="400px"
@@ -75,6 +122,16 @@ export default function HeroSticky({
           And when you finish the free trial, you will have read 30.000
         </Title>
       </SecondTitleWrapper>
+      
+      {/* Reader Demo Modal with Signup - Rendered in Portal */}
+      {isReaderDemoOpened && selectedLanguage && (
+        <Portal>
+          <ReaderDemo 
+            selectedLanguage={selectedLanguage}
+            onClose={() => setIsReaderDemoOpened(false)}
+          />
+        </Portal>
+      )}
     </HeroWrapper>
   );
 }
@@ -166,5 +223,66 @@ const Title = styled.h1`
   
   ${media('<=phone')} {
     font-size: 2.5rem;
+  }
+`;
+
+const Question = styled.h2`
+  font-size: 2rem;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  
+  ${media('<=tablet')} {
+    font-size: 1.75rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.5rem;
+  }
+`;
+
+const LanguageWordContainer = styled.span`
+  display: inline-block;
+  width: 200px; /* Fixed width to prevent layout shift */
+  text-align: center;
+  position: relative;
+  margin: 0 0.5rem;
+  vertical-align: middle;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 152, 0, 0.2);
+  height: 1.8em;
+  line-height: 1.8em;
+`;
+
+const LanguageWord = styled.span<{ fontFamily: string }>`
+  color: rgb(255, 152, 0);
+  font-family: ${props => props.fontFamily};
+  font-weight: 700;
+  display: inline-block;
+  animation: fadeInOut 2s ease-in-out;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  line-height: 1;
+  
+  @keyframes fadeInOut {
+    0% { 
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(-10px);
+    }
+    20%, 80% { 
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+    }
+    100% { 
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(10px);
+    }
   }
 `;
