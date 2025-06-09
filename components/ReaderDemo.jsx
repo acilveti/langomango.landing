@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
-import Container from './Container';
 import Overlay from './Overlay';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
@@ -21,10 +20,6 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
     x: 0,
     y: 0
   });
-  const [isLongPressing, setIsLongPressing] = useState(false);
-  const popupJustOpened = useRef(false);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-  const [translationIntensity, setTranslationIntensity] = useState(5);
   const [showSignupExpanded, setShowSignupExpanded] = useState(false);
   const [interactionCount, setInteractionCount] = useState(0);
   const [email, setEmail] = useState('');
@@ -32,12 +27,109 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
 
   useEscClose({ onClose });
 
-  // Debug log to check expansion state
-  useEffect(() => {
-    console.log('Signup expanded:', showSignupExpanded, 'Interaction count:', interactionCount);
-  }, [showSignupExpanded, interactionCount]);
+  // Translations for different languages
+  const translations = {
+    de: {
+      'Where there was coral before,': 'Wo früher Korallen waren,',
+      'He opened his eyes': 'Er öffnete die Augen',
+      'The storm had grown worse': 'Der Sturm war schlimmer geworden',
+      'Joan struggled to his feet': 'Joan kämpfte sich auf die Füße',
+      'The door opened': 'Die Tür öffnete sich',
+      'His eyes burned from the salt': 'Seine Augen brannten vom Salz',
+      'Through the spray and darkness': 'Durch die Gischt und Dunkelheit',
+      'The ship groaned': 'Das Schiff ächzte'
+    },
+    es: {
+      'Where there was coral before,': 'Donde antes había coral,',
+      'He opened his eyes': 'Abrió los ojos',
+      'The storm had grown worse': 'La tormenta había empeorado',
+      'Joan struggled to his feet': 'Joan luchó para ponerse de pie',
+      'The door opened': 'La puerta se abrió',
+      'His eyes burned from the salt': 'Sus ojos ardían por la sal',
+      'Through the spray and darkness': 'A través del rocío y la oscuridad',
+      'The ship groaned': 'El barco crujió'
+    },
+    fr: {
+      'Where there was coral before,': 'Là où il y avait du corail avant,',
+      'He opened his eyes': 'Il ouvrit les yeux',
+      'The storm had grown worse': 'La tempête avait empiré',
+      'Joan struggled to his feet': 'Joan se leva avec difficulté',
+      'The door opened': 'La porte s\'ouvrit',
+      'His eyes burned from the salt': 'Ses yeux brûlaient à cause du sel',
+      'Through the spray and darkness': 'À travers les embruns et l\'obscurité',
+      'The ship groaned': 'Le navire gémit'
+    },
+    it: {
+      'Where there was coral before,': 'Dove prima c\'era il corallo,',
+      'He opened his eyes': 'Aprì gli occhi',
+      'The storm had grown worse': 'La tempesta era peggiorata',
+      'Joan struggled to his feet': 'Joan si alzò a fatica',
+      'The door opened': 'La porta si aprì',
+      'His eyes burned from the salt': 'I suoi occhi bruciavano per il sale',
+      'Through the spray and darkness': 'Attraverso gli spruzzi e l\'oscurità',
+      'The ship groaned': 'La nave gemette'
+    },
+    pt: {
+      'Where there was coral before,': 'Onde antes havia coral,',
+      'He opened his eyes': 'Ele abriu os olhos',
+      'The storm had grown worse': 'A tempestade havia piorado',
+      'Joan struggled to his feet': 'Joan lutou para se levantar',
+      'The door opened': 'A porta se abriu',
+      'His eyes burned from the salt': 'Seus olhos ardiam do sal',
+      'Through the spray and darkness': 'Através do spray e da escuridão',
+      'The ship groaned': 'O navio gemeu'
+    },
+    zh: {
+      'Where there was coral before,': '以前有珊瑚的地方，',
+      'He opened his eyes': '他睁开了眼睛',
+      'The storm had grown worse': '暴风雨变得更糟了',
+      'Joan struggled to his feet': '琼挣扎着站起来',
+      'The door opened': '门打开了',
+      'His eyes burned from the salt': '他的眼睛被盐灼伤',
+      'Through the spray and darkness': '穿过浪花和黑暗',
+      'The ship groaned': '船呻吟着'
+    },
+    ja: {
+      'Where there was coral before,': '以前サンゴがあった場所に、',
+      'He opened his eyes': '彼は目を開いた',
+      'The storm had grown worse': '嵐はさらに悪化していた',
+      'Joan struggled to his feet': 'ジョアンは立ち上がろうと奮闘した',
+      'The door opened': 'ドアが開いた',
+      'His eyes burned from the salt': '彼の目は塩で焼けるようだった',
+      'Through the spray and darkness': '飛沫と暗闇を通して',
+      'The ship groaned': '船がうめいた'
+    },
+    ko: {
+      'Where there was coral before,': '이전에 산호가 있던 곳에,',
+      'He opened his eyes': '그는 눈을 떴다',
+      'The storm had grown worse': '폭풍은 더욱 심해졌다',
+      'Joan struggled to his feet': '조안은 일어서려고 애썼다',
+      'The door opened': '문이 열렸다',
+      'His eyes burned from the salt': '그의 눈은 소금으로 타는 듯했다',
+      'Through the spray and darkness': '물보라와 어둠을 통해',
+      'The ship groaned': '배가 신음했다'
+    },
+    ru: {
+      'Where there was coral before,': 'Там, где раньше были кораллы,',
+      'He opened his eyes': 'Он открыл глаза',
+      'The storm had grown worse': 'Шторм усилился',
+      'Joan struggled to his feet': 'Жоан с трудом поднялся на ноги',
+      'The door opened': 'Дверь открылась',
+      'His eyes burned from the salt': 'Его глаза жгла соль',
+      'Through the spray and darkness': 'Сквозь брызги и темноту',
+      'The ship groaned': 'Корабль застонал'
+    }
+  };
 
-  // Book content
+  // Function to get translation based on selected language
+  const getTranslation = (englishText) => {
+    if (!selectedLanguage || !englishText) return englishText;
+    const langCode = selectedLanguage.code;
+    const langTranslations = translations[langCode];
+    return langTranslations?.[englishText] || translations.de[englishText] || englishText;
+  };
+
+  // Book content (base English content)
   const bookContent = {
     7: {
       paragraphs: [
@@ -68,7 +160,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'Where there was coral before,',
-              translation: 'Wo früher Korallen waren,',
+              translationKey: 'Where there was coral before,',
               showTranslation: true
             },
             {
@@ -85,7 +177,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'He opened his eyes',
-              translation: 'Er öffnete die Augen',
+              translationKey: 'He opened his eyes',
               showTranslation: true
             },
             {
@@ -98,7 +190,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'The storm had grown worse',
-              translation: 'Der Sturm war schlimmer geworden'
+              translationKey: 'The storm had grown worse'
             },
             {
               text: ' during the night, and the waves crashed over the deck with tremendous force.'
@@ -110,7 +202,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'Joan struggled to his feet',
-              translation: 'Joan kämpfte sich auf die Füße',
+              translationKey: 'Joan struggled to his feet',
               showTranslation: true
             },
             {
@@ -122,8 +214,8 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
         {
           segments: [
             {
-              translation: 'The door opened',
-              text: 'Die Tür öffnete sich'
+              text: 'The door opened',
+              translationKey: 'The door opened'
             },
             {
               text: ' against the howling wind, nearly knocking him backwards.'
@@ -134,8 +226,8 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
         {
           segments: [
             {
-              translation: 'His eyes burned from the salt',
-              text: 'Seine Augen brannten vom Salz'
+              text: 'His eyes burned from the salt',
+              translationKey: 'His eyes burned from the salt'
             },
             {
               text: ' as he stumbled toward the companionway.'
@@ -158,7 +250,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'Through the spray and darkness',
-              translation: 'Durch die Gischt und Dunkelheit'
+              translationKey: 'Through the spray and darkness'
             },
             {
               text: ', Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
@@ -178,7 +270,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           segments: [
             {
               text: 'The ship groaned',
-              translation: 'Das Schiff ächzte',
+              translationKey: 'The ship groaned',
               showTranslation: true
             },
             {
@@ -282,9 +374,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
   }, [pageInput, totalPages, currentPage]);
 
   const hidePopup = useCallback(() => {
-    if (!popupJustOpened.current) {
-      setPopup(prev => ({ ...prev, visible: false }));
-    }
+    setPopup(prev => ({ ...prev, visible: false }));
   }, []);
 
   const handleLongPressStart = useCallback((e, segment) => {
@@ -295,9 +385,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
       e.stopPropagation();
     }
     
-    if (!segment.translation || segment.showTranslation) return;
-
-    setIsLongPressing(true);
+    if (!segment.translationKey || segment.showTranslation) return;
     
     const target = e.currentTarget;
     const rect = target.getBoundingClientRect();
@@ -309,21 +397,15 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
     const y = rect.top - pageRect.top;
 
     longPressTimer.current = setTimeout(() => {
-      popupJustOpened.current = true;
       setPopup({
         visible: true,
         text: segment.text,
-        translation: segment.translation || '',
+        translation: getTranslation(segment.translationKey),
         x: x,
         y: y
       });
-      setIsLongPressing(false);
-      
-      setTimeout(() => {
-        popupJustOpened.current = false;
-      }, 200);
     }, 500);
-  }, []);
+  }, [getTranslation]);
 
   const handleLongPressEnd = useCallback((e) => {
     if ('touches' in e) {
@@ -332,8 +414,6 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
       e.preventDefault();
       e.stopPropagation();
     }
-    
-    setIsLongPressing(false);
     
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
@@ -355,12 +435,8 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
     const handleGlobalClick = (e) => {
       const target = e.target;
       
-      if (!target.closest('.translation-popup') && !popupJustOpened.current && popup.visible) {
+      if (!target.closest('.translation-popup') && popup.visible) {
         hidePopup();
-      }
-      
-      if (showSettingsMenu && !target.closest('.settings-menu') && !target.closest('.settings-button')) {
-        setShowSettingsMenu(false);
       }
     };
 
@@ -371,66 +447,9 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
       document.removeEventListener('mousedown', handleGlobalClick);
       document.removeEventListener('touchstart', handleGlobalClick);
     };
-  }, [popup.visible, hidePopup, showSettingsMenu]);
+  }, [popup.visible, hidePopup]);
 
-  // Get language-specific content
-  const getLanguageContent = () => {
-    if (!selectedLanguage) return bookContent;
-    
-    // You can customize content based on selected language
-    // For now, we'll use the same content but you can expand this
-    switch (selectedLanguage.code) {
-      case 'de': // German (already have content)
-        return bookContent;
-      case 'es': // Spanish example
-        return {
-          8: {
-            paragraphs: [
-              {
-                segments: [
-                  {
-                    text: 'Abrió los ojos',
-                    translation: 'He opened his eyes',
-                    showTranslation: true
-                  },
-                  {
-                    text: ' y se encontró frente al contramaestre que, a pocos centímetros de distancia y con agua corriendo por su rostro, le gritaba a todo pulmón.'
-                  }
-                ],
-                indent: true
-              },
-              // Add more Spanish content...
-            ]
-          }
-        };
-      case 'fr': // French example
-        return {
-          8: {
-            paragraphs: [
-              {
-                segments: [
-                  {
-                    text: 'Il ouvrit les yeux',
-                    translation: 'He opened his eyes',
-                    showTranslation: true
-                  },
-                  {
-                    text: ' et se retrouva face au maître d\'équipage qui, à quelques centimètres de lui et avec de l\'eau coulant sur son visage, lui criait à pleins poumons.'
-                  }
-                ],
-                indent: true
-              },
-              // Add more French content...
-            ]
-          }
-        };
-      default:
-        return bookContent; // Default to German content
-    }
-  };
-
-  const languageContent = getLanguageContent();
-  const currentContent = languageContent[currentPage] || languageContent[8] || bookContent[8];
+  const currentContent = bookContent[currentPage] || bookContent[8];
 
   return (
     <Overlay>
@@ -442,12 +461,10 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
 
           <ReaderContainer $expanded={showSignupExpanded}>
             {/* Language indicator */}
-            {selectedLanguage && (
-              <LanguageIndicator>
-                <span>{selectedLanguage.flag}</span>
-                <span>{selectedLanguage.name}</span>
-              </LanguageIndicator>
-            )}
+            <LanguageIndicator>
+              <span>{selectedLanguage ? selectedLanguage.flag : '🇩🇪'}</span>
+              <span>{selectedLanguage ? selectedLanguage.name : 'German'}</span>
+            </LanguageIndicator>
             
             {/* Left Navigation */}
             <NavButtonLeft 
@@ -469,7 +486,7 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
                     {paragraph.segments.map((segment, segmentIndex) => {
                       const key = `${index}-${segmentIndex}`;
                       
-                      if (segment.translation && !segment.showTranslation) {
+                      if (segment.translationKey && !segment.showTranslation) {
                         return (
                           <TranslatableText
                             key={key}
@@ -484,11 +501,11 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
                             {segment.text}
                           </TranslatableText>
                         );
-                      } else if (segment.translation && segment.showTranslation) {
+                      } else if (segment.translationKey && segment.showTranslation) {
                         return (
                           <InlineTranslation key={key}>
                             <OriginalText>{segment.text}</OriginalText>
-                            <TranslationText>{segment.translation}</TranslationText>
+                            <TranslationText>{getTranslation(segment.translationKey)}</TranslationText>
                           </InlineTranslation>
                         );
                       } else {
@@ -527,12 +544,6 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
           {/* Bottom Navigation Bar and Signup */}
           <BottomSection $expanded={showSignupExpanded}>
             <BottomBar>
-              {/* Left controls */}
-              <ControlGroup>
-                <IconButton>☰</IconButton>
-                <IconButton>?</IconButton>
-              </ControlGroup>
-
               {/* Page navigation */}
               <PageNavigation>
                 <PageNavButton 
@@ -561,17 +572,6 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
                   &gt;
                 </PageNavButton>
               </PageNavigation>
-
-              {/* Right controls */}
-              <ControlGroup>
-                <IconButton>⚙</IconButton>
-                <IconButton 
-                  className="settings-button"
-                  onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                >
-                  ⋯
-                </IconButton>
-              </ControlGroup>
             </BottomBar>
 
             {/* Signup Section */}
@@ -600,14 +600,12 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
                     <DividerLine />
                   </DividerCompact>
                   <GoogleButtonCompact onClick={handleGoogleSignup}>
-                    <GoogleIcon>
-                      <svg viewBox="0 0 24 24" width="18" height="18">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                    </GoogleIcon>
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
                     Continue with Google
                   </GoogleButtonCompact>
                 </SignupCompact>
@@ -634,14 +632,12 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
                     </PrimaryButton>
                     
                     <GoogleButton onClick={handleGoogleSignup}>
-                      <GoogleIcon>
-                        <svg viewBox="0 0 24 24" width="20" height="20">
-                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                      </GoogleIcon>
+                      <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
                       Continue with Google
                     </GoogleButton>
                   </ButtonContainer>
@@ -653,42 +649,6 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
               )}
             </SignupSection>
           </BottomSection>
-
-          {/* Settings Menu */}
-          {showSettingsMenu && (
-            <SettingsMenu className="settings-menu">
-              <SettingRow>
-                <SettingLabel>Translation intensity</SettingLabel>
-                <SettingControls>
-                  <SettingButton 
-                    onClick={() => setTranslationIntensity(Math.max(0, translationIntensity - 1))}
-                  >
-                    -
-                  </SettingButton>
-                  <SettingValue>{translationIntensity}</SettingValue>
-                  <SettingButton 
-                    onClick={() => setTranslationIntensity(Math.min(10, translationIntensity + 1))}
-                  >
-                    +
-                  </SettingButton>
-                </SettingControls>
-              </SettingRow>
-
-              <SettingRow>
-                <SettingLabel>Wordwise assistance</SettingLabel>
-                <SettingControls>
-                  <SettingButton>-</SettingButton>
-                  <SettingValue>10</SettingValue>
-                  <SettingButton>+</SettingButton>
-                </SettingControls>
-              </SettingRow>
-
-              <FontControls>
-                <FontButton>A-</FontButton>
-                <FontButton>A+</FontButton>
-              </FontControls>
-            </SettingsMenu>
-          )}
         </ReaderCard>
       </ModalContainer>
     </Overlay>
@@ -956,32 +916,11 @@ const BottomSection = styled.div`
 const BottomBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   background: white;
   border-top: 1px solid #e5e7eb;
   padding: 1.2rem 2rem;
   flex-shrink: 0;
-`;
-
-const ControlGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.6rem;
-`;
-
-const IconButton = styled.button`
-  padding: 0.8rem;
-  background: white;
-  border: none;
-  border-radius: 0.8rem;
-  font-size: 2rem;
-  color: #4b5563;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: #f3f4f6;
-  }
 `;
 
 const PageNavigation = styled.div`
@@ -1064,17 +1003,6 @@ const CompactFormRow = styled.div`
   
   ${media('<=tablet')} {
     gap: 0.6rem;
-  }
-`;
-
-const CompactFormContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  align-items: center;
-  
-  ${media('<=tablet')} {
-    flex-direction: column;
   }
 `;
 
@@ -1215,54 +1143,6 @@ const GoogleButtonCompact = styled.button`
   &:active {
     transform: translateY(0);
   }
-  
-  ${media('<=tablet')} {
-    padding: 0.8rem 1.2rem;
-    font-size: 1.2rem;
-  }
-`;
-
-const PromptText = styled.p`
-  margin: 0 0 0.5rem 0;
-  font-size: 1.3rem;
-  color: #374151;
-  font-weight: 500;
-  text-align: center;
-  
-  ${media('<=tablet')} {
-    font-size: 1.2rem;
-  }
-`;
-
-const SignupButton = styled.button`
-  background: #ff9800;
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  border-radius: 0.6rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  
-  &:hover {
-    background: #f57c00;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  &:active {
-    transform: translateY(0);
-    background: #e65100;
-  }
-  
-  ${media('<=tablet')} {
-    font-size: 1.3rem;
-    padding: 0.8rem 1.5rem;
-    width: 100%;
-  }
 `;
 
 const SignupExpanded = styled.div`
@@ -1357,107 +1237,23 @@ const GoogleButton = styled.button`
   }
 `;
 
-const GoogleIcon = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const LoginPrompt = styled.p`
   font-size: 1.4rem;
   color: #6b7280;
-  margin: 1rem 0 0;
+  margin: 0;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+  }
 `;
 
 const LoginLink = styled.a`
   color: rgb(var(--primary));
+  font-weight: 500;
   text-decoration: none;
-  font-weight: 600;
   
   &:hover {
     text-decoration: underline;
-  }
-`;
-
-const SettingsMenu = styled.div`
-  position: absolute;
-  bottom: 6rem;
-  left: 0;
-  right: 0;
-  background: white;
-  border-radius: 1.2rem 1.2rem 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-  padding: 2.4rem;
-  z-index: 50;
-`;
-
-const SettingRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.6rem;
-  border-bottom: 1px solid #e5e7eb;
-
-  &:last-of-type {
-    border-bottom: none;
-  }
-`;
-
-const SettingLabel = styled.span`
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: #374151;
-`;
-
-const SettingControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2.4rem;
-`;
-
-const SettingButton = styled.button`
-  padding: 1.2rem;
-  background: white;
-  border: none;
-  border-radius: 0.8rem;
-  font-size: 2rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const SettingValue = styled.span`
-  font-size: 2rem;
-  font-weight: 500;
-  min-width: 3rem;
-  text-align: center;
-`;
-
-const FontControls = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.6rem;
-  margin-top: 2.4rem;
-`;
-
-const FontButton = styled.button`
-  padding: 1.2rem 2.4rem;
-  background: white;
-  border: none;
-  border-radius: 0.8rem;
-  font-size: 2.4rem;
-  color: #374151;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: #f3f4f6;
   }
 `;
 
@@ -1480,5 +1276,17 @@ const LanguageIndicator = styled.div`
   ${media('<=tablet')} {
     font-size: 1rem;
     padding: 0.4rem 0.8rem;
+  }
+`;
+
+const PromptText = styled.p`
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: #374151;
+  font-weight: 500;
+  text-align: center;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
   }
 `;

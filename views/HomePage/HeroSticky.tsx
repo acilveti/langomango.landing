@@ -39,9 +39,10 @@ export default function HeroSticky({
   overlayOpacity = 0.4
 }: HeroStickyProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [currentLanguageIndex, setCurrentLanguageIndex] = useState(0);
+  const [currentLanguageIndex, setCurrentLanguageIndex] = useState(2); // Start with German (index 2)
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const [isReaderDemoOpened, setIsReaderDemoOpened] = useState(false);
+  const [hasStartedRotating, setHasStartedRotating] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const secondTitleRef = useRef<HTMLHeadingElement>(null);
@@ -62,6 +63,18 @@ export default function HeroSticky({
 
   // Rotate languages effect
   useEffect(() => {
+    // Wait 5 seconds before starting rotation
+    const startRotationTimer = setTimeout(() => {
+      setHasStartedRotating(true);
+    }, 5000);
+
+    return () => clearTimeout(startRotationTimer);
+  }, []);
+
+  useEffect(() => {
+    if (!hasStartedRotating) return;
+
+    // Start rotating every 2 seconds after the initial 5 second delay
     const interval = setInterval(() => {
       setCurrentLanguageIndex((prevIndex) => 
         (prevIndex + 1) % ROTATING_LANGUAGES.length
@@ -69,7 +82,7 @@ export default function HeroSticky({
     }, 2000); // Change language every 2 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [hasStartedRotating]);
 
   // Calculate whether to show the trial text based on scroll position
   const shouldShowTrialText = scrollProgress > 50; // Show text after 50px of scrolling
