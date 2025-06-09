@@ -8,7 +8,7 @@ import Overlay from './Overlay';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 // Component for demonstrating the e-reader functionality
-export default function ReaderDemoModal({ onClose }) {
+export default function ReaderDemoModal({ onClose, selectedLanguage }) {
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
@@ -373,7 +373,64 @@ export default function ReaderDemoModal({ onClose }) {
     };
   }, [popup.visible, hidePopup, showSettingsMenu]);
 
-  const currentContent = bookContent[currentPage] || bookContent[8];
+  // Get language-specific content
+  const getLanguageContent = () => {
+    if (!selectedLanguage) return bookContent;
+    
+    // You can customize content based on selected language
+    // For now, we'll use the same content but you can expand this
+    switch (selectedLanguage.code) {
+      case 'de': // German (already have content)
+        return bookContent;
+      case 'es': // Spanish example
+        return {
+          8: {
+            paragraphs: [
+              {
+                segments: [
+                  {
+                    text: 'Abrió los ojos',
+                    translation: 'He opened his eyes',
+                    showTranslation: true
+                  },
+                  {
+                    text: ' y se encontró frente al contramaestre que, a pocos centímetros de distancia y con agua corriendo por su rostro, le gritaba a todo pulmón.'
+                  }
+                ],
+                indent: true
+              },
+              // Add more Spanish content...
+            ]
+          }
+        };
+      case 'fr': // French example
+        return {
+          8: {
+            paragraphs: [
+              {
+                segments: [
+                  {
+                    text: 'Il ouvrit les yeux',
+                    translation: 'He opened his eyes',
+                    showTranslation: true
+                  },
+                  {
+                    text: ' et se retrouva face au maître d\'équipage qui, à quelques centimètres de lui et avec de l\'eau coulant sur son visage, lui criait à pleins poumons.'
+                  }
+                ],
+                indent: true
+              },
+              // Add more French content...
+            ]
+          }
+        };
+      default:
+        return bookContent; // Default to German content
+    }
+  };
+
+  const languageContent = getLanguageContent();
+  const currentContent = languageContent[currentPage] || languageContent[8] || bookContent[8];
 
   return (
     <Overlay>
@@ -384,6 +441,14 @@ export default function ReaderDemoModal({ onClose }) {
           </CloseIconContainer>
 
           <ReaderContainer $expanded={showSignupExpanded}>
+            {/* Language indicator */}
+            {selectedLanguage && (
+              <LanguageIndicator>
+                <span>{selectedLanguage.flag}</span>
+                <span>{selectedLanguage.name}</span>
+              </LanguageIndicator>
+            )}
+            
             {/* Left Navigation */}
             <NavButtonLeft 
               onClick={handlePrevPage} 
@@ -1393,5 +1458,27 @@ const FontButton = styled.button`
 
   &:hover {
     background: #f3f4f6;
+  }
+`;
+
+const LanguageIndicator = styled.div`
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  font-size: 1.2rem;
+  color: #374151;
+  
+  ${media('<=tablet')} {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
   }
 `;

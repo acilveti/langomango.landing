@@ -35,7 +35,7 @@ import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackP
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
-import LanguageSelector, { Language } from 'components/LanguageSelector'; // Import the new component
+import LanguageSelector, { Language } from 'components/LanguageSelector';
 import ReaderDemoModal from 'components/ReaderDemo';
 
 // Reddit Pixel ID
@@ -51,6 +51,18 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [showReaderDemo, setShowReaderDemo] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const languageSelectorRef = useRef<any>(null);
+
+  const handleLanguageSelect = useCallback((language: Language) => {
+    console.log('Language selected:', language);
+    setSelectedLanguage(language);
+  }, []);
+
+  const handleLanguageProcessingComplete = useCallback((language: Language) => {
+    console.log('Processing complete for language:', language);
+    setShowReaderDemo(true);
+  }, []);
 
   useEffect(() => {
     captureReferral();
@@ -207,6 +219,23 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="hero-section">
             <Hero />
           </div>
+          
+          {/* Language Selector Section */}
+          <LanguageSelectorSection>
+            <SelectorTitle>Choose a language to start learning</SelectorTitle>
+            <LanguageSelector
+              ref={languageSelectorRef}
+              onLanguageSelect={handleLanguageSelect}
+              onProcessingComplete={handleLanguageProcessingComplete}
+              placeholder="Select your target language"
+              processingDuration={1200}
+              confirmationDuration={1000}
+              showProcessingMessage={true}
+              showConfirmationMessage={true}
+              maxWidth="400px"
+            />
+          </LanguageSelectorSection>
+          
           {/* Reader Demo Button */}
           <ReaderDemoButtonContainer>
             <ReaderDemoButton onClick={() => setShowReaderDemo(true)}>
@@ -263,7 +292,16 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
       {/* Reader Demo Modal */}
       {showReaderDemo && (
-        <ReaderDemoModal onClose={() => setShowReaderDemo(false)} />
+        <ReaderDemoModal 
+          onClose={() => {
+            setShowReaderDemo(false);
+            // Reset language selector after closing modal
+            if (languageSelectorRef.current) {
+              languageSelectorRef.current.resetStates();
+            }
+          }} 
+          selectedLanguage={selectedLanguage}
+        />
       )}
 
       <style jsx global>{`
@@ -357,43 +395,6 @@ const DarkerBackgroundContainer = styled.div`
   }
 `;
 
-const ReaderDemoButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 3rem 0;
-  background: rgb(var(--secondBackground));
-`;
-
-const ReaderDemoButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1.8rem 3.6rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-  border-radius: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-
-  ${media('<=tablet')} {
-    font-size: 1.6rem;
-    padding: 1.4rem 2.8rem;
-  }
-`;
-
 const WhiteBackgroundContainer = styled.div`
   background: rgb(var(--secondBackground));
 
@@ -436,6 +437,64 @@ const VideoTitle = styled.h1`
   ${media('<=tablet')} {
     font-size: 4.6rem;
     margin-bottom: 2rem;
+  }
+`;
+
+const LanguageSelectorSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2rem;
+  background: rgb(var(--secondBackground));
+  gap: 2rem;
+`;
+
+const SelectorTitle = styled.h2`
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: rgb(var(--text));
+  text-align: center;
+  margin: 0;
+  
+  ${media('<=tablet')} {
+    font-size: 2rem;
+  }
+`;
+
+const ReaderDemoButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+  background: rgb(var(--secondBackground));
+`;
+
+const ReaderDemoButton = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1.8rem 3.6rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  border-radius: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+    padding: 1.4rem 2.8rem;
   }
 `;
 
