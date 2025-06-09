@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
-import JumpingButton from 'components/JumpingButton';
+import LanguageSelector from 'components/LanguageSelector';
+import type { Language } from 'components/LanguageSelector';
 
 interface HeroStickyProps {
   backgroundImage: string;
@@ -53,16 +54,19 @@ export default function HeroSticky({
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>{title}</Title>
-        <JumpingButton
-          trackingEvent="hero sticky demo button"
-          location="hero sticky section"
-          style={{ 
-            zIndex: 999,
-            position: 'relative'
+        <LanguageSelector
+          onLanguageSelect={(language: Language) => {
+            console.log('Language selected:', language);
+            // You can add additional logic here for when a language is selected
           }}
-        >
-          Use the demo
-        </JumpingButton>
+          onProcessingComplete={(language: Language) => {
+            console.log('Processing complete for:', language);
+            // You can add logic here for after processing is complete
+          }}
+          placeholder="Select your target language"
+          maxWidth="400px"
+          isDark={true}
+        />
       </ContentWrapper>
       
       {/* Second title that appears after scrolling */}
