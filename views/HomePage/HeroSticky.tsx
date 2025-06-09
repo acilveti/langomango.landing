@@ -102,14 +102,14 @@ export default function HeroSticky({
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>
-          You just started to learn 28 <LanguageWordContainer>
+          You just started to learn 28 words in <LanguageWordContainer>
             <LanguageWord 
               fontFamily={ROTATING_LANGUAGES[currentLanguageIndex].font}
               key={currentLanguageIndex}
             >
               {ROTATING_LANGUAGES[currentLanguageIndex].word}
             </LanguageWord>
-          </LanguageWordContainer> words.
+          </LanguageWordContainer>.
         </Title>
         <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
