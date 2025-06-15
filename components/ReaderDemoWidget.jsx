@@ -504,7 +504,13 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         
         {/* Words Read Counter */}
         <WordsReadCounter $hasWords={wordsRead > 0}>
-          <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber> words read in {selectedLanguage ? selectedLanguage.name : 'German'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber>
+            <span>words read</span>
+          </div>
+          <div style={{ fontSize: '0.9em', opacity: 0.8 }}>
+            in {selectedLanguage ? selectedLanguage.name : 'German'}
+          </div>
         </WordsReadCounter>
 
         {/* Book Content */}
@@ -833,20 +839,24 @@ const ReaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2rem 7rem;
   position: relative;
   background: white;
   
   ${media('<=tablet')} {
-    padding: 1.5rem;
+    padding: 1.5rem 5rem;
     flex-direction: column;
     gap: 2rem;
+  }
+  
+  ${media('<=phone')} {
+    padding: 1.5rem 4rem;
   }
 `;
 
 const NavButtonLeft = styled.button`
   position: absolute;
-  left: 2rem;
+  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
@@ -879,14 +889,14 @@ const NavButtonLeft = styled.button`
   }
 
   ${media('<=tablet')} {
-    left: 1.5rem;
+    left: 0.8rem;
     width: 4rem;
     height: 4rem;
     font-size: 2.4rem;
   }
 
   ${media('<=phone')} {
-    left: 1rem;
+    left: 0.5rem;
     width: 3.5rem;
     height: 3.5rem;
     font-size: 2rem;
@@ -967,7 +977,7 @@ const ArrowIndicator = styled.div`
 
 const NavButtonRight = styled.button`
   position: absolute;
-  right: 2rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
@@ -1037,7 +1047,7 @@ const NavButtonRight = styled.button`
   }
 
   ${media('<=tablet')} {
-    right: 1.5rem;
+    right: 0.8rem;
     width: 4rem;
     height: 4rem;
     font-size: 2.4rem;
@@ -1052,7 +1062,7 @@ const NavButtonRight = styled.button`
   }
 
   ${media('<=phone')} {
-    right: 1rem;
+    right: 0.5rem;
     width: 3.5rem;
     height: 3.5rem;
     font-size: 2rem;
@@ -1071,11 +1081,12 @@ const NavButtonRight = styled.button`
 
 const BookContent = styled.div`
   flex: 1;
-  max-width: 55rem;
+  max-width: 45rem;
   min-height: 40rem;
   background: white;
   border-radius: 0.8rem;
-  padding: 3rem;
+  padding: 3rem 2rem;
+  margin: 0 auto;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
@@ -1083,9 +1094,14 @@ const BookContent = styled.div`
   flex-direction: column;
 
   ${media('<=tablet')} {
-    padding: 2rem;
+    padding: 1.5rem 0.5rem;
     max-width: 100%;
     min-height: 30rem;
+  }
+  
+  ${media('<=phone')} {
+    padding: 1.5rem 1rem;
+    max-width: calc(100% - 8rem);
   }
 `;
 
@@ -1101,6 +1117,7 @@ const ContentArea = styled.div`
   flex-direction: column;
   justify-content: center;
   padding-bottom: 1rem;
+  margin: 0 auto;
 
   ${media('<=tablet')} {
     font-size: 1.6rem;
@@ -1109,13 +1126,19 @@ const ContentArea = styled.div`
 `;
 
 const ParagraphContainer = styled.div`
-  margin-left: ${props => props.$indent ? '2rem' : '0'};
+  padding-left: ${props => props.$indent ? '1rem' : '0'};
+  padding-right: ${props => props.$indent ? '1rem' : '0'};
   margin-bottom: ${props => props.$isLast ? '0' : '2.8rem'};
-  text-align: left;
+  text-align: justify;
+  text-justify: inter-word;
   width: 100%;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
 
   ${media('<=tablet')} {
-    margin-left: ${props => props.$indent ? '1.2rem' : '0'};
+    padding-left: ${props => props.$indent ? '0.1rem' : '0'};
+    padding-right: ${props => props.$indent ? '0.1rem' : '0'};
     margin-bottom: ${props => props.$isLast ? '0' : '2rem'};
   }
 `;
@@ -1333,23 +1356,28 @@ const WordsReadCounter = styled.div`
   top: 1.5rem;
   right: 2rem;
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 1.2rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  font-size: 1.1rem;
   color: #2563eb;
   font-weight: 500;
   z-index: 10;
   animation: ${(props) => props.$hasWords ? successGlow : 'none'} 1s ease-out;
+  text-align: right;
+  max-width: 12rem;
   
   ${media('<=tablet')} {
-    font-size: 1.1rem;
+    font-size: 1rem;
     right: 1.5rem;
     top: 1rem;
+    max-width: 10rem;
   }
   
   ${media('<=phone')} {
-    font-size: 1rem;
+    font-size: 0.9rem;
     right: 1rem;
+    max-width: 8rem;
   }
 `;
 
