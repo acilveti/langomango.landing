@@ -278,6 +278,31 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     }
   }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded]);
 
+  // Calculate total words for current page translations
+  const calculatePageWords = useCallback((pageNumber) => {
+    console.log(`[calculatePageWords] Called for page ${pageNumber}`);
+    const content = bookContent[pageNumber];
+    if (!content) {
+      console.log(`[calculatePageWords] No content found for page ${pageNumber}`);
+      return 0;
+    }
+    
+    let totalWords = 0;
+    content.paragraphs.forEach((paragraph, pIndex) => {
+      paragraph.segments.forEach((segment, sIndex) => {
+        if (segment.translationKey && segment.showTranslation) {
+          const translatedText = getTranslation(segment.translationKey);
+          const wordCount = getWordCount(translatedText);
+          console.log(`[calculatePageWords] P${pIndex}S${sIndex}: "${segment.translationKey}" -> "${translatedText}" (${wordCount} words)`);
+          totalWords += wordCount;
+        }
+      });
+    });
+    
+    console.log(`[calculatePageWords] Total words for page ${pageNumber}: ${totalWords}`);
+    return totalWords;
+  }, [selectedLanguage]);
+
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -304,14 +329,17 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           setShowWordCounts(true);
           // Update global counter 1 second after word counts appear
           setTimeout(() => {
-            setWordsRead(12);
+            // Calculate total words from both pages
+            const page8Words = calculatePageWords(8);
+            const page9Words = calculatePageWords(9);
+            setWordsRead(page8Words + page9Words);
             setJustUpdated(true);
             setTimeout(() => setJustUpdated(false), 1000);
           }, 1000);
         }, 3000);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, hasClicked]);
+  }, [currentPage, totalPages, handleInteraction, hasClicked, calculatePageWords]);
 
   const handlePageInputChange = useCallback((text) => {
     setPageInput(text);
@@ -427,29 +455,49 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     };
   }, [popup.visible, hidePopup]);
 
+  const calculatePageWordsRef = useRef();
+  calculatePageWordsRef.current = calculatePageWords;
+
+  const visibilityTimerRef = useRef(null);
+  const hasStartedTimerRef = useRef(false);
+
   // Check if reader container is visible and start word counter
   useEffect(() => {
-    let hasStartedTimer = false;
-    let visibilityTimer = null;
+    console.log('[useEffect] Visibility effect mounted');
     
     const checkVisibility = () => {
-      if (readerContainerRef.current && !hasStartedTimer) {
+      console.log('[checkVisibility] Called, hasStartedTimer:', hasStartedTimerRef.current);
+      
+      if (readerContainerRef.current && !hasStartedTimerRef.current) {
         const rect = readerContainerRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight || document.documentElement.clientHeight;
         
         // Check if the ENTIRE reader container is visible in viewport
         const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
         
+        console.log('[checkVisibility] Reader rect:', {
+          top: rect.top,
+          bottom: rect.bottom,
+          windowHeight: windowHeight,
+          isFullyVisible: isFullyVisible
+        });
+        
         if (isFullyVisible) {
+          console.log('[checkVisibility] Reader is fully visible! Starting timer...');
           // If not already timing, start the 2-second visibility timer
-          if (!visibilityTimer) {
-            visibilityTimer = setTimeout(() => {
-              hasStartedTimer = true;
+          if (!visibilityTimerRef.current) {
+            console.log('[checkVisibility] Setting 2-second visibility timer');
+            visibilityTimerRef.current = setTimeout(() => {
+              console.log('[visibilityTimer] 2 seconds elapsed, updating word counts');
+              hasStartedTimerRef.current = true;
               // Show word counts first
               setShowWordCounts(true);
+              console.log('[visibilityTimer] Word count badges shown');
               // Then update global counter 1 second later
               wordsTimerRef.current = setTimeout(() => {
-                setWordsRead(9);
+                const page8Words = calculatePageWordsRef.current(8);
+                console.log('[wordsTimer] Calculated page 8 words:', page8Words);
+                setWordsRead(page8Words);
                 setJustUpdated(true);
                 setTimeout(() => setJustUpdated(false), 1000);
               }, 1000); // 1 second after word counts appear
@@ -457,9 +505,10 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           }
         } else {
           // Reader container is not fully visible, clear the visibility timer
-          if (visibilityTimer) {
-            clearTimeout(visibilityTimer);
-            visibilityTimer = null;
+          if (visibilityTimerRef.current) {
+            console.log('[checkVisibility] Reader not fully visible, clearing timer');
+            clearTimeout(visibilityTimerRef.current);
+            visibilityTimerRef.current = null;
           }
         }
       }
@@ -471,22 +520,23 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     window.addEventListener('resize', checkVisibility);
     
     // Also check after mount
-    const mountTimer = setTimeout(checkVisibility, 500);
+    const mountTimer = setTimeout(() => {
+      console.log('[mountTimer] Checking visibility after mount');
+      checkVisibility();
+    }, 500);
     
     return () => {
+      console.log('[useEffect] Cleaning up visibility effect');
       window.removeEventListener('scroll', checkVisibility);
       window.removeEventListener('resize', checkVisibility);
       clearTimeout(mountTimer);
-      if (visibilityTimer) {
-        clearTimeout(visibilityTimer);
-      }
-      if (wordsTimerRef.current) {
-        clearTimeout(wordsTimerRef.current);
-      }
+      // Don't clear the visibility timer here - let it complete
     };
-  }, []);
+  }, []); // Remove dependencies to prevent re-runs
 
   const currentContent = bookContent[currentPage] || bookContent[8];
+  
+  console.log('[ReaderDemoWidget] Rendering with wordsRead:', wordsRead, 'showWordCounts:', showWordCounts);
 
   return (
     <WidgetWrapper $expanded={showSignupExpanded}>
