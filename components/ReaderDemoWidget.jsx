@@ -44,7 +44,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'Die Tür öffnete sich',
       'His eyes burned from the salt': 'Seine Augen brannten vom Salz',
       'Through the spray and darkness': 'Durch die Gischt und Dunkelheit',
-      'The ship groaned': 'Das Schiff ächzte'
+      'The ship groaned': 'Das Schiff ächzte',
+      'The deck was chaos': 'Das Deck war ein Chaos'
     },
     es: {
       'Where there was coral before,': 'Donde antes había coral,',
@@ -54,7 +55,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'La puerta se abrió',
       'His eyes burned from the salt': 'Sus ojos ardían por la sal',
       'Through the spray and darkness': 'A través del rocío y la oscuridad',
-      'The ship groaned': 'El barco crujió'
+      'The ship groaned': 'El barco crujió',
+      'The deck was chaos': 'La cubierta era un caos'
     },
     fr: {
       'Where there was coral before,': 'Là où il y avait du corail avant,',
@@ -64,7 +66,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'La porte s\'ouvrit',
       'His eyes burned from the salt': 'Ses yeux brûlaient à cause du sel',
       'Through the spray and darkness': 'À travers les embruns et l\'obscurité',
-      'The ship groaned': 'Le navire gémit'
+      'The ship groaned': 'Le navire gémit',
+      'The deck was chaos': 'Le pont était le chaos'
     },
     it: {
       'Where there was coral before,': 'Dove prima c\'era il corallo,',
@@ -74,7 +77,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'La porta si aprì',
       'His eyes burned from the salt': 'I suoi occhi bruciavano per il sale',
       'Through the spray and darkness': 'Attraverso gli spruzzi e l\'oscurità',
-      'The ship groaned': 'La nave gemette'
+      'The ship groaned': 'La nave gemette',
+      'The deck was chaos': 'Il ponte era il caos'
     },
     pt: {
       'Where there was coral before,': 'Onde antes havia coral,',
@@ -84,7 +88,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'A porta se abriu',
       'His eyes burned from the salt': 'Seus olhos ardiam do sal',
       'Through the spray and darkness': 'Através do spray e da escuridão',
-      'The ship groaned': 'O navio gemeu'
+      'The ship groaned': 'O navio gemeu',
+      'The deck was chaos': 'O convés era o caos'
     },
     zh: {
       'Where there was coral before,': '以前有珊瑚的地方，',
@@ -94,7 +99,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': '门打开了',
       'His eyes burned from the salt': '他的眼睛被盐灼伤',
       'Through the spray and darkness': '穿过浪花和黑暗',
-      'The ship groaned': '船呻吟着'
+      'The ship groaned': '船呻吟着',
+      'The deck was chaos': '甲板一片混乱'
     },
     ja: {
       'Where there was coral before,': '以前サンゴがあった場所に、',
@@ -104,7 +110,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'ドアが開いた',
       'His eyes burned from the salt': '彼の目は塩で焼けるようだった',
       'Through the spray and darkness': '飛沫と暗闇を通して',
-      'The ship groaned': '船がうめいた'
+      'The ship groaned': '船がうめいた',
+      'The deck was chaos': 'デッキは大混乱だった'
     },
     ko: {
       'Where there was coral before,': '이전에 산호가 있던 곳에,',
@@ -114,7 +121,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': '문이 열렸다',
       'His eyes burned from the salt': '그의 눈은 소금으로 타는 듯했다',
       'Through the spray and darkness': '물보라와 어둠을 통해',
-      'The ship groaned': '배가 신음했다'
+      'The ship groaned': '배가 신음했다',
+      'The deck was chaos': '갑판은 혼돈이었다'
     },
     ru: {
       'Where there was coral before,': 'Там, где раньше были кораллы,',
@@ -124,7 +132,8 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       'The door opened': 'Дверь открылась',
       'His eyes burned from the salt': 'Его глаза жгла соль',
       'Through the spray and darkness': 'Сквозь брызги и темноту',
-      'The ship groaned': 'Корабль застонал'
+      'The ship groaned': 'Корабль застонал',
+      'The deck was chaos': 'На палубе царил хаос'
     }
   };
 
@@ -184,11 +193,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         {
           segments: [
             {
-              text: 'The storm had grown worse',
-              translationKey: 'The storm had grown worse'
-            },
-            {
-              text: ' during the night, and the waves crashed over the deck with tremendous force.'
+              text: ' The storm had grown worse, during the night, and the waves crashed over the deck with tremendous force.'
             }
           ],
           indent: true
@@ -213,7 +218,12 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         {
           segments: [
             {
-              text: 'The deck was chaos. Men ran in all directions, some trying to secure loose cargo while others fought to control the sails.'
+              text: 'The deck was chaos',
+              translationKey: 'The deck was chaos',
+              showTranslation: true
+            },
+            {
+              text: '. Men ran in all directions, some trying to secure loose cargo while others fought to control the sails.'
             }
           ],
           indent: true
@@ -221,11 +231,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         {
           segments: [
             {
-              text: 'Through the spray and darkness',
-              translationKey: 'Through the spray and darkness'
-            },
-            {
-              text: ', Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
+              text: 'Through the spray and darkness, Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
             }
           ],
           indent: true
@@ -1161,7 +1167,8 @@ const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
   margin: 0 auto;
 
   ${media('<=tablet')} {
