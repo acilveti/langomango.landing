@@ -481,8 +481,8 @@ const ProcessingMessage = styled.div`
   align-items: center;
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
-  border: 1px solid rgba(255, 152, 0, 0.2);
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(255, 152, 0, 0.8) 100%);
+  border: 1px solid rgba(255, 152, 0, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out;
 `;
@@ -494,12 +494,15 @@ const ProcessingIcon = styled.span`
 `;
 
 const ProcessingText = styled.span`
-  color: #d97706;
+  color: #ffffff;
   font-size: 1.1rem;
   line-height: 1.4;
+  opacity: 1;
   
   strong {
     font-weight: 600;
+    color: #ffffff;
+    opacity: 1;
   }
 `;
 
@@ -508,8 +511,8 @@ const ConfirmationMessage = styled.div`
   align-items: center;
   margin-top: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(34, 197, 94, 0.8) 100%);
+  border: 1px solid rgba(34, 197, 94, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out, ${pulse} 2s infinite;
 `;
@@ -521,11 +524,14 @@ const ConfirmationIcon = styled.span`
 `;
 
 const ConfirmationText = styled.span`
-  color: #059669;
+  color: #ffffff;
   font-size: 1.1rem;
   line-height: 1.4;
+  opacity: 1;
   
   strong {
     font-weight: 600;
+    color: #ffffff;
+    opacity: 1;
   }
 `;
