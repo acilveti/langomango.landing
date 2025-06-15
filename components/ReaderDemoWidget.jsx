@@ -485,6 +485,23 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   return (
     <WidgetWrapper $expanded={showSignupExpanded}>
       <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''}>
+        {/* Words Read Counter */}
+        <WordsReadCounter $hasWords={wordsRead > 0} $justUpdated={justUpdated}>
+          {justUpdated && (
+            <>
+              <SuccessParticle $color="#22c55e" $shape="circle" $delay={0} />
+              <SuccessParticle $color="#3b82f6" $shape="square" $delay={0.1} />
+              <SuccessParticle $color="#f59e0b" $shape="circle" $delay={0.2} />
+              <SuccessParticle $color="#ef4444" $shape="square" $delay={0.3} />
+              <SuccessParticle $color="#8b5cf6" $shape="circle" $delay={0.4} />
+            </>
+          )}
+          <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber>
+          <WordsLabel>
+            <span>words read</span>
+            <span>in {selectedLanguage ? selectedLanguage.name : 'German'}</span>
+          </WordsLabel>
+        </WordsReadCounter>
       <ReaderContainer ref={readerContainerRef}>
         {/* Left Navigation */}
         <NavButtonLeft 
@@ -515,26 +532,6 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           <span>{selectedLanguage ? selectedLanguage.flag : '🇩🇪'}</span>
           <span>{selectedLanguage ? selectedLanguage.name : 'German'}</span>
         </LanguageIndicator>
-        
-        {/* Words Read Counter */}
-        <WordsReadCounter $hasWords={wordsRead > 0} $justUpdated={justUpdated}>
-          {justUpdated && (
-            <>
-              <SuccessParticle $color="#22c55e" $shape="circle" $delay={0} />
-              <SuccessParticle $color="#3b82f6" $shape="square" $delay={0.1} />
-              <SuccessParticle $color="#f59e0b" $shape="circle" $delay={0.2} />
-              <SuccessParticle $color="#ef4444" $shape="square" $delay={0.3} />
-              <SuccessParticle $color="#8b5cf6" $shape="circle" $delay={0.4} />
-            </>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber>
-            <span>words read</span>
-          </div>
-          <div style={{ fontSize: '0.9em', opacity: 0.8 }}>
-            in {selectedLanguage ? selectedLanguage.name : 'German'}
-          </div>
-        </WordsReadCounter>
 
         {/* Book Content */}
         <BookContent ref={pageRef}>
@@ -1244,7 +1241,6 @@ const WordCountBadge = styled.span`
   white-space: nowrap;
   margin-bottom: 0.5rem;
   width: fit-content;
-  margin-left: auto;
   
   &::before {
     content: '+';
@@ -1417,19 +1413,16 @@ const SuccessParticle = styled.div`
 const WordsReadCounter = styled.div`
   position: absolute;
   top: 1.5rem;
-  left: 2rem;
+  right: 1.5rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
+  align-items: flex-end;
+  gap: 0.3rem;
   font-size: 1.1rem;
   color: #2563eb;
   font-weight: 500;
-  z-index: 10;
+  z-index: 15;
   animation: ${(props) => props.$hasWords ? successGlow : 'none'} 1s ease-out;
-  text-align: left;
-  max-width: 12rem;
-  position: relative;
   
   &::after {
     content: '';
@@ -1448,28 +1441,27 @@ const WordsReadCounter = styled.div`
   
   ${media('<=tablet')} {
     font-size: 1rem;
-    left: 1.5rem;
+    right: 1.5rem;
     top: 1rem;
-    max-width: 10rem;
   }
   
   ${media('<=phone')} {
     font-size: 0.9rem;
-    left: 1rem;
-    max-width: 8rem;
+    right: 1rem;
+    gap: 0.3rem;
   }
 `;
 
 const WordsNumber = styled.span`
   display: inline-block;
   font-weight: 700;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #1d4ed8;
   animation: ${popIn} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   position: relative;
-  padding: 0.3rem 0.8rem;
+  padding: 0.2rem 0.6rem;
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
   box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
   
   &::after {
@@ -1496,17 +1488,43 @@ const WordsNumber = styled.span`
   }
   
   ${media('<=tablet')} {
-    font-size: 1.5rem;
-    padding: 0.25rem 0.7rem;
+    font-size: 1.3rem;
+    padding: 0.2rem 0.5rem;
   }
   
   ${media('<=phone')} {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+    padding: 0.15rem 0.4rem;
     
     &::before {
       font-size: 1.2rem;
       top: -10px;
       right: -10px;
+    }
+  }
+`;
+
+const WordsLabel = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  line-height: 1.2;
+  
+  span {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  ${media('<=tablet')} {
+    span {
+      font-size: 0.9rem;
+    }
+  }
+  
+  ${media('<=phone')} {
+    span {
+      font-size: 0.85rem;
     }
   }
 `;
