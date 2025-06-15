@@ -18,13 +18,14 @@ const ColorSwitcher = dynamic(() => import('../components/ColorSwitcher'), { ssr
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
-type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero: boolean };
+type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero: boolean; isDarkened: boolean };
 
 export default function Navbar({ items }: NavbarProps) {
   const router = useRouter();
   const { toggle } = Drawer.useDrawer();
   const [scrollingDirection, setScrollingDirection] = useState<ScrollingDirections>('none');
   const [isOverHero, setIsOverHero] = useState(true);
+  const [isDarkened, setIsDarkened] = useState(false);
 
   let lastScrollY = useRef(0);
   const lastRoute = useRef('');
@@ -55,6 +56,43 @@ export default function Navbar({ items }: NavbarProps) {
     };
   }, []);
 
+  // Check for darkening effect (same logic as in Homepage)
+  useEffect(() => {
+    // Only apply darkening logic on homepage
+    if (router.pathname !== '/') return;
+
+    const handleScroll = () => {
+      const heroSection = document.getElementById('hero-section');
+      if (!heroSection) return;
+      
+      const widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"]');
+      if (widgetContainers.length === 0) return;
+      
+      const widget = widgetContainers[0];
+      const rect = widget.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const elementCenterY = rect.top + rect.height / 2;
+      const screenCenterY = windowHeight / 2;
+      
+      const distanceFromCenter = Math.abs(elementCenterY - screenCenterY);
+      const maxDistance = windowHeight / 2;
+      const darkness = Math.max(0, 1 - (distanceFromCenter / maxDistance));
+      const smoothDarkness = Math.pow(darkness, 2);
+      
+      // Set darkened state if darkness is above threshold
+      setIsDarkened(smoothDarkness > 0.3); // Trigger animation when effect is moderately active
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [router.pathname]);
+
   // Modified scroll position callback to prevent hiding the navbar
   function scrollPositionCallback({ currPos }: ScrollPositionEffectProps) {
     const routerPath = router.asPath;
@@ -79,7 +117,7 @@ export default function Navbar({ items }: NavbarProps) {
   const isTransparent = true; // We'll control transparency via isOverHero instead
 
   return (
-    <NavbarContainer hidden={isNavbarHidden} transparent={isTransparent} isOverHero={isOverHero}>
+    <NavbarContainer hidden={isNavbarHidden} transparent={isTransparent} isOverHero={isOverHero} isDarkened={isDarkened}>
       <Content>
         <NextLink href="/" passHref>
           <LogoWrapper isOverHero={isOverHero}>
@@ -167,7 +205,7 @@ const NavItemWrapper = styled.li<Partial<SingleNavItem> & { isOverHero?: boolean
 
 const NavbarContainer = styled.div<NavbarContainerProps>`
   display: flex;
-  position: fixed; /* Changed from sticky to fixed to ensure it's always visible */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -178,12 +216,15 @@ const NavbarContainer = styled.div<NavbarContainerProps>`
 
   background-color: ${(p) => (p.isOverHero ? 'transparent' : 'rgb(var(--navbarBackground))')};
   box-shadow: ${(p) => (p.isOverHero ? 'none' : '0 1px 2px 0 rgb(0 0 0 / 5%)')};
-  visibility: visible; /* Always visible */
-  transform: translateY(0) translateZ(0) scale(1); /* Always showing */
+  visibility: ${(p) => (p.isDarkened ? 'hidden' : 'visible')};
+  transform: ${(p) => p.isDarkened ? 'translateY(-100%) translateZ(0)' : 'translateY(0) translateZ(0)'};
+  opacity: ${(p) => (p.isDarkened ? 0 : 1)};
 
-  transition-property: background-color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-in-out;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.8s,
+              background-color 0.3s ease-in-out,
+              box-shadow 0.3s ease-in-out;
 `;
 
 const Content = styled(Container)`
