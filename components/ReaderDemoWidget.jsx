@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
@@ -12,6 +12,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [showSignupExpanded, setShowSignupExpanded] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [hasInteracted, setHasInteracted] = useState(false);
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
   const { setIsModalOpened } = useNewsletterModalContext();
@@ -238,6 +239,10 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
 
   // Handle interactions - either use provided callback or default behavior
   const handleInteraction = useCallback(() => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
+    
     if (onInteraction) {
       // If parent component provides interaction handler, use it
       onInteraction();
@@ -259,7 +264,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         setPageChangeCount(0);
       }
     }
-  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded]);
+  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded, hasInteracted]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
@@ -398,25 +403,32 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   return (
     <WidgetWrapper $expanded={showSignupExpanded}>
       <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''}>
-      {/* Left Navigation */}
-      <NavButtonLeft 
-        onClick={handlePrevPage} 
-        disabled={currentPage === 1}
-        aria-label="Previous page"
-      >
-        &#8249;
-      </NavButtonLeft>
-
-      {/* Right Navigation */}
-      <NavButtonRight 
-        onClick={handleNextPage} 
-        disabled={currentPage === totalPages}
-        aria-label="Next page"
-      >
-        &#8250;
-      </NavButtonRight>
-
       <ReaderContainer>
+        {/* Left Navigation */}
+        <NavButtonLeft 
+          onClick={handlePrevPage} 
+          disabled={currentPage === 1}
+          aria-label="Previous page"
+        >
+          &#8249;
+        </NavButtonLeft>
+
+        {/* Right Navigation - Enhanced with animations */}
+        <NavButtonRight 
+          onClick={handleNextPage} 
+          disabled={currentPage === totalPages}
+          aria-label="Next page"
+          $hasInteracted={hasInteracted}
+        >
+          &#8250;
+          <PulseRing />
+          <HintText>NEXT</HintText>
+          <ArrowIndicator>
+            <span>→</span>
+            <span>→</span>
+            <span>→</span>
+          </ArrowIndicator>
+        </NavButtonRight>
         {/* Language indicator */}
         <LanguageIndicator>
           <span>{selectedLanguage ? selectedLanguage.flag : '🇩🇪'}</span>
@@ -559,6 +571,90 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   );
 }
 
+// Animation Keyframes
+const vibrateWithIntervals = keyframes`
+  0%, 2% { transform: translateY(-50%) translateX(0); }
+  2.5% { transform: translateY(-50%) translateX(-3px); }
+  3% { transform: translateY(-50%) translateX(3px); }
+  3.5% { transform: translateY(-50%) translateX(-3px); }
+  4% { transform: translateY(-50%) translateX(3px); }
+  4.5% { transform: translateY(-50%) translateX(-2px); }
+  5% { transform: translateY(-50%) translateX(2px); }
+  5.5% { transform: translateY(-50%) translateX(0); }
+  
+  6%, 25% { transform: translateY(-50%) translateX(0); }
+  
+  25.5% { transform: translateY(-50%) translateX(-3px); }
+  26% { transform: translateY(-50%) translateX(3px); }
+  26.5% { transform: translateY(-50%) translateX(-3px); }
+  27% { transform: translateY(-50%) translateX(3px); }
+  27.5% { transform: translateY(-50%) translateX(-2px); }
+  28% { transform: translateY(-50%) translateX(2px); }
+  28.5% { transform: translateY(-50%) translateX(0); }
+  
+  29%, 50% { transform: translateY(-50%) translateX(0); }
+  
+  50.5% { transform: translateY(-50%) translateX(-3px); }
+  51% { transform: translateY(-50%) translateX(3px); }
+  51.5% { transform: translateY(-50%) translateX(-3px); }
+  52% { transform: translateY(-50%) translateX(3px); }
+  52.5% { transform: translateY(-50%) translateX(-2px); }
+  53% { transform: translateY(-50%) translateX(2px); }
+  53.5% { transform: translateY(-50%) translateX(0); }
+  
+  54%, 100% { transform: translateY(-50%) translateX(0); }
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+`;
+
+const arrowSlide = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+`;
+
+const glow = keyframes`
+  0% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 152, 0, 0);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 152, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 152, 0, 0);
+  }
+`;
+
+const fadeInOut = keyframes`
+  0%, 100% {
+    opacity: 0;
+  }
+  20%, 80% {
+    opacity: 1;
+  }
+`;
+
 // Styled Components
 const WidgetWrapper = styled.div`
   position: relative;
@@ -654,21 +750,91 @@ const NavButtonLeft = styled.button`
   }
 `;
 
+const PulseRing = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 152, 0, 0.3);
+  pointer-events: none;
+`;
+
+const HintText = styled.span`
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff9800;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #ff9800;
+  }
+`;
+
+const ArrowIndicator = styled.div`
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 3px;
+  pointer-events: none;
+  opacity: 0;
+  
+  span {
+    color: #ff9800;
+    font-size: 18px;
+    font-weight: bold;
+    opacity: 0;
+    animation: ${arrowSlide} 1.5s ease-in-out infinite;
+    
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+`;
+
 const NavButtonRight = styled.button`
   position: absolute;
   right: 2rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: ${props => props.$hasInteracted ? 'white' : 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)'};
+  border: ${props => props.$hasInteracted ? '1px solid #e5e7eb' : '2px solid #ff9800'};
   border-radius: 50%;
   font-size: 2.8rem;
-  font-weight: 300;
+  font-weight: ${props => props.$hasInteracted ? '300' : '600'};
   line-height: 1;
-  color: #4b5563;
+  color: ${props => props.$hasInteracted ? '#4b5563' : 'white'};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 10;
   display: flex;
@@ -676,16 +842,57 @@ const NavButtonRight = styled.button`
   justify-content: center;
   width: 4.5rem;
   height: 4.5rem;
+  overflow: visible;
 
-  &:hover:not(:disabled) {
-    background: #f3f4f6;
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
+  ${props => !props.$hasInteracted && css`
+    animation: ${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite;
+    animation-delay: 1s, 1s;
+    
+    ${PulseRing} {
+      animation: ${pulse} 2s ease-out infinite;
+    }
+    
+    ${HintText} {
+      animation: ${fadeInOut} 4s ease-in-out infinite;
+      animation-delay: 2s;
+    }
+    
+    ${ArrowIndicator} {
+      opacity: 1;
+    }
+    
+    &:hover {
+      animation-play-state: paused, paused;
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
+      
+      ${PulseRing} {
+        animation-play-state: paused;
+      }
+      
+      ${HintText} {
+        opacity: 1;
+        animation: none;
+      }
+    }
+  `}
+
+  ${props => props.$hasInteracted && css`
+    &:hover:not(:disabled) {
+      background: #f3f4f6;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+  `}
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    animation: none;
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-weight: 300;
   }
 
   ${media('<=tablet')} {
@@ -693,6 +900,14 @@ const NavButtonRight = styled.button`
     width: 4rem;
     height: 4rem;
     font-size: 2.4rem;
+    
+    ${ArrowIndicator} {
+      right: -35px;
+      
+      span {
+        font-size: 16px;
+      }
+    }
   }
 
   ${media('<=phone')} {
@@ -700,8 +915,19 @@ const NavButtonRight = styled.button`
     width: 3.5rem;
     height: 3.5rem;
     font-size: 2rem;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    
+    ${props => props.$hasInteracted && css`
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    `}
+    
+    ${HintText} {
+      display: none;
+    }
+    
+    ${ArrowIndicator} {
+      display: none;
+    }
   }
 `;
 
