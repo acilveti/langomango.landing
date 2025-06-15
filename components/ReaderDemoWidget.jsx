@@ -14,9 +14,11 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [emailError, setEmailError] = useState('');
   const [wordsRead, setWordsRead] = useState(0);
   const [hasClicked, setHasClicked] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
   const wordsTimerRef = useRef(null);
+  const widgetRef = useRef(null);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [popup, setPopup] = useState({
     visible: false,
@@ -402,14 +404,53 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     };
   }, [popup.visible, hidePopup]);
 
-  // Start the word counter timer when component mounts
+  // Check if widget is visible and start word counter
   useEffect(() => {
-    // After 2 seconds, set words to 6
-    wordsTimerRef.current = setTimeout(() => {
-      setWordsRead(6);
-    }, 2000);
+    let hasStartedTimer = false;
+    let visibilityTimer = null;
+    
+    const checkVisibility = () => {
+      if (widgetRef.current && !hasStartedTimer) {
+        const rect = widgetRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+        
+        // Check if the ENTIRE widget is visible in viewport
+        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
+        
+        if (isFullyVisible) {
+          // If not already timing, start the 2-second visibility timer
+          if (!visibilityTimer) {
+            visibilityTimer = setTimeout(() => {
+              hasStartedTimer = true;
+              // Widget has been visible for 2 seconds, animate immediately
+              setWordsRead(6);
+            }, 2000); // Must be visible for 2 seconds
+          }
+        } else {
+          // Widget is not fully visible, clear the visibility timer
+          if (visibilityTimer) {
+            clearTimeout(visibilityTimer);
+            visibilityTimer = null;
+          }
+        }
+      }
+    };
+
+    // Check visibility on mount and scroll
+    checkVisibility();
+    window.addEventListener('scroll', checkVisibility);
+    window.addEventListener('resize', checkVisibility);
+    
+    // Also check after mount
+    const mountTimer = setTimeout(checkVisibility, 500);
     
     return () => {
+      window.removeEventListener('scroll', checkVisibility);
+      window.removeEventListener('resize', checkVisibility);
+      clearTimeout(mountTimer);
+      if (visibilityTimer) {
+        clearTimeout(visibilityTimer);
+      }
       if (wordsTimerRef.current) {
         clearTimeout(wordsTimerRef.current);
       }
@@ -419,7 +460,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const currentContent = bookContent[currentPage] || bookContent[8];
 
   return (
-    <WidgetWrapper $expanded={showSignupExpanded}>
+    <WidgetWrapper $expanded={showSignupExpanded} ref={widgetRef}>
       <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''}>
       <ReaderContainer>
         {/* Left Navigation */}
@@ -453,7 +494,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         </LanguageIndicator>
         
         {/* Words Read Counter */}
-        <WordsReadCounter>
+        <WordsReadCounter $hasWords={wordsRead > 0}>
           <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber> words read in {selectedLanguage ? selectedLanguage.name : 'German'}
         </WordsReadCounter>
 
@@ -679,14 +720,17 @@ const fadeInOut = keyframes`
 
 const popIn = keyframes`
   0% {
-    transform: scale(0);
+    transform: scale(0) rotate(-180deg);
     opacity: 0;
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.3) rotate(10deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-5deg);
   }
   100% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
 `;
@@ -703,6 +747,29 @@ const countUp = keyframes`
   100% {
     transform: translateY(0) scale(1);
     opacity: 1;
+  }
+`;
+
+const sparkle = keyframes`
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+const successGlow = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
   }
 `;
 
@@ -1195,24 +1262,25 @@ const LanguageIndicator = styled.div`
 const WordsReadCounter = styled.div`
   position: absolute;
   top: 1.5rem;
-  left: 2rem;
+  right: 2rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.6rem;
   font-size: 1.2rem;
   color: #2563eb;
   font-weight: 500;
   z-index: 10;
+  animation: ${(props) => props.$hasWords ? successGlow : 'none'} 1s ease-out;
   
   ${media('<=tablet')} {
     font-size: 1.1rem;
-    left: 1.5rem;
+    right: 1.5rem;
     top: 1rem;
   }
   
   ${media('<=phone')} {
     font-size: 1rem;
-    left: 1rem;
+    right: 1rem;
   }
 `;
 
@@ -1221,8 +1289,12 @@ const WordsNumber = styled.span`
   font-weight: 700;
   font-size: 1.4rem;
   color: #1d4ed8;
-  animation: ${popIn} 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: ${popIn} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   position: relative;
+  padding: 0.2rem 0.6rem;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 0.4rem;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   
   &::after {
     content: '';
@@ -1231,8 +1303,19 @@ const WordsNumber = styled.span`
     left: 0;
     right: 0;
     height: 2px;
-    background: #60a5fa;
+    background: linear-gradient(90deg, #3b82f6, #22c55e, #3b82f6);
+    background-size: 200% 100%;
     animation: ${countUp} 0.8s ease-out;
+  }
+  
+  &::before {
+    content: '✨';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 1.2rem;
+    animation: ${sparkle} 1s ease-out;
+    animation-delay: 0.3s;
   }
   
   ${media('<=tablet')} {
@@ -1241,6 +1324,12 @@ const WordsNumber = styled.span`
   
   ${media('<=phone')} {
     font-size: 1.2rem;
+    
+    &::before {
+      font-size: 1rem;
+      top: -8px;
+      right: -8px;
+    }
   }
 `;
 
