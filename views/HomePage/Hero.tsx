@@ -53,7 +53,7 @@ export default function Hero() {
             {t('home:hero.description')}
           </Description>
           <MobileDemoContainer>
-            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} />
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </MobileDemoContainer>
           <MobileButtonGroup>
             <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
@@ -126,7 +126,7 @@ export default function Hero() {
         
         <DemoColumn>
           <DemoContainer>
-            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} />
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </DemoContainer>
         </DemoColumn>
       </TwoColumnLayout>
@@ -217,6 +217,7 @@ const DemoContainer = styled.div`
   border-radius: 1.6rem;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
 `;
 
 const MobileDemoContainer = styled.div`
@@ -225,6 +226,7 @@ const MobileDemoContainer = styled.div`
   border-radius: 1.2rem;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e5e7eb;
 `;
 
 

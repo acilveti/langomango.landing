@@ -18,7 +18,7 @@ export default function ReaderDemoSection({ selectedLanguage }) {
           </SectionSubtitle>
         </HeaderContainer>
 
-        <ReaderDemoWidget selectedLanguage={selectedLanguage} />
+        <ReaderDemoWidget selectedLanguage={selectedLanguage} useInlineSignup={true} />
       </Container>
     </SectionWrapper>
   );
