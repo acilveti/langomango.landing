@@ -12,9 +12,11 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [showSignupExpanded, setShowSignupExpanded] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [wordsRead, setWordsRead] = useState(0);
+  const [hasClicked, setHasClicked] = useState(false);
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
+  const wordsTimerRef = useRef(null);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [popup, setPopup] = useState({
     visible: false,
@@ -239,10 +241,6 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
 
   // Handle interactions - either use provided callback or default behavior
   const handleInteraction = useCallback(() => {
-    if (!hasInteracted) {
-      setHasInteracted(true);
-    }
-    
     if (onInteraction) {
       // If parent component provides interaction handler, use it
       onInteraction();
@@ -264,7 +262,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         setPageChangeCount(0);
       }
     }
-  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded, hasInteracted]);
+  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
@@ -281,8 +279,14 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       setPageInput((currentPage + 1).toString());
       hidePopup();
       handleInteraction();
+      
+      // Update words read on first click
+      if (!hasClicked) {
+        setHasClicked(true);
+        setWordsRead(9);
+      }
     }
-  }, [currentPage, totalPages, handleInteraction]);
+  }, [currentPage, totalPages, handleInteraction, hasClicked]);
 
   const handlePageInputChange = useCallback((text) => {
     setPageInput(text);
@@ -398,6 +402,20 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     };
   }, [popup.visible, hidePopup]);
 
+  // Start the word counter timer when component mounts
+  useEffect(() => {
+    // After 2 seconds, set words to 6
+    wordsTimerRef.current = setTimeout(() => {
+      setWordsRead(6);
+    }, 2000);
+    
+    return () => {
+      if (wordsTimerRef.current) {
+        clearTimeout(wordsTimerRef.current);
+      }
+    };
+  }, []);
+
   const currentContent = bookContent[currentPage] || bookContent[8];
 
   return (
@@ -418,7 +436,6 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           onClick={handleNextPage} 
           disabled={currentPage === totalPages}
           aria-label="Next page"
-          $hasInteracted={hasInteracted}
         >
           &#8250;
           <PulseRing />
@@ -434,6 +451,11 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           <span>{selectedLanguage ? selectedLanguage.flag : '🇩🇪'}</span>
           <span>{selectedLanguage ? selectedLanguage.name : 'German'}</span>
         </LanguageIndicator>
+        
+        {/* Words Read Counter */}
+        <WordsReadCounter>
+          <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber> words read in {selectedLanguage ? selectedLanguage.name : 'German'}
+        </WordsReadCounter>
 
         {/* Book Content */}
         <BookContent ref={pageRef}>
@@ -655,6 +677,35 @@ const fadeInOut = keyframes`
   }
 `;
 
+const popIn = keyframes`
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+const countUp = keyframes`
+  0% {
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-20%) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+`;
+
 // Styled Components
 const WidgetWrapper = styled.div`
   position: relative;
@@ -826,13 +877,13 @@ const NavButtonRight = styled.button`
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
-  background: ${props => props.$hasInteracted ? 'white' : 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)'};
-  border: ${props => props.$hasInteracted ? '1px solid #e5e7eb' : '2px solid #ff9800'};
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  border: 2px solid #ff9800;
   border-radius: 50%;
   font-size: 2.8rem;
-  font-weight: ${props => props.$hasInteracted ? '300' : '600'};
+  font-weight: 600;
   line-height: 1;
-  color: ${props => props.$hasInteracted ? '#4b5563' : 'white'};
+  color: white;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -843,47 +894,38 @@ const NavButtonRight = styled.button`
   width: 4.5rem;
   height: 4.5rem;
   overflow: visible;
-
-  ${props => !props.$hasInteracted && css`
-    animation: ${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite;
-    animation-delay: 1s, 1s;
+  
+  /* Always apply animations */
+  animation: ${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite;
+  animation-delay: 1s, 1s;
+  
+  ${PulseRing} {
+    animation: ${pulse} 2s ease-out infinite;
+  }
+  
+  ${HintText} {
+    animation: ${fadeInOut} 4s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+  
+  ${ArrowIndicator} {
+    opacity: 1;
+  }
+  
+  &:hover {
+    animation-play-state: paused, paused;
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
     
     ${PulseRing} {
-      animation: ${pulse} 2s ease-out infinite;
+      animation-play-state: paused;
     }
     
     ${HintText} {
-      animation: ${fadeInOut} 4s ease-in-out infinite;
-      animation-delay: 2s;
-    }
-    
-    ${ArrowIndicator} {
       opacity: 1;
+      animation: none;
     }
-    
-    &:hover {
-      animation-play-state: paused, paused;
-      transform: translateY(-50%) scale(1.15);
-      box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
-      
-      ${PulseRing} {
-        animation-play-state: paused;
-      }
-      
-      ${HintText} {
-        opacity: 1;
-        animation: none;
-      }
-    }
-  `}
-
-  ${props => props.$hasInteracted && css`
-    &:hover:not(:disabled) {
-      background: #f3f4f6;
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
-  `}
+  }
 
   &:disabled {
     opacity: 0.5;
@@ -893,6 +935,11 @@ const NavButtonRight = styled.button`
     border: 1px solid #e5e7eb;
     color: #4b5563;
     font-weight: 300;
+    
+    ${PulseRing}, ${HintText}, ${ArrowIndicator} {
+      animation: none;
+      opacity: 0;
+    }
   }
 
   ${media('<=tablet')} {
@@ -916,10 +963,7 @@ const NavButtonRight = styled.button`
     height: 3.5rem;
     font-size: 2rem;
     
-    ${props => props.$hasInteracted && css`
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-    `}
+
     
     ${HintText} {
       display: none;
@@ -1145,6 +1189,58 @@ const LanguageIndicator = styled.div`
     font-size: 1.1rem;
     padding: 0.5rem 1rem;
     top: 1rem;
+  }
+`;
+
+const WordsReadCounter = styled.div`
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.2rem;
+  color: #2563eb;
+  font-weight: 500;
+  z-index: 10;
+  
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
+    left: 1.5rem;
+    top: 1rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+    left: 1rem;
+  }
+`;
+
+const WordsNumber = styled.span`
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #1d4ed8;
+  animation: ${popIn} 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #60a5fa;
+    animation: ${countUp} 0.8s ease-out;
+  }
+  
+  ${media('<=tablet')} {
+    font-size: 1.3rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.2rem;
   }
 `;
 
