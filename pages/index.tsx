@@ -37,7 +37,7 @@ import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector, { Language } from 'components/LanguageSelector';
 import ReaderDemoModal from 'components/ReaderDemoModal';
-import ReaderDemoSection from 'components/ReaderDemoSection';
+import ReaderDemoWidget from 'components/ReaderDemoWidget';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -220,9 +220,11 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           <div id="hero-section">
             <Hero />
           </div>
-          {/* Reader Demo Section */}
-          <div id="reader-demo-section">
-            <ReaderDemoSection selectedLanguage={selectedLanguage} />
+          {/* Reader Demo */}
+          <div id="reader-demo-section" style={{ margin: '4rem 0' }}>
+            <Container>
+              <ReaderDemoWidget selectedLanguage={selectedLanguage} useInlineSignup={true} />
+            </Container>
           </div>
           
           <div id="section-1">

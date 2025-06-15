@@ -30,6 +30,7 @@ const SectionWrapper = styled.section`
   background: #2c7a7b; /* Teal/turquoise background like in the CTA */
   position: relative;
   overflow: hidden;
+  min-height: auto;
 
   ${media('<=tablet')} {
     padding: 5rem 0;
