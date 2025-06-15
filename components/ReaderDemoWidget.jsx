@@ -16,10 +16,11 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [hasClicked, setHasClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
+  const [justUpdated, setJustUpdated] = useState(false);
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
   const wordsTimerRef = useRef(null);
-  const widgetRef = useRef(null);
+  const readerContainerRef = useRef(null);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [popup, setPopup] = useState({
     visible: false,
@@ -290,7 +291,18 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       // Update words read on first click
       if (!hasClicked) {
         setHasClicked(true);
-        setWordsRead(12); // Changed from 9 to 12
+        // Hide word counts temporarily
+        setShowWordCounts(false);
+        // Wait 3 seconds then show word counts again before updating global counter
+        setTimeout(() => {
+          setShowWordCounts(true);
+          // Update global counter 1 second after word counts appear
+          setTimeout(() => {
+            setWordsRead(12);
+            setJustUpdated(true);
+            setTimeout(() => setJustUpdated(false), 1000);
+          }, 1000);
+        }, 3000);
       }
     }
   }, [currentPage, totalPages, handleInteraction, hasClicked]);
@@ -409,17 +421,17 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     };
   }, [popup.visible, hidePopup]);
 
-  // Check if widget is visible and start word counter
+  // Check if reader container is visible and start word counter
   useEffect(() => {
     let hasStartedTimer = false;
     let visibilityTimer = null;
     
     const checkVisibility = () => {
-      if (widgetRef.current && !hasStartedTimer) {
-        const rect = widgetRef.current.getBoundingClientRect();
+      if (readerContainerRef.current && !hasStartedTimer) {
+        const rect = readerContainerRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight || document.documentElement.clientHeight;
         
-        // Check if the ENTIRE widget is visible in viewport
+        // Check if the ENTIRE reader container is visible in viewport
         const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
         
         if (isFullyVisible) {
@@ -432,11 +444,13 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
               // Then update global counter 1 second later
               wordsTimerRef.current = setTimeout(() => {
                 setWordsRead(9);
+                setJustUpdated(true);
+                setTimeout(() => setJustUpdated(false), 1000);
               }, 1000); // 1 second after word counts appear
             }, 2000); // Must be visible for 2 seconds
           }
         } else {
-          // Widget is not fully visible, clear the visibility timer
+          // Reader container is not fully visible, clear the visibility timer
           if (visibilityTimer) {
             clearTimeout(visibilityTimer);
             visibilityTimer = null;
@@ -469,9 +483,9 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const currentContent = bookContent[currentPage] || bookContent[8];
 
   return (
-    <WidgetWrapper $expanded={showSignupExpanded} ref={widgetRef}>
+    <WidgetWrapper $expanded={showSignupExpanded}>
       <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''}>
-      <ReaderContainer>
+      <ReaderContainer ref={readerContainerRef}>
         {/* Left Navigation */}
         <NavButtonLeft 
           onClick={handlePrevPage} 
@@ -503,7 +517,16 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
         </LanguageIndicator>
         
         {/* Words Read Counter */}
-        <WordsReadCounter $hasWords={wordsRead > 0}>
+        <WordsReadCounter $hasWords={wordsRead > 0} $justUpdated={justUpdated}>
+          {justUpdated && (
+            <>
+              <SuccessParticle $color="#22c55e" $shape="circle" $delay={0} />
+              <SuccessParticle $color="#3b82f6" $shape="square" $delay={0.1} />
+              <SuccessParticle $color="#f59e0b" $shape="circle" $delay={0.2} />
+              <SuccessParticle $color="#ef4444" $shape="square" $delay={0.3} />
+              <SuccessParticle $color="#8b5cf6" $shape="circle" $delay={0.4} />
+            </>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber>
             <span>words read</span>
@@ -791,6 +814,31 @@ const sparkle = keyframes`
   50% {
     opacity: 1;
     transform: scale(1);
+  }
+`;
+
+const successBurst = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(20);
+    opacity: 0;
+  }
+`;
+
+const confetti = keyframes`
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(720deg);
+    opacity: 0;
   }
 `;
 
@@ -1196,6 +1244,7 @@ const WordCountBadge = styled.span`
   white-space: nowrap;
   margin-bottom: 0.5rem;
   width: fit-content;
+  margin-left: auto;
   
   &::before {
     content: '+';
@@ -1351,32 +1400,62 @@ const LanguageIndicator = styled.div`
   }
 `;
 
+const SuccessParticle = styled.div`
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: ${props => props.$color};
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: ${props => props.$shape === 'circle' ? '50%' : '2px'};
+  animation: ${confetti} 1s ease-out forwards;
+  animation-delay: ${props => props.$delay}s;
+  opacity: 0;
+`;
+
 const WordsReadCounter = styled.div`
   position: absolute;
   top: 1.5rem;
-  right: 2rem;
+  left: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 0.2rem;
   font-size: 1.1rem;
   color: #2563eb;
   font-weight: 500;
   z-index: 10;
   animation: ${(props) => props.$hasWords ? successGlow : 'none'} 1s ease-out;
-  text-align: right;
+  text-align: left;
   max-width: 12rem;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: #22c55e;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: -1;
+    animation: ${(props) => props.$justUpdated ? successBurst : 'none'} 1s ease-out;
+  }
   
   ${media('<=tablet')} {
     font-size: 1rem;
-    right: 1.5rem;
+    left: 1.5rem;
     top: 1rem;
     max-width: 10rem;
   }
   
   ${media('<=phone')} {
     font-size: 0.9rem;
-    right: 1rem;
+    left: 1rem;
     max-width: 8rem;
   }
 `;
@@ -1384,14 +1463,14 @@ const WordsReadCounter = styled.div`
 const WordsNumber = styled.span`
   display: inline-block;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   color: #1d4ed8;
   animation: ${popIn} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   position: relative;
-  padding: 0.2rem 0.6rem;
+  padding: 0.3rem 0.8rem;
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-radius: 0.4rem;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  border-radius: 0.6rem;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
   
   &::after {
     content: '';
@@ -1399,33 +1478,35 @@ const WordsNumber = styled.span`
     bottom: -2px;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background: linear-gradient(90deg, #3b82f6, #22c55e, #3b82f6);
     background-size: 200% 100%;
     animation: ${countUp} 0.8s ease-out;
+    border-radius: 2px;
   }
   
   &::before {
     content: '✨';
     position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 1.2rem;
+    top: -12px;
+    right: -12px;
+    font-size: 1.4rem;
     animation: ${sparkle} 1s ease-out;
     animation-delay: 0.3s;
   }
   
   ${media('<=tablet')} {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    padding: 0.25rem 0.7rem;
   }
   
   ${media('<=phone')} {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     
     &::before {
-      font-size: 1rem;
-      top: -8px;
-      right: -8px;
+      font-size: 1.2rem;
+      top: -10px;
+      right: -10px;
     }
   }
 `;
