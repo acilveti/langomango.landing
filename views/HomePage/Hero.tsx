@@ -1,7 +1,7 @@
 // views/HomePage/Hero.tsx
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
@@ -17,6 +17,9 @@ export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [isMobile, setIsMobile] = useState(false);
+  const [darkenAmount, setDarkenAmount] = useState(0);
+  const demoContainerRef = useRef<HTMLDivElement>(null);
+  const mobileDemoContainerRef = useRef<HTMLDivElement>(null);
   
   // Check if we're on client side before using window
   useEffect(() => {
@@ -35,6 +38,44 @@ export default function Hero() {
     // Clean up
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
+
+  // Scroll effect for darkening the reader widget
+  useEffect(() => {
+    const handleScroll = () => {
+      const containerRef = isMobile ? mobileDemoContainerRef : demoContainerRef;
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const elementCenterY = rect.top + rect.height / 2;
+      const screenCenterY = windowHeight / 2;
+      
+      // Calculate distance from center of screen
+      const distanceFromCenter = Math.abs(elementCenterY - screenCenterY);
+      const maxDistance = windowHeight / 2;
+      
+      // Calculate darkening amount (0 to 1)
+      // 0 when far from center, 1 when perfectly centered
+      const darkness = Math.max(0, 1 - (distanceFromCenter / maxDistance));
+      
+      // Apply exponential curve for smoother transition
+      const smoothDarkness = Math.pow(darkness, 2);
+      
+      setDarkenAmount(smoothDarkness * 0.6); // Max 60% darkness
+    };
+
+    // Initial check
+    handleScroll();
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [isMobile]);
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -45,14 +86,16 @@ export default function Hero() {
   // Mobile content
   if (isMobile) {
     return (
-      <HeroWrapper>
+      <>
+        <PageDarkenOverlay opacity={darkenAmount} />
+        <HeroWrapper>
         <MobileContents>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
           <Heading>{t('home:hero.heading')}</Heading>
           <Description>
             {t('home:hero.description')}
           </Description>
-          <MobileDemoContainer>
+          <MobileDemoContainer ref={mobileDemoContainerRef}>
             <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </MobileDemoContainer>
           <MobileButtonGroup>
@@ -99,12 +142,15 @@ export default function Hero() {
           }
         `}</style>
       </HeroWrapper>
+      </>
     );
   }
   
   // Desktop content with two columns
   return (
-    <HeroWrapper>
+    <>
+      <PageDarkenOverlay opacity={darkenAmount} />
+      <HeroWrapper>
       <TwoColumnLayout>
         <TextColumn>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
@@ -125,7 +171,7 @@ export default function Hero() {
         </TextColumn>
         
         <DemoColumn>
-          <DemoContainer>
+          <DemoContainer ref={demoContainerRef}>
             <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </DemoContainer>
         </DemoColumn>
@@ -163,6 +209,7 @@ export default function Hero() {
         }
       `}</style>
     </HeroWrapper>
+    </>
   );
 }
 
@@ -218,6 +265,8 @@ const DemoContainer = styled.div`
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   border: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 15;
 `;
 
 const MobileDemoContainer = styled.div`
@@ -227,6 +276,21 @@ const MobileDemoContainer = styled.div`
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   border: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 15;
+`;
+
+const PageDarkenOverlay = styled.div<{ opacity: number }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: ${props => props.opacity};
+  pointer-events: none;
+  z-index: 9;
+  transition: opacity 0.3s ease-out;
 `;
 
 

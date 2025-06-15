@@ -54,6 +54,7 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [showReaderDemo, setShowReaderDemo] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const languageSelectorRef = useRef<any>(null);
+  const [darkenAmount, setDarkenAmount] = useState(0);
 
   const handleLanguageSelect = useCallback((language: Language) => {
     console.log('Language selected:', language);
@@ -67,6 +68,50 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   useEffect(() => {
     captureReferral();
+  }, []);
+
+  // Scroll effect for darkening when widget is centered
+  useEffect(() => {
+    const handleScroll = () => {
+      // Find the reader widget in the Hero section
+      const heroSection = document.getElementById('hero-section');
+      if (!heroSection) return;
+      
+      // Look for the reader widget container
+      const widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"]');
+      if (widgetContainers.length === 0) return;
+      
+      const widget = widgetContainers[0];
+      const rect = widget.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const elementCenterY = rect.top + rect.height / 2;
+      const screenCenterY = windowHeight / 2;
+      
+      // Calculate distance from center of screen
+      const distanceFromCenter = Math.abs(elementCenterY - screenCenterY);
+      const maxDistance = windowHeight / 2;
+      
+      // Calculate darkening amount (0 to 1)
+      // 0 when far from center, 1 when perfectly centered
+      const darkness = Math.max(0, 1 - (distanceFromCenter / maxDistance));
+      
+      // Apply exponential curve for smoother transition
+      const smoothDarkness = Math.pow(darkness, 2);
+      
+      setDarkenAmount(smoothDarkness * 0.6); // Max 60% darkness
+    };
+
+    // Initial check
+    handleScroll();
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -191,6 +236,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   return (
     <>
+      {/* Page-wide darkening overlay */}
+      <PageDarkenOverlay opacity={darkenAmount} />
+      
       {/* Reddit Pixel Base Code - Using Next.js Script component */}
       <Script
         id="reddit-pixel-base"
@@ -217,15 +265,15 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         </div>
         {/* Add the HeroSticky component at the very beginning */}
         <WhiteBackgroundContainer className="white-background-container">
-          <div id="hero-section">
+          <HeroSection id="hero-section">
             <Hero />
-          </div>
+          </HeroSection>
           {/* Reader Demo */}
-          <div id="reader-demo-section" style={{ margin: '4rem 0' }}>
+          {/* <div id="reader-demo-section" style={{ margin: '4rem 0' }}>
             <Container>
               <ReaderDemoWidget selectedLanguage={selectedLanguage} useInlineSignup={true} />
             </Container>
-          </div>
+          </div> */}
           
           <div id="section-1">
             {/* Pass the title and overTitle to Testimonials */}
@@ -372,6 +420,11 @@ const HomepageWrapper = styled.div`
   overflow-x: hidden;
 `;
 
+const HeroSection = styled.div`
+  position: relative;
+  z-index: 10;
+`;
+
 const DarkerBackgroundContainer = styled.div`
   background: rgb(var(--background));
 
@@ -493,6 +546,19 @@ const CustomAutofitGrid = styled(AutofitGrid)`
   ${media('<=phone')} {
     --autofit-grid-item-size: 100%;
   }
+`;
+
+const PageDarkenOverlay = styled.div<{ opacity: number }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: ${props => props.opacity};
+  pointer-events: none;
+  z-index: 9;
+  transition: opacity 0.3s ease-out;
 `;
 
 export async function getStaticProps({ locale }: { locale: string }) {

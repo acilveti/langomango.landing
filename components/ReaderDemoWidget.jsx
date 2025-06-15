@@ -583,6 +583,7 @@ const ReaderWrapper = styled.div`
   transition: transform 0.4s ease;
   transform-origin: top center;
   width: 100%;
+  z-index: 20;
   
   ${props => props.className === 'reader-wrapper' ? 'transform: scale(0.85);' : ''}
 `;
