@@ -98,16 +98,6 @@ export default function Hero() {
           <MobileDemoContainer ref={mobileDemoContainerRef}>
             <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </MobileDemoContainer>
-          <MobileButtonGroup>
-            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
-              {t('common:startReading')} <span>&rarr;</span>
-            </VibratingButton>
-            {/* <NextLink href="/authors" passHref>
-              <Button transparent>
-                {t('common:areYouAuthor')} <span>&rarr;</span>
-              </Button>
-            </NextLink> */}
-          </MobileButtonGroup>
         </MobileContents>
 
         <style jsx>{`
@@ -254,9 +244,7 @@ const CustomButtonGroup = styled(ButtonGroup)`
   margin-top: 4rem;
 `;
 
-const MobileButtonGroup = styled(ButtonGroup)`
-  margin-top: 2rem;
-`;
+
 
 const DemoContainer = styled.div`
   width: 100%;

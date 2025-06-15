@@ -570,6 +570,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
 
         {/* Right Navigation - Enhanced with animations */}
         <NavButtonRight 
+          key={`nav-right-${currentPage}`}
           onClick={handleNextPage} 
           disabled={currentPage === totalPages}
           aria-label="Next page"
@@ -658,13 +659,6 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       {/* Bottom Navigation Bar */}
       <BottomBar>
         <PageNavigation>
-          <PageNavButton 
-            onClick={handlePrevPage} 
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </PageNavButton>
-          
           <PageInputContainer>
             <PageInput
               type="text"
@@ -676,13 +670,6 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
             />
             <PageTotal>/ {totalPages}</PageTotal>
           </PageInputContainer>
-
-          <PageNavButton 
-            onClick={handleNextPage} 
-            disabled={currentPage === totalPages}
-          >
-            &gt;
-          </PageNavButton>
         </PageNavigation>
       </BottomBar>
     </ReaderWrapper>
@@ -1103,9 +1090,11 @@ const NavButtonRight = styled.button`
   height: 4.5rem;
   overflow: visible;
   
-  /* Always apply animations */
+  /* Always apply animations with will-change for performance */
+  will-change: transform;
   animation: ${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite;
   animation-delay: 1s, 1s;
+  animation-fill-mode: both;
   
   ${PulseRing} {
     animation: ${pulse} 2s ease-out infinite;
@@ -1120,7 +1109,7 @@ const NavButtonRight = styled.button`
     opacity: 1;
   }
   
-  &:hover {
+  &:hover:not(:disabled) {
     animation-play-state: paused, paused;
     transform: translateY(-50%) scale(1.15);
     box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
