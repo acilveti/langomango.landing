@@ -15,6 +15,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [wordsRead, setWordsRead] = useState(0);
   const [hasClicked, setHasClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [showWordCounts, setShowWordCounts] = useState(false);
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
   const wordsTimerRef = useRef(null);
@@ -27,6 +28,10 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     x: 0,
     y: 0
   });
+
+  const getWordCount = (text) => {
+    return text.trim().split(/\s+/).length;
+  };
 
   // Translations for different languages
   const translations = {
@@ -285,7 +290,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       // Update words read on first click
       if (!hasClicked) {
         setHasClicked(true);
-        setWordsRead(9);
+        setWordsRead(12); // Changed from 9 to 12
       }
     }
   }, [currentPage, totalPages, handleInteraction, hasClicked]);
@@ -422,8 +427,12 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           if (!visibilityTimer) {
             visibilityTimer = setTimeout(() => {
               hasStartedTimer = true;
-              // Widget has been visible for 2 seconds, animate immediately
-              setWordsRead(6);
+              // Show word counts first
+              setShowWordCounts(true);
+              // Then update global counter 1 second later
+              wordsTimerRef.current = setTimeout(() => {
+                setWordsRead(9);
+              }, 1000); // 1 second after word counts appear
             }, 2000); // Must be visible for 2 seconds
           }
         } else {
@@ -526,10 +535,17 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
                       </TranslatableText>
                     );
                   } else if (segment.translationKey && segment.showTranslation) {
+                    const translatedText = getTranslation(segment.translationKey);
+                    const wordCount = getWordCount(translatedText);
                     return (
                       <InlineTranslation key={key}>
+                        {showWordCounts && (
+                          <WordCountBadge key={`badge-${key}`}>
+                            {wordCount} words in {selectedLanguage ? selectedLanguage.name : 'German'}
+                          </WordCountBadge>
+                        )}
                         <OriginalText>{segment.text}</OriginalText>
-                        <TranslationText>{getTranslation(segment.translationKey)}</TranslationText>
+                        <TranslationText>{translatedText}</TranslationText>
                       </InlineTranslation>
                     );
                   } else {
@@ -747,6 +763,17 @@ const countUp = keyframes`
   100% {
     transform: translateY(0) scale(1);
     opacity: 1;
+  }
+`;
+
+const slideInFade = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 `;
 
@@ -1110,6 +1137,14 @@ const TranslatableText = styled.span`
 
 const InlineTranslation = styled.span`
   display: inline-block;
+  position: relative;
+`;
+
+const TranslationHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.2rem;
 `;
 
 const OriginalText = styled.span`
@@ -1121,6 +1156,40 @@ const OriginalText = styled.span`
   ${media('<=tablet')} {
     font-size: 1.6rem;
     line-height: 2.8rem;
+  }
+`;
+
+const WordCountBadge = styled.span`
+  display: block;
+  font-size: 0.95rem;
+  color: #2563eb;
+  background: #dbeafe;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: ${slideInFade} 0.5s ease-out;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  white-space: nowrap;
+  margin-bottom: 0.5rem;
+  width: fit-content;
+  
+  &::before {
+    content: '+';
+    margin-right: 0.2rem;
+    font-weight: 700;
+  }
+  
+  ${media('<=tablet')} {
+    font-size: 0.85rem;
+    padding: 0.15rem 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 0.8rem;
+    padding: 0.1rem 0.4rem;
+    margin-bottom: 0.3rem;
   }
 `;
 
