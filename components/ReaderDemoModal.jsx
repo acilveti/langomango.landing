@@ -140,13 +140,24 @@ const ReaderCard = styled.div`
 
 const CloseIconContainer = styled.div`
   position: absolute;
-  right: 1rem;
+  left: 1rem; /* Moved to left side to avoid overlap */
   top: 1rem;
-  z-index: 300;
+  z-index: 350;
 
   svg {
     cursor: pointer;
-    width: 2rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    background: white;
+    border-radius: 50%;
+    padding: 0.4rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
   }
 `;
 
