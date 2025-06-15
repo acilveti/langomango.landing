@@ -690,6 +690,9 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       {/* Inline Signup Section */}
       {useInlineSignup && showSignupExpanded && (
         <SignupSection>
+          <CloseButton onClick={() => setShowSignupExpanded(false)} aria-label="Close signup">
+            ×
+          </CloseButton>
           <SignupExpanded>
             <SignupTitle>✨ Create your free account to continue</SignupTitle>
             <SignupSubtitle>Start learning languages with interactive reading</SignupSubtitle>
@@ -1897,5 +1900,53 @@ const LoginLink = styled.a`
   
   &:hover {
     text-decoration: underline;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 3.6rem;
+  height: 3.6rem;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  font-size: 2.8rem;
+  font-weight: 300;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #374151;
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  ${media('<=tablet')} {
+    width: 3.2rem;
+    height: 3.2rem;
+    font-size: 2.4rem;
+    top: 1.2rem;
+    right: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 2.2rem;
+    top: 1rem;
+    right: 1rem;
   }
 `;
