@@ -4,7 +4,47 @@ import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 // Standalone Reader Demo Widget
-export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useInlineSignup = false }) {
+// Import the language list from LanguageSelector
+const DEFAULT_LANGUAGES = [
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'de', name: 'German', flag: '🇩🇪' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+  { code: 'it', name: 'Italian', flag: '🇮🇹' },
+  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
+  { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
+  { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
+  { code: 'da', name: 'Danish', flag: '🇩🇰' },
+  { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
+  { code: 'pl', name: 'Polish', flag: '🇵🇱' },
+  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭' },
+  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
+  { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
+  { code: 'ms', name: 'Malay', flag: '🇲🇾' },
+  { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
+  { code: 'el', name: 'Greek', flag: '🇬🇷' },
+  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
+  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
+  { code: 'cs', name: 'Czech', flag: '🇨🇿' },
+  { code: 'sk', name: 'Slovak', flag: '🇸🇰' },
+  { code: 'bg', name: 'Bulgarian', flag: '🇧🇬' },
+  { code: 'hr', name: 'Croatian', flag: '🇭🇷' },
+  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
+  { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
+  { code: 'et', name: 'Estonian', flag: '🇪🇪' },
+  { code: 'lv', name: 'Latvian', flag: '🇱🇻' },
+  { code: 'lt', name: 'Lithuanian', flag: '🇱🇹' },
+  { code: 'eu', name: 'Basque', flag: '🇪🇸' },
+];
+
+export default function ReaderDemoWidget({ selectedLanguage, onInteraction, onLanguageChange, useInlineSignup = false }) {
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
@@ -17,6 +57,11 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
   const [isVisible, setIsVisible] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  // Use internal state to track if language was selected by user
+  const [internalLanguage, setInternalLanguage] = useState(null);
+  // Derive the current language from either internal selection or prop
+  const currentLanguage = internalLanguage || selectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
   const pageRef = useRef(null);
   const longPressTimer = useRef(null);
   const wordsTimerRef = useRef(null);
@@ -139,10 +184,41 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
 
   // Function to get translation based on selected language
   const getTranslation = (englishText) => {
-    if (!selectedLanguage || !englishText) return englishText;
-    const langCode = selectedLanguage.code;
+    if (!currentLanguage || !englishText) return englishText;
+    const langCode = currentLanguage.code;
     const langTranslations = translations[langCode];
     return langTranslations?.[englishText] || translations.de[englishText] || englishText;
+  };
+
+  // Handle language selection
+  const handleLanguageSelect = (language) => {
+    // Set internal language to override prop
+    setInternalLanguage(language);
+    setIsLanguageDropdownOpen(false);
+    
+    // Reset ALL word counting related states
+    setWordsRead(0);
+    setShowWordCounts(false);
+    setHasClicked(false);
+    setJustUpdated(false);
+    
+    // Clear any running timers
+    if (wordsTimerRef.current) {
+      clearTimeout(wordsTimerRef.current);
+      wordsTimerRef.current = null;
+    }
+    if (visibilityTimerRef.current) {
+      clearTimeout(visibilityTimerRef.current);
+      visibilityTimerRef.current = null;
+    }
+    
+    // Reset the visibility tracking
+    hasStartedTimerRef.current = false;
+    
+    // Call parent callback if provided
+    if (onLanguageChange) {
+      onLanguageChange(language);
+    }
   };
 
   // Book content (base English content) - 3 paragraphs per page
@@ -301,7 +377,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     
     console.log(`[calculatePageWords] Total words for page ${pageNumber}: ${totalWords}`);
     return totalWords;
-  }, [selectedLanguage]);
+  }, [currentLanguage, getTranslation]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
@@ -436,13 +512,28 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     };
   }, []);
 
+  // Reset internal language if parent explicitly changes selectedLanguage
+  useEffect(() => {
+    // Only reset if the parent is actively controlling the language
+    if (selectedLanguage && internalLanguage && selectedLanguage.code !== internalLanguage.code) {
+      // Parent is overriding, so clear internal selection
+      setInternalLanguage(null);
+    }
+  }, [selectedLanguage?.code]);
+
   // Global click handler
   useEffect(() => {
     const handleGlobalClick = (e) => {
       const target = e.target;
       
+      // Close translation popup if clicking outside
       if (!target.closest('.translation-popup') && popup.visible) {
         hidePopup();
+      }
+      
+      // Close language dropdown if clicking outside
+      if (!target.closest('.language-selector-container') && isLanguageDropdownOpen) {
+        setIsLanguageDropdownOpen(false);
       }
     };
 
@@ -453,7 +544,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
       document.removeEventListener('mousedown', handleGlobalClick);
       document.removeEventListener('touchstart', handleGlobalClick);
     };
-  }, [popup.visible, hidePopup]);
+  }, [popup.visible, hidePopup, isLanguageDropdownOpen]);
 
   const calculatePageWordsRef = useRef();
   calculatePageWordsRef.current = calculatePageWords;
@@ -463,7 +554,10 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
-    console.log('[useEffect] Visibility effect mounted');
+    console.log('[useEffect] Visibility effect mounted or language changed');
+    
+    // Reset the timer tracking when language changes
+    hasStartedTimerRef.current = false;
     
     const checkVisibility = () => {
       console.log('[checkVisibility] Called, hasStartedTimer:', hasStartedTimerRef.current);
@@ -519,20 +613,28 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
     window.addEventListener('scroll', checkVisibility);
     window.addEventListener('resize', checkVisibility);
     
-    // Also check after mount
+    // Also check after mount - with a longer delay to ensure proper initialization
     const mountTimer = setTimeout(() => {
       console.log('[mountTimer] Checking visibility after mount');
       checkVisibility();
-    }, 500);
+    }, 1000);
     
     return () => {
       console.log('[useEffect] Cleaning up visibility effect');
       window.removeEventListener('scroll', checkVisibility);
       window.removeEventListener('resize', checkVisibility);
       clearTimeout(mountTimer);
-      // Don't clear the visibility timer here - let it complete
+      // Clear timers on cleanup
+      if (visibilityTimerRef.current) {
+        clearTimeout(visibilityTimerRef.current);
+        visibilityTimerRef.current = null;
+      }
+      if (wordsTimerRef.current) {
+        clearTimeout(wordsTimerRef.current);
+        wordsTimerRef.current = null;
+      }
     };
-  }, []); // Remove dependencies to prevent re-runs
+  }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
   const currentContent = bookContent[currentPage] || bookContent[8];
   
@@ -555,7 +657,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
           <WordsNumber key={wordsRead}>{wordsRead}</WordsNumber>
           <WordsLabel>
             <span>words read</span>
-            <span>in {selectedLanguage ? selectedLanguage.name : 'German'}</span>
+            <span>in {currentLanguage.name}</span>
           </WordsLabel>
         </WordsReadCounter>
       <ReaderContainer ref={readerContainerRef}>
@@ -584,11 +686,34 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
             <span>→</span>
           </ArrowIndicator>
         </NavButtonRight>
-        {/* Language indicator */}
-        <LanguageIndicator>
-          <span>{selectedLanguage ? selectedLanguage.flag : '🇩🇪'}</span>
-          <span>{selectedLanguage ? selectedLanguage.name : 'German'}</span>
-        </LanguageIndicator>
+        {/* Language selector dropdown */}
+        <LanguageSelectorContainer className="language-selector-container">
+          <LanguageDropdown
+            onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+            $isOpen={isLanguageDropdownOpen}
+          >
+            <SelectedLanguage>
+              <LanguageFlag>{currentLanguage.flag}</LanguageFlag>
+              <LanguageName>{currentLanguage.name}</LanguageName>
+              <ChevronIcon $isOpen={isLanguageDropdownOpen}>▼</ChevronIcon>
+            </SelectedLanguage>
+          </LanguageDropdown>
+          
+          {isLanguageDropdownOpen && (
+            <LanguageList>
+              {DEFAULT_LANGUAGES.map((language) => (
+                <LanguageOption
+                  key={language.code}
+                  $isSelected={currentLanguage.code === language.code}
+                  onClick={() => handleLanguageSelect(language)}
+                >
+                  <LanguageFlag>{language.flag}</LanguageFlag>
+                  <LanguageName>{language.name}</LanguageName>
+                </LanguageOption>
+              ))}
+            </LanguageList>
+          )}
+        </LanguageSelectorContainer>
 
         {/* Book Content */}
         <BookContent ref={pageRef}>
@@ -624,7 +749,7 @@ export default function ReaderDemoWidget({ selectedLanguage, onInteraction, useI
                       <InlineTranslation key={key}>
                         {showWordCounts && (
                           <WordCountBadge key={`badge-${key}`}>
-                            {wordCount} words in {selectedLanguage ? selectedLanguage.name : 'German'}
+                            {wordCount} words in {currentLanguage.name}
                           </WordCountBadge>
                         )}
                         <OriginalText>{segment.text}</OriginalText>
@@ -1423,25 +1548,115 @@ const PageTotal = styled.span`
   color: #6b7280;
 `;
 
-const LanguageIndicator = styled.div`
+const LanguageSelectorContainer = styled.div`
   position: absolute;
   top: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 30;
+  min-width: 180px;
+  
+  ${media('<=tablet')} {
+    top: 1rem;
+    min-width: 160px;
+  }
+`;
+
+const LanguageDropdown = styled.div`
+  background: white;
+  border: 2px solid ${props => props.$isOpen ? 'rgb(255, 152, 0)' : '#e5e7eb'};
+  border-radius: ${props => props.$isOpen ? '0.8rem 0.8rem 0 0' : '2rem'};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    border-color: rgb(255, 152, 0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const SelectedLanguage = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #f3f4f6;
   padding: 0.6rem 1.2rem;
-  border-radius: 2rem;
-  z-index: 10;
   font-size: 1.3rem;
   color: #374151;
   
   ${media('<=tablet')} {
     font-size: 1.1rem;
     padding: 0.5rem 1rem;
-    top: 1rem;
+  }
+`;
+
+const LanguageFlag = styled.span`
+  font-size: 1.2rem;
+  line-height: 1;
+`;
+
+const LanguageName = styled.span`
+  flex: 1;
+  font-weight: 500;
+`;
+
+const ChevronIcon = styled.span`
+  font-size: 0.8rem;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+  transform: ${props => props.$isOpen ? 'rotate(180deg)' : 'rotate(0)'};
+`;
+
+const LanguageList = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid rgb(255, 152, 0);
+  border-top: none;
+  border-radius: 0 0 0.8rem 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+`;
+
+const LanguageOption = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: ${props => props.$isSelected ? 'rgba(255, 152, 0, 0.1)' : 'transparent'};
+  
+  &:hover {
+    background: rgba(255, 152, 0, 0.05);
+  }
+  
+  &:not(:last-child) {
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  ${media('<=tablet')} {
+    padding: 0.6rem 1rem;
   }
 `;
 

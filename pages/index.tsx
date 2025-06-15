@@ -288,6 +288,9 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           </div>
         </WhiteBackgroundContainer>
         <DarkerBackgroundContainer className="front-element">
+          <div id="pricing-section">
+            <PricingTablesSection />
+          </div>
           <div id="section-5">
             <SingleTestimonial title={t('home:section5.title')} overTitle={t('home:section5.overTitle')}/>
           </div>
@@ -314,9 +317,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
           {/* <div id="cta-section-bottom">
             <Cta onCtaClick={handleCtaClick} />
           </div> */}
-          <div id="pricing-section">
-            <PricingTablesSection />
-          </div>
           <div id="faq-section">
             <FaqSection />
           </div>

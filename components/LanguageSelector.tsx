@@ -310,6 +310,10 @@ const placeholderPulse = keyframes`
 const LanguageSelectorContainer = styled.div<{ maxWidth: string }>`
   max-width: ${props => props.maxWidth};
   position: relative;
+  /* Ensure messages don't affect container height */
+  min-height: 60px;
+  /* Allow overflow for messages */
+  overflow: visible;
 `;
 
 const LanguageDropdown = styled.div<{ isOpen: boolean; isDark?: boolean }>`
@@ -479,12 +483,19 @@ const LanguageName = styled.span<{ isDark?: boolean }>`
 const ProcessingMessage = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
   padding: 1rem;
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(255, 152, 0, 0.8) 100%);
   border: 1px solid rgba(255, 152, 0, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out;
+  z-index: 10;
+  white-space: nowrap;
+  min-width: max-content;
 `;
 
 const ProcessingIcon = styled.span`
@@ -509,12 +520,19 @@ const ProcessingText = styled.span`
 const ConfirmationMessage = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
   padding: 1rem;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(34, 197, 94, 0.8) 100%);
   border: 1px solid rgba(34, 197, 94, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out, ${pulse} 2s infinite;
+  z-index: 10;
+  white-space: nowrap;
+  min-width: max-content;
 `;
 
 const ConfirmationIcon = styled.span`
