@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { media } from 'utils/media';
 import LanguageSelector from 'components/LanguageSelector';
 import type { Language } from 'components/LanguageSelector';
-import ReaderDemo from 'components/ReaderDemo';
+import ReaderDemo from 'components/ReaderDemoModal';
 import Portal from 'components/Portal';
 
 interface HeroStickyProps {
@@ -109,7 +109,7 @@ export default function HeroSticky({
             >
               {ROTATING_LANGUAGES[currentLanguageIndex].word}
             </LanguageWord>
-          </LanguageWordContainer>.
+          </LanguageWordContainer>
         </Title>
         <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
@@ -132,7 +132,6 @@ export default function HeroSticky({
       {/* Second title that appears after scrolling */}
       <SecondTitleWrapper visible={shouldShowTrialText} ref={secondTitleRef}>
         <Title>
-          And when you finish the free trial, you will have read 30.000
         </Title>
       </SecondTitleWrapper>
       

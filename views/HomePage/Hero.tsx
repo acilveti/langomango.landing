@@ -5,13 +5,13 @@ import { useEffect, useState } from 'react';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
-import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
 import VibratingButton from 'components/VibratingButton';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { addReferralToUrl } from 'utils/referral';
 import { useTranslation } from 'next-i18next';
+import ReaderDemoWidget from 'components/ReaderDemoWidget';
 
 export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
@@ -52,14 +52,9 @@ export default function Hero() {
           <Description>
             {t('home:hero.description')}
           </Description>
-          <MobileImageContainer style={{ padding: '2px' }}>
-            <NextImage
-              src={'/portada2resize.jpeg'}
-              alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
-              layout="fill"
-              objectFit="cover"
-            />
-          </MobileImageContainer>
+          <MobileDemoContainer>
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} />
+          </MobileDemoContainer>
           <MobileButtonGroup>
             <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
               {t('common:startReading')} <span>&rarr;</span>
@@ -129,16 +124,11 @@ export default function Hero() {
           </CustomButtonGroup>
         </TextColumn>
         
-        <ImageColumn>
-          <ImageContainer style={{ padding: '2px' }}>
-            <NextImage
-              src={'/portada2resize.jpeg'}
-              alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
-              layout="fill"
-              objectFit="cover"
-            />
-          </ImageContainer>
-        </ImageColumn>
+        <DemoColumn>
+          <DemoContainer>
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} />
+          </DemoContainer>
+        </DemoColumn>
       </TwoColumnLayout>
 
       <style jsx>{`
@@ -200,9 +190,12 @@ const TextColumn = styled.div`
   max-width: 50%;
 `;
 
-const ImageColumn = styled.div`
+const DemoColumn = styled.div`
   flex: 1;
   max-width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MobileContents = styled.div`
@@ -218,45 +211,23 @@ const MobileButtonGroup = styled(ButtonGroup)`
   margin-top: 2rem;
 `;
 
-const ImageContainer = styled.div`
-  position: relative;
+const DemoContainer = styled.div`
   width: 100%;
-  
-  &:before {
-    display: block;
-    content: '';
-    width: 100%;
-    padding-top: calc((9 / 16) * 100%);
-  }
-
-  & > div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
+  max-width: 60rem;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 `;
 
-const MobileImageContainer = styled.div`
-  position: relative;
+const MobileDemoContainer = styled.div`
   width: 100%;
-  margin: 1rem 0;
-  &:before {
-    display: block;
-    content: '';
-    width: 100%;
-    padding-top: calc((9 / 16) * 100%);
-  }
-
-  & > div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
+  margin: 2rem 0;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 `;
+
+
 
 const Description = styled.p`
   font-size: 1.8rem;

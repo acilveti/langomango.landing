@@ -36,7 +36,7 @@ import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector, { Language } from 'components/LanguageSelector';
-import ReaderDemoModal from 'components/ReaderDemo';
+import ReaderDemoModal from 'components/ReaderDemoModal';
 import ReaderDemoSection from 'components/ReaderDemoSection';
 
 // Reddit Pixel ID
