@@ -61,7 +61,7 @@ export default function Hero() {
       // Apply exponential curve for smoother transition
       const smoothDarkness = Math.pow(darkness, 2);
       
-      setDarkenAmount(smoothDarkness * 0.6); // Max 60% darkness
+      setDarkenAmount(smoothDarkness * 0.95); // Max 60% darkness
     };
 
     // Initial check
