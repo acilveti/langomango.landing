@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import Collapse from 'components/Collapse';
+import { useVisitor } from 'contexts/VisitorContext';
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
@@ -83,13 +84,20 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   autoOpenModal = false,
   isDark = false
 }, ref) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage } = useVisitor();
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Sync with context when it changes
+  useEffect(() => {
+    setSelectedLanguage(contextLanguage);
+  }, [contextLanguage]);
 
   function handleLanguageSelect(language: Language) {
     setSelectedLanguage(language);
+    setContextLanguage(language); // Update context
     setIsLanguageDropdownOpen(false);
     
     // Call the immediate callback

@@ -19,6 +19,7 @@ import NavigationDrawer from 'components/NavigationDrawer';
 import NewsletterModal from 'components/NewsletterModal';
 import WaveCta from 'components/WaveCta';
 import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
 import { addReferralToUrl } from 'utils/referral';
 import { appWithTranslation } from 'next-i18next';
@@ -190,7 +191,9 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
     <NewsletterModalContextProvider>
-      {children}
+      <VisitorProvider>
+        {children}
+      </VisitorProvider>
     </NewsletterModalContextProvider>
   );
 }

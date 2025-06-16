@@ -38,6 +38,7 @@ import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector, { Language } from 'components/LanguageSelector';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import ReaderDemoWidget from 'components/ReaderDemoWidget';
+import { useVisitor } from 'contexts/VisitorContext';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -45,6 +46,7 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
+  const { selectedLanguage, setSelectedLanguage } = useVisitor();
 
   // New state variables to track our conditions
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -52,7 +54,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [showReaderDemo, setShowReaderDemo] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const languageSelectorRef = useRef<any>(null);
   const [darkenAmount, setDarkenAmount] = useState(0);
 
