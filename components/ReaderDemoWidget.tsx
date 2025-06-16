@@ -934,6 +934,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌱</LevelEmoji>
                       <LevelName>A1</LevelName>
@@ -956,6 +957,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌿</LevelEmoji>
                       <LevelName>A2</LevelName>
@@ -978,6 +980,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🍀</LevelEmoji>
                       <LevelName>B1</LevelName>
@@ -1000,6 +1003,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌳</LevelEmoji>
                       <LevelName>B2</LevelName>
@@ -1022,6 +1026,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌲</LevelEmoji>
                       <LevelName>C1</LevelName>
@@ -1044,6 +1049,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🎯</LevelEmoji>
                       <LevelName>C2</LevelName>
@@ -1062,12 +1068,17 @@ export default function ReaderDemoWidget({
                 )}
               </LanguageSetupContainer>
               
-              {(!hasSelectedTarget || isEditingTarget) && (
-                <PromptMessage>
-                  <PromptIcon>👆</PromptIcon>
-                  Please select your target language to continue
-                </PromptMessage>
-              )}
+              {(!hasSelectedTarget || isEditingTarget) ? (
+              <PromptMessage>
+              <PromptIcon>👆</PromptIcon>
+              Please select your target language to continue
+              </PromptMessage>
+              ) : (!selectedLevel && hasSelectedTarget) ? (
+                  <PromptMessage>
+                    <PromptIcon>🎯</PromptIcon>
+                    Now select your level to start reading
+                  </PromptMessage>
+                ) : null}
               
               <SecondarySection>
                 <SecondaryDivider>
@@ -2748,7 +2759,32 @@ const LevelButtons = styled.div`
   }
 `;
 
-const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean }>`
+// Add level selection animation
+const levelPulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+`;
+
+const levelPulseRing = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+`;
+
+const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean; $needsSelection?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2762,6 +2798,25 @@ const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean }>
   min-width: 100px;
   color: ${props => props.$isDisabled ? '#9ca3af' : props.$isActive ? 'white' : '#374151'};
   opacity: ${props => props.$isDisabled ? '0.6' : '1'};
+  position: relative;
+  
+  ${props => props.$needsSelection && !props.$isDisabled && css`
+    animation: ${levelPulse} 2s ease-in-out infinite;
+    border-color: #ff9800;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid #ff9800;
+      border-radius: 1.2rem;
+      opacity: 0;
+      animation: ${levelPulseRing} 2s ease-in-out infinite;
+    }
+  `}
   
   &:hover:not(:disabled) {
     transform: ${props => props.$isDisabled ? 'none' : 'translateY(-2px)'};
