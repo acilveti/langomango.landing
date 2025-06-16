@@ -1,7 +1,7 @@
 // views/HomePage/Hero.tsx
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';

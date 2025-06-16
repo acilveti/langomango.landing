@@ -1,5 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import Collapse from 'components/Collapse';
 import { useVisitor } from 'contexts/VisitorContext';
 

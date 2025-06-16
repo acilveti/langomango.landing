@@ -302,7 +302,7 @@ export default function Acknowledgments() {
         <title>{t('acknowledgments:title')} - Langomango</title>
         <meta name="description" content={t('acknowledgments:metaDescription')} />
       </Head>
-      <Page>
+      <Page title={t('acknowledgments:title')}>
         <HeroSection>
           <Container>
             <PageTitle>{t('acknowledgments:title')}</PageTitle>
