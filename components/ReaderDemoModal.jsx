@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import ReaderDemoWidget from './ReaderDemoWidget';
@@ -8,20 +8,29 @@ import useEscClose from 'hooks/useEscKey';
 
 // Reader Demo Modal component
 export default function ReaderDemoModal({ onClose, selectedLanguage }) {
+  const [showSignup, setShowSignup] = useState(false);
+  
   useEscClose({ onClose });
+
+  const handleSignupShow = useCallback((isShowing) => {
+    setShowSignup(isShowing);
+  }, []);
 
   return (
     <Overlay>
       <ModalContainer>
         <ReaderCard>
-          <CloseIconContainer>
-            <CloseIcon onClick={onClose} />
-          </CloseIconContainer>
+          {!showSignup && (
+            <CloseIconContainer>
+              <CloseIcon onClick={onClose} />
+            </CloseIconContainer>
+          )}
 
           <ReaderDemoWidget 
             selectedLanguage={selectedLanguage} 
             useInlineSignup={true}
             signupMode="fullscreen"
+            onSignupVisibilityChange={handleSignupShow}
           />
         </ReaderCard>
       </ModalContainer>

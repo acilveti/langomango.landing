@@ -11,6 +11,7 @@ interface ReaderDemoWidgetProps {
   onLanguageChange?: (language: Language) => void;
   useInlineSignup?: boolean;
   signupMode?: 'panel' | 'fullscreen';
+  onSignupVisibilityChange?: (isVisible: boolean) => void;
 }
 
 export default function ReaderDemoWidget({ 
@@ -18,7 +19,8 @@ export default function ReaderDemoWidget({
   onInteraction, 
   onLanguageChange, 
   useInlineSignup = false,
-  signupMode = 'panel'
+  signupMode = 'panel',
+  onSignupVisibilityChange
 }: ReaderDemoWidgetProps) {
   const { 
     selectedLanguage: contextLanguage, 
@@ -381,6 +383,9 @@ export default function ReaderDemoWidget({
       
       if (newCount >= 2 && !showSignupExpanded) {
         setShowSignupExpanded(true);
+        if (onSignupVisibilityChange) {
+          onSignupVisibilityChange(true);
+        }
       }
     } else {
       // Default behavior: open newsletter modal after 2 interactions
@@ -392,7 +397,7 @@ export default function ReaderDemoWidget({
         setPageChangeCount(0);
       }
     }
-  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded]);
+  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded, onSignupVisibilityChange]);
 
   // Calculate total words for current page translations
   const calculatePageWords = useCallback((pageNumber: number) => {
@@ -846,7 +851,12 @@ export default function ReaderDemoWidget({
       {useInlineSignup && showSignupExpanded && (
         <SignupSection $isFullscreen={signupMode === 'fullscreen'}>
           <CloseButton 
-            onClick={() => setShowSignupExpanded(false)} 
+            onClick={() => {
+              setShowSignupExpanded(false);
+              if (onSignupVisibilityChange) {
+                onSignupVisibilityChange(false);
+              }
+            }} 
             aria-label="Close signup"
             $isFullscreen={signupMode === 'fullscreen'}
           >
