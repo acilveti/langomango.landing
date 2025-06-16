@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import Collapse from 'components/Collapse';
+import { useVisitor } from 'contexts/VisitorContext';
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
@@ -23,6 +24,7 @@ interface LanguageSelectorProps {
   className?: string;
   maxWidth?: string;
   autoOpenModal?: boolean;
+  isDark?: boolean;
 }
 
 interface LanguageSelectorRef {
@@ -79,15 +81,23 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   showConfirmationMessage = true,
   className,
   maxWidth = "300px",
-  autoOpenModal = false
+  autoOpenModal = false,
+  isDark = false
 }, ref) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage } = useVisitor();
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Sync with context when it changes
+  useEffect(() => {
+    setSelectedLanguage(contextLanguage);
+  }, [contextLanguage]);
 
   function handleLanguageSelect(language: Language) {
     setSelectedLanguage(language);
+    setContextLanguage(language); // Update context
     setIsLanguageDropdownOpen(false);
     
     // Call the immediate callback
@@ -133,32 +143,34 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       <LanguageDropdown 
         onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)} 
         isOpen={isLanguageDropdownOpen}
+        isDark={isDark}
       >
         <SelectedLanguage>
           {selectedLanguage ? (
             <>
               <LanguageFlag>{selectedLanguage.flag}</LanguageFlag>
-              <LanguageName>{selectedLanguage.name}</LanguageName>
+              <LanguageName isDark={isDark}>{selectedLanguage.name}</LanguageName>
               {isProcessing && <ProcessingSpinner />}
               {showConfirmation && !isProcessing && <CheckmarkIcon>✓</CheckmarkIcon>}
             </>
           ) : (
-            <PlaceholderText>{placeholder}</PlaceholderText>
+            <PlaceholderText isDark={isDark}>{placeholder}</PlaceholderText>
           )}
-          <ChevronIcon isOpen={isLanguageDropdownOpen}>▼</ChevronIcon>
+          <ChevronIcon isOpen={isLanguageDropdownOpen} isDark={isDark}>▼</ChevronIcon>
         </SelectedLanguage>
       </LanguageDropdown>
 
       <Collapse isOpen={isLanguageDropdownOpen} duration={300}>
-        <LanguageList>
+        <LanguageList isDark={isDark}>
           {languages.map((language) => (
             <LanguageOption
               key={language.code}
               isSelected={selectedLanguage?.code === language.code}
               onClick={() => handleLanguageSelect(language)}
+              isDark={isDark}
             >
               <LanguageFlag>{language.flag}</LanguageFlag>
-              <LanguageName>{language.name}</LanguageName>
+              <LanguageName isDark={isDark}>{language.name}</LanguageName>
             </LanguageOption>
           ))}
         </LanguageList>
@@ -306,42 +318,62 @@ const placeholderPulse = keyframes`
 const LanguageSelectorContainer = styled.div<{ maxWidth: string }>`
   max-width: ${props => props.maxWidth};
   position: relative;
+  /* Ensure messages don't affect container height */
+  min-height: 60px;
+  /* Allow overflow for messages */
+  overflow: visible;
 `;
 
-const LanguageDropdown = styled.div<{ isOpen: boolean }>`
-  border: 2px solid #e5e7eb;
+const LanguageDropdown = styled.div<{ isOpen: boolean; isDark?: boolean }>`
+  border: 2px solid ${props => props.isDark ? 'transparent' : '#e5e7eb'};
   border-radius: 0.5rem;
-  background: white;
+  background: ${props => props.isDark ? 'rgb(255, 152, 0)' : 'white'};
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  ${props => props.isDark && `
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  `}
 
   &:hover {
-    border-color: rgb(255, 152, 0);
+    border-color: ${props => props.isDark ? 'transparent' : 'rgb(255, 152, 0)'};
     transform: translateY(-2px);
-    box-shadow: 0 0 5px rgba(255, 152, 0, 0.2);
+    box-shadow: ${props => props.isDark 
+      ? '0 8px 16px rgba(0, 0, 0, 0.2)' 
+      : '0 0 5px rgba(255, 152, 0, 0.2)'};
+    ${props => props.isDark && `
+      background: rgb(255, 162, 0);
+    `}
   }
 
   ${(props) =>
     props.isOpen &&
     `
-    border-color: rgb(255,152,0);
+    border-color: ${props.isDark ? 'transparent' : 'rgb(255,152,0)'};
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   `}
 
   // Add vibration and border color animation when no language is selected
   ${LanguageSelectorContainer}:not([data-has-selection="true"]) & {
-    animation: ${vibrateWithIntervals} 6s infinite, ${borderColorBounce} 3s ease-in-out infinite;
-    animation-delay: 2s, 2s;
+    ${props => props.isDark 
+      ? css`
+          animation: ${vibrateWithIntervals} 6s infinite;
+          animation-delay: 2s;
+        `
+      : css`
+          animation: ${vibrateWithIntervals} 6s infinite, ${borderColorBounce} 3s ease-in-out infinite;
+          animation-delay: 2s, 2s;
+        `
+    }
     
     &:hover {
-      animation-play-state: paused, paused;
+      animation-play-state: ${props => props.isDark ? 'paused' : 'paused, paused'};
     }
     
     &:focus {
-      animation-play-state: paused, paused;
+      animation-play-state: ${props => props.isDark ? 'paused' : 'paused, paused'};
     }
   }
 `;
@@ -355,15 +387,15 @@ const SelectedLanguage = styled.div`
   z-index: 1;
 `;
 
-const PlaceholderText = styled.span`
-  color: #6b7280;
-  font-weight: 400;
+const PlaceholderText = styled.span<{ isDark?: boolean }>`
+  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.9)' : '#6b7280'};
+  font-weight: ${props => props.isDark ? '500' : '400'};
   animation: ${placeholderPulse} 2s ease-in-out infinite;
 `;
 
-const ChevronIcon = styled.span<{ isOpen: boolean }>`
+const ChevronIcon = styled.span<{ isOpen: boolean; isDark?: boolean }>`
   transition: transform 0.2s ease;
-  color: #6b7280;
+  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.9)' : '#6b7280'};
   font-size: 0.8rem;
 
   ${(props) =>
@@ -391,31 +423,57 @@ const CheckmarkIcon = styled.span`
   animation: ${checkmarkBounce} 0.5s ease-out;
 `;
 
-const LanguageList = styled.div`
-  border: 2px solid rgb(255, 152, 0);
+const LanguageList = styled.div<{ isDark?: boolean }>`
+  border: 2px solid ${props => props.isDark ? 'transparent' : 'rgb(255, 152, 0)'};
   border-top: none;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  background: white;
+  background: ${props => props.isDark ? 'rgba(0, 0, 0, 0.9)' : 'white'};
   max-height: 200px;
   overflow-y: auto;
+  ${props => props.isDark && `
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  `}
+
+  /* Custom scrollbar for dark mode */
+  ${props => props.isDark && `
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 152, 0, 0.5);
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 152, 0, 0.7);
+    }
+  `}
 `;
 
-const LanguageOption = styled.div<{ isSelected: boolean }>`
+const LanguageOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: ${(props) => (props.isSelected ? 'rgba(255,152,0,0.1)' : 'transparent')};
+  background: ${(props) => {
+    if (props.isSelected) {
+      return props.isDark ? 'rgba(255,152,0,0.3)' : 'rgba(255,152,0,0.1)';
+    }
+    return 'transparent';
+  }};
+  color: ${props => props.isDark ? 'white' : 'inherit'};
 
   &:hover {
-    background: rgba(255, 152, 0, 0.05);
+    background: ${props => props.isDark ? 'rgba(255, 152, 0, 0.2)' : 'rgba(255, 152, 0, 0.05)'};
     transform: translateX(2px);
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid ${props => props.isDark ? 'rgba(255, 255, 255, 0.1)' : '#f3f4f6'};
   }
 `;
 
@@ -424,20 +482,28 @@ const LanguageFlag = styled.span`
   margin-right: 0.75rem;
 `;
 
-const LanguageName = styled.span`
+const LanguageName = styled.span<{ isDark?: boolean }>`
   font-size: 1.2rem;
-  font-weight: 400;
+  font-weight: ${props => props.isDark ? '500' : '400'};
+  color: ${props => props.isDark ? 'white' : 'inherit'};
 `;
 
 const ProcessingMessage = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
-  border: 1px solid rgba(255, 152, 0, 0.2);
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(255, 152, 0, 0.8) 100%);
+  border: 1px solid rgba(255, 152, 0, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out;
+  z-index: 10;
+  white-space: nowrap;
+  min-width: max-content;
 `;
 
 const ProcessingIcon = styled.span`
@@ -447,24 +513,34 @@ const ProcessingIcon = styled.span`
 `;
 
 const ProcessingText = styled.span`
-  color: #d97706;
+  color: #ffffff;
   font-size: 1.1rem;
   line-height: 1.4;
+  opacity: 1;
   
   strong {
     font-weight: 600;
+    color: #ffffff;
+    opacity: 1;
   }
 `;
 
 const ConfirmationMessage = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(34, 197, 94, 0.8) 100%);
+  border: 1px solid rgba(34, 197, 94, 1);
   border-radius: 0.5rem;
   animation: ${fadeInUp} 0.5s ease-out, ${pulse} 2s infinite;
+  z-index: 10;
+  white-space: nowrap;
+  min-width: max-content;
 `;
 
 const ConfirmationIcon = styled.span`
@@ -474,11 +550,14 @@ const ConfirmationIcon = styled.span`
 `;
 
 const ConfirmationText = styled.span`
-  color: #059669;
+  color: #ffffff;
   font-size: 1.1rem;
   line-height: 1.4;
+  opacity: 1;
   
   strong {
     font-weight: 600;
+    color: #ffffff;
+    opacity: 1;
   }
 `;
