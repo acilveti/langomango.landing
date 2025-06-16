@@ -18,7 +18,13 @@ export default function ReaderDemoWidget({
   onLanguageChange, 
   useInlineSignup = false 
 }: ReaderDemoWidgetProps) {
-  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, nativeLanguage } = useVisitor();
+  const { 
+    selectedLanguage: contextLanguage, 
+    setSelectedLanguage: setContextLanguage, 
+    nativeLanguage,
+    hasSelectedLanguage,
+    setHasSelectedLanguage 
+  } = useVisitor();
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
@@ -36,7 +42,7 @@ export default function ReaderDemoWidget({
   const [showExpandedForm, setShowExpandedForm] = useState(true);
   const [isEditingNative, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
-  const [hasSelectedTarget, setHasSelectedTarget] = useState(false);
+  const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
   const [showBookAnimation, setShowBookAnimation] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
@@ -45,6 +51,15 @@ export default function ReaderDemoWidget({
   // Initialize temp language states after currentLanguage is defined
   const [tempNativeLanguage, setTempNativeLanguage] = useState(nativeLanguage);
   const [tempTargetLanguage, setTempTargetLanguage] = useState(currentLanguage);
+  
+  // Check if we should show the language as not selected (if it's still the default German and user hasn't actively selected)
+  useEffect(() => {
+    if (!hasSelectedLanguage && currentLanguage.code === 'de') {
+      setHasSelectedTarget(false);
+    } else if (hasSelectedLanguage) {
+      setHasSelectedTarget(true);
+    }
+  }, [hasSelectedLanguage, currentLanguage.code]);
   
   // Update temp languages when context changes
   useEffect(() => {
@@ -197,6 +212,7 @@ export default function ReaderDemoWidget({
     // Update context language
     setContextLanguage(language);
     setIsLanguageDropdownOpen(false);
+    setHasSelectedLanguage(true);
     
     // Reset ALL word counting related states
     setWordsRead(0);
@@ -849,8 +865,6 @@ export default function ReaderDemoWidget({
                     </LanguageNote>
                   </LanguageBox>
                   
-                  <ArrowIcon>→</ArrowIcon>
-                  
                   <LanguageBox 
                     className="language-box"
                     onClick={() => setIsEditingTarget(true)}
@@ -859,8 +873,8 @@ export default function ReaderDemoWidget({
                   >
                     <LanguageBoxLabel>You're learning</LanguageBoxLabel>
                     <LanguageDisplay>
-                      <LanguageFlag>{tempTargetLanguage.flag}</LanguageFlag>
-                      <LanguageName>{tempTargetLanguage.name}</LanguageName>
+                      <LanguageFlag>{hasSelectedTarget ? tempTargetLanguage.flag : '🌐'}</LanguageFlag>
+                      <LanguageName>{hasSelectedTarget ? tempTargetLanguage.name : 'Select language'}</LanguageName>
                     </LanguageDisplay>
                     <LanguageNote>
                       {isEditingTarget ? 'Select a language below' : ''}
@@ -883,6 +897,7 @@ export default function ReaderDemoWidget({
                               setContextLanguage(language);
                               setIsEditingTarget(false);
                               setHasSelectedTarget(true);
+                              setHasSelectedLanguage(true);
                             }
                           }}
                           $isSelected={
@@ -908,7 +923,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('A1');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'A1'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -923,7 +945,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('A2');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'A2'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -938,7 +967,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('B1');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'B1'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -953,7 +989,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('B2');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'B2'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -968,7 +1011,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('C1');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'C1'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -983,7 +1033,14 @@ export default function ReaderDemoWidget({
                         if (!(!hasSelectedTarget || isEditingTarget)) {
                           setSelectedLevel('C2');
                           setShowBookAnimation(true);
-                          setTimeout(() => setShowBookAnimation(false), 2000);
+                          setTimeout(() => {
+                            const params = new URLSearchParams({
+                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              target: tempTargetLanguage.code,
+                              level: 'C2'
+                            });
+                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                          }, 2000);
                         }
                       }}
                       $isDisabled={!hasSelectedTarget || isEditingTarget}
@@ -1003,28 +1060,11 @@ export default function ReaderDemoWidget({
                 </LevelSelectorContainer>
               </LanguageSetupContainer>
               
-              {(!hasSelectedTarget || isEditingTarget) ? (
+              {(!hasSelectedTarget || isEditingTarget) && (
                 <PromptMessage>
                   <PromptIcon>👆</PromptIcon>
                   Please select your target language to continue
                 </PromptMessage>
-              ) : !selectedLevel ? (
-                <PromptMessage>
-                  <PromptIcon>🎯</PromptIcon>
-                  Select your level to get a customized reading experience
-                </PromptMessage>
-              ) : (
-                <ContinueButton onClick={() => {
-                  // Store preferences and redirect to sign up
-                  const params = new URLSearchParams({
-                    native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                    target: tempTargetLanguage.code,
-                    level: selectedLevel
-                  });
-                  window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                }}>
-                  Continue to Sign Up →
-                </ContinueButton>
               )}
               
               <SecondarySection>
@@ -2413,7 +2453,8 @@ const LanguageSetupContainer = styled.div`
   flex-direction: column;
   gap: 2.5rem;
   width: 100%;
-  margin: 1rem 0;
+  margin: 1rem auto;
+  max-width: 700px;
 `;
 
 const LanguageSetupRow = styled.div`
@@ -2421,10 +2462,19 @@ const LanguageSetupRow = styled.div`
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
   
   ${media('<=tablet')} {
     gap: 1.5rem;
+    max-width: 450px;
+  }
+  
+  ${media('<=phone')} {
+    flex-wrap: wrap;
+    gap: 1.2rem;
   }
 `;
 
@@ -2446,7 +2496,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   border: 2px solid ${props => props.$isEditing ? '#ff9800' : props.$isPulsing ? '#ff9800' : '#e5e7eb'};
   border-radius: 1.2rem;
   padding: 1.8rem;
-  min-width: 180px;
+  min-width: 220px;
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -2478,7 +2528,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   }
   
   ${media('<=tablet')} {
-    min-width: 140px;
+    min-width: 180px;
     padding: 1.4rem;
     
     &::after {
@@ -2489,7 +2539,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   }
   
   ${media('<=phone')} {
-    min-width: 120px;
+    min-width: 140px;
     padding: 1.2rem;
   }
 `;

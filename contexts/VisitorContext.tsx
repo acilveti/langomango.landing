@@ -57,6 +57,8 @@ interface VisitorContextType {
   availableLanguages: Language[];
   nativeLanguage: Language | null;
   referralSource: ReferralSource;
+  hasSelectedLanguage: boolean;
+  setHasSelectedLanguage: (value: boolean) => void;
 }
 
 // Create the context
@@ -125,6 +127,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(defaultLanguage);
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState<boolean>(false);
 
   useEffect(() => {
     // Detect native language on mount
@@ -152,6 +155,8 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     availableLanguages,
     nativeLanguage,
     referralSource,
+    hasSelectedLanguage,
+    setHasSelectedLanguage,
   };
 
   return (
