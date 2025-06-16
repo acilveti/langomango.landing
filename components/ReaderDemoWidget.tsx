@@ -866,8 +866,8 @@ export default function ReaderDemoWidget({
           {showExpandedForm ? (
             <SignupExpandedWrapper>
               <SignupExpanded>
-              <SignupTitle>Let's continue with a more customized reading for you</SignupTitle>
-              <SignupSubtitle>We'll personalize your learning experience based on your language preferences</SignupSubtitle>
+              <SignupTitle>Let&apos;s continue with a more customized reading for you</SignupTitle>
+              <SignupSubtitle>We&apos;ll personalize your learning experience based on your language preferences</SignupSubtitle>
               
               <LanguageSetupContainer>
                 <LanguageSetupRow>
@@ -892,7 +892,7 @@ export default function ReaderDemoWidget({
                     $isEditing={isEditingTarget}
                     $isPulsing={!hasSelectedTarget}
                   >
-                    <LanguageBoxLabel>You're learning</LanguageBoxLabel>
+                    <LanguageBoxLabel>You&apos;re learning</LanguageBoxLabel>
                     <LanguageDisplay>
                       <LanguageFlag>{hasSelectedTarget ? tempTargetLanguage.flag : '🌐'}</LanguageFlag>
                       <LanguageName>{hasSelectedTarget ? tempTargetLanguage.name : 'Select language'}</LanguageName>
