@@ -70,6 +70,7 @@ export default function Navbar({ items }: NavbarProps) {
       
       // Look for the reader demo container by multiple methods
       let widgetContainers = heroSection.querySelectorAll('.reader-demo-container');
+      let widget: Element | null = null;
       
       if (widgetContainers.length === 0) {
         // Try data attributes on DemoContainer
@@ -86,25 +87,25 @@ export default function Navbar({ items }: NavbarProps) {
         widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"], [class*="ReaderWrapper"], [class*="ReaderContainer"]');
       }
       
-      if (widgetContainers.length === 0) {
+      if (widgetContainers.length > 0) {
+        widget = widgetContainers[0];
+      } else {
         // Try one more time with a more specific search
         const allDivs = heroSection.getElementsByTagName('div');
         for (let i = 0; i < allDivs.length; i++) {
           const className = allDivs[i].className;
           if (typeof className === 'string' && 
               (className.includes('Demo') || className.includes('Reader') || className.includes('Widget'))) {
-            widgetContainers = [allDivs[i]];
+            widget = allDivs[i];
             break;
           }
         }
       }
       
-      if (widgetContainers.length === 0) {
+      if (!widget) {
         console.warn('[Navbar] No reader widget containers found');
         return;
       }
-      
-      const widget = widgetContainers[0];
       const rect = widget.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       const elementCenterY = rect.top + rect.height / 2;
