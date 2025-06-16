@@ -65,7 +65,8 @@ export default function Navbar({ items }: NavbarProps) {
       const heroSection = document.getElementById('hero-section');
       if (!heroSection) return;
       
-      const widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"]');
+      // Look for the ReaderDemoWidget container - search for the widget wrapper or reader container
+      const widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"], [class*="ReaderWrapper"], [class*="ReaderContainer"]');
       if (widgetContainers.length === 0) return;
       
       const widget = widgetContainers[0];

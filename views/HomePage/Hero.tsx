@@ -88,7 +88,7 @@ export default function Hero() {
     return (
       <>
         <PageDarkenOverlay opacity={darkenAmount} />
-        <HeroWrapper>
+        <HeroWrapper id="hero-section">
         <MobileContents>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
           <Heading>{t('home:hero.heading')}</Heading>
@@ -140,7 +140,7 @@ export default function Hero() {
   return (
     <>
       <PageDarkenOverlay opacity={darkenAmount} />
-      <HeroWrapper>
+      <HeroWrapper id="hero-section">
       <TwoColumnLayout>
         <TextColumn>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
