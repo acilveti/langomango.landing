@@ -18,7 +18,7 @@ export default function ReaderDemoWidget({
   onLanguageChange, 
   useInlineSignup = false 
 }: ReaderDemoWidgetProps) {
-  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage } = useVisitor();
+  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, nativeLanguage } = useVisitor();
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
@@ -32,9 +32,29 @@ export default function ReaderDemoWidget({
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState('');
+  const [showExpandedForm, setShowExpandedForm] = useState(true);
+  const [isEditingNative, setIsEditingNative] = useState(false);
+  const [isEditingTarget, setIsEditingTarget] = useState(false);
+  const [hasSelectedTarget, setHasSelectedTarget] = useState(false);
+  const [showBookAnimation, setShowBookAnimation] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
+  
+  // Initialize temp language states after currentLanguage is defined
+  const [tempNativeLanguage, setTempNativeLanguage] = useState(nativeLanguage);
+  const [tempTargetLanguage, setTempTargetLanguage] = useState(currentLanguage);
+  
+  // Update temp languages when context changes
+  useEffect(() => {
+    setTempNativeLanguage(nativeLanguage);
+  }, [nativeLanguage]);
+  
+  useEffect(() => {
+    setTempTargetLanguage(currentLanguage);
+  }, [currentLanguage]);
+  
   const pageRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -526,6 +546,12 @@ export default function ReaderDemoWidget({
         hidePopup();
       }
       
+      // Close language pickers when clicking outside
+      if (!target.closest('.language-picker-container') && !target.closest('.language-box')) {
+        setIsEditingNative(false);
+        setIsEditingTarget(false);
+      }
+      
       // Close language dropdown if clicking outside
       if (!target.closest('.language-selector-container') && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
@@ -800,42 +826,273 @@ export default function ReaderDemoWidget({
           <CloseButton onClick={() => setShowSignupExpanded(false)} aria-label="Close signup">
             ×
           </CloseButton>
-          <SignupExpanded>
-            <SignupTitle>✨ Create your free account to continue</SignupTitle>
-            <SignupSubtitle>Start learning languages with interactive reading</SignupSubtitle>
-            
-            <ButtonContainer>
-              <EmailInputExpanded
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError('');
-                }}
-                onKeyPress={(e) => e.key === 'Enter' && handleSignup()}
-                $hasError={!!emailError}
-              />
-              {emailError && <ErrorText>{emailError}</ErrorText>}
-              <PrimaryButton onClick={handleSignup}>
-                Sign up with Email
-              </PrimaryButton>
+          
+          {showExpandedForm ? (
+            <SignupExpanded>
+              <SignupTitle>Let's continue with a more customized reading for you</SignupTitle>
+              <SignupSubtitle>We'll personalize your learning experience based on your language preferences</SignupSubtitle>
               
-              <GoogleButton onClick={handleGoogleSignup}>
-                <svg viewBox="0 0 24 24" width="20" height="20">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Continue with Google
-              </GoogleButton>
-            </ButtonContainer>
-            
-            <LoginPrompt>
-              Already have an account? <LoginLink href="https://beta-app.langomango.com/login">Log in</LoginLink>
-            </LoginPrompt>
-          </SignupExpanded>
+              <LanguageSetupContainer>
+                <LanguageSetupRow>
+                  <LanguageBox 
+                    className="language-box"
+                    onClick={() => setIsEditingNative(true)}
+                    $isEditing={isEditingNative}
+                  >
+                    <LanguageBoxLabel>Your native language</LanguageBoxLabel>
+                    <LanguageDisplay>
+                      <LanguageFlag>{tempNativeLanguage?.flag || nativeLanguage?.flag || '🌐'}</LanguageFlag>
+                      <LanguageName>{tempNativeLanguage?.name || nativeLanguage?.name || 'English'}</LanguageName>
+                    </LanguageDisplay>
+                    <LanguageNote>
+                      {isEditingNative ? 'Select a language below' : 'Auto-detected from browser'}
+                    </LanguageNote>
+                  </LanguageBox>
+                  
+                  <ArrowIcon>→</ArrowIcon>
+                  
+                  <LanguageBox 
+                    className="language-box"
+                    onClick={() => setIsEditingTarget(true)}
+                    $isEditing={isEditingTarget}
+                    $isPulsing={!hasSelectedTarget}
+                  >
+                    <LanguageBoxLabel>You're learning</LanguageBoxLabel>
+                    <LanguageDisplay>
+                      <LanguageFlag>{tempTargetLanguage.flag}</LanguageFlag>
+                      <LanguageName>{tempTargetLanguage.name}</LanguageName>
+                    </LanguageDisplay>
+                    <LanguageNote>
+                      {isEditingTarget ? 'Select a language below' : ''}
+                    </LanguageNote>
+                  </LanguageBox>
+                </LanguageSetupRow>
+                
+                {(isEditingNative || isEditingTarget) && (
+                  <LanguagePickerContainer className="language-picker-container">
+                    <LanguagePickerGrid>
+                      {DEFAULT_LANGUAGES.map((language) => (
+                        <LanguagePickerOption
+                          key={language.code}
+                          onClick={() => {
+                            if (isEditingNative) {
+                              setTempNativeLanguage(language);
+                              setIsEditingNative(false);
+                            } else if (isEditingTarget) {
+                              setTempTargetLanguage(language);
+                              setContextLanguage(language);
+                              setIsEditingTarget(false);
+                              setHasSelectedTarget(true);
+                            }
+                          }}
+                          $isSelected={
+                            isEditingNative 
+                              ? tempNativeLanguage?.code === language.code 
+                              : tempTargetLanguage.code === language.code
+                          }
+                        >
+                          <span>{language.flag}</span>
+                          <span>{language.name}</span>
+                        </LanguagePickerOption>
+                      ))}
+                    </LanguagePickerGrid>
+                  </LanguagePickerContainer>
+                )}
+                
+                <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
+                  <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
+                  <LevelButtons>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'A1'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('A1');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🌱</LevelEmoji>
+                      <LevelName>A1</LevelName>
+                      <LevelDesc>Beginner</LevelDesc>
+                    </LevelButton>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'A2'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('A2');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🌿</LevelEmoji>
+                      <LevelName>A2</LevelName>
+                      <LevelDesc>Elementary</LevelDesc>
+                    </LevelButton>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'B1'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('B1');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🍀</LevelEmoji>
+                      <LevelName>B1</LevelName>
+                      <LevelDesc>Intermediate</LevelDesc>
+                    </LevelButton>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'B2'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('B2');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🌳</LevelEmoji>
+                      <LevelName>B2</LevelName>
+                      <LevelDesc>Upper Int.</LevelDesc>
+                    </LevelButton>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'C1'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('C1');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🌲</LevelEmoji>
+                      <LevelName>C1</LevelName>
+                      <LevelDesc>Advanced</LevelDesc>
+                    </LevelButton>
+                    <LevelButton 
+                      $isActive={selectedLevel === 'C2'}
+                      onClick={() => {
+                        if (!(!hasSelectedTarget || isEditingTarget)) {
+                          setSelectedLevel('C2');
+                          setShowBookAnimation(true);
+                          setTimeout(() => setShowBookAnimation(false), 2000);
+                        }
+                      }}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                    >
+                      <LevelEmoji>🎯</LevelEmoji>
+                      <LevelName>C2</LevelName>
+                      <LevelDesc>Mastery</LevelDesc>
+                    </LevelButton>
+                  </LevelButtons>
+                  
+                  {showBookAnimation && (
+                    <BookAnimationOverlay>
+                      <BookIcon>📖</BookIcon>
+                      <BookText>Preparing your customized Alice in Wonderland...</BookText>
+                    </BookAnimationOverlay>
+                  )}
+                </LevelSelectorContainer>
+              </LanguageSetupContainer>
+              
+              {(!hasSelectedTarget || isEditingTarget) ? (
+                <PromptMessage>
+                  <PromptIcon>👆</PromptIcon>
+                  Please select your target language to continue
+                </PromptMessage>
+              ) : !selectedLevel ? (
+                <PromptMessage>
+                  <PromptIcon>🎯</PromptIcon>
+                  Select your level to get a customized reading experience
+                </PromptMessage>
+              ) : (
+                <ContinueButton onClick={() => {
+                  // Store preferences and redirect to sign up
+                  const params = new URLSearchParams({
+                    native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                    target: tempTargetLanguage.code,
+                    level: selectedLevel
+                  });
+                  window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
+                }}>
+                  Continue to Sign Up →
+                </ContinueButton>
+              )}
+              
+              <SecondarySection>
+                <SecondaryDivider>
+                  <DividerLine />
+                  <DividerText>or jump straight to the app</DividerText>
+                  <DividerLine />
+                </SecondaryDivider>
+                
+                <SecondaryButtons>
+                  <SecondaryButton onClick={() => setShowExpandedForm(false)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Sign up with Email
+                  </SecondaryButton>
+                  <SecondaryButton onClick={handleGoogleSignup}>
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                  </SecondaryButton>
+                </SecondaryButtons>
+              </SecondarySection>
+            </SignupExpanded>
+          ) : (
+            <SignupExpanded>
+              <BackButton onClick={() => setShowExpandedForm(true)}>← Back</BackButton>
+              <SignupTitle>✨ Create your free account</SignupTitle>
+              <SignupSubtitle>Start learning languages with interactive reading</SignupSubtitle>
+              
+              <ButtonContainer>
+                <EmailInputExpanded
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError('');
+                  }}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSignup()}
+                  $hasError={!!emailError}
+                />
+                {emailError && <ErrorText>{emailError}</ErrorText>}
+                <PrimaryButton onClick={handleSignup}>
+                  Sign up with Email
+                </PrimaryButton>
+                
+                <GoogleButton onClick={handleGoogleSignup}>
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Continue with Google
+                </GoogleButton>
+              </ButtonContainer>
+              
+              <LoginPrompt>
+                Already have an account? <LoginLink href="https://beta-app.langomango.com/login">Log in</LoginLink>
+              </LoginPrompt>
+            </SignupExpanded>
+          )}
         </SignupSection>
       )}
     </WidgetWrapper>
@@ -2147,5 +2404,524 @@ const CloseButton = styled.button`
     font-size: 2.2rem;
     top: 1rem;
     right: 1rem;
+  }
+`;
+
+// New styled components for customized signup
+const LanguageSetupContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+  margin: 1rem 0;
+`;
+
+const LanguageSetupRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  
+  ${media('<=tablet')} {
+    gap: 1.5rem;
+  }
+`;
+
+// Add pulse glow animation for language selection prompt
+const pulseGlow = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+  }
+`;
+
+const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
+  background: ${props => props.$isEditing ? '#fff3cd' : '#f8f9fa'};
+  border: 2px solid ${props => props.$isEditing ? '#ff9800' : props.$isPulsing ? '#ff9800' : '#e5e7eb'};
+  border-radius: 1.2rem;
+  padding: 1.8rem;
+  min-width: 180px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  ${props => props.$isPulsing && css`
+    animation: ${pulseGlow} 2s ease-in-out infinite;
+  `}
+  
+  &::after {
+    content: '✏️';
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    font-size: 1.4rem;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+  
+  &:hover {
+    border-color: ${props => props.$isEditing ? '#ff9800' : '#ff9800'};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: ${props => props.$isEditing ? '#fff3cd' : '#fefefe'};
+    
+    &::after {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+  
+  ${media('<=tablet')} {
+    min-width: 140px;
+    padding: 1.4rem;
+    
+    &::after {
+      font-size: 1.2rem;
+      top: 0.6rem;
+      right: 0.6rem;
+    }
+  }
+  
+  ${media('<=phone')} {
+    min-width: 120px;
+    padding: 1.2rem;
+  }
+`;
+
+const LanguageBoxLabel = styled.div`
+  font-size: 1.2rem;
+  color: #6b7280;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+`;
+
+const LanguageDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border-radius: 0.8rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  
+  ${LanguageFlag} {
+    font-size: 2.4rem;
+  }
+  
+  ${LanguageName} {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+`;
+
+const LanguageNote = styled.div`
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 1.4rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1rem;
+  }
+`;
+
+const ArrowIcon = styled.div`
+  font-size: 2.4rem;
+  color: #ff9800;
+  font-weight: bold;
+  
+  ${media('<=tablet')} {
+    font-size: 2rem;
+    transform: rotate(90deg);
+  }
+`;
+
+const LevelSelectorContainer = styled.div<{ $isDisabled?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+  opacity: ${props => props.$isDisabled ? '0.4' : '1'};
+  transition: opacity 0.3s ease;
+  position: relative;
+  
+  ${props => props.$isDisabled && css`
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      cursor: not-allowed;
+      z-index: 1;
+    }
+  `}
+`;
+
+// Book animation styles
+const bookFloat = keyframes`
+  0% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+`;
+
+const bookFadeInOut = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+`;
+
+const BookAnimationOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+  animation: ${bookFadeInOut} 2s ease-in-out;
+`;
+
+const BookIcon = styled.div`
+  font-size: 4rem;
+  animation: ${bookFloat} 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  
+  ${media('<=tablet')} {
+    font-size: 3.5rem;
+  }
+`;
+
+const BookText = styled.div`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ff9800;
+  text-align: center;
+  background: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+    padding: 0.6rem 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.1rem;
+    white-space: normal;
+    max-width: 200px;
+  }
+`;
+
+const LevelLabel = styled.label`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+`;
+
+const LevelButtons = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  justify-content: center;
+  max-width: 420px;
+  margin: 0 auto;
+  
+  ${media('<=tablet')} {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    max-width: 360px;
+  }
+  
+  ${media('<=phone')} {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 280px;
+  }
+`;
+
+const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.2rem 1.5rem;
+  background: ${props => props.$isDisabled ? '#f3f4f6' : props.$isActive ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' : 'white'};
+  border: 2px solid ${props => props.$isDisabled ? '#e5e7eb' : props.$isActive ? '#ff9800' : '#e5e7eb'};
+  border-radius: 1rem;
+  cursor: ${props => props.$isDisabled ? 'not-allowed' : 'pointer'};
+  transition: all 0.2s ease;
+  min-width: 100px;
+  color: ${props => props.$isDisabled ? '#9ca3af' : props.$isActive ? 'white' : '#374151'};
+  opacity: ${props => props.$isDisabled ? '0.6' : '1'};
+  
+  &:hover:not(:disabled) {
+    transform: ${props => props.$isDisabled ? 'none' : 'translateY(-2px)'};
+    box-shadow: ${props => props.$isDisabled ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.15)'};
+    border-color: ${props => props.$isDisabled ? '#e5e7eb' : '#ff9800'};
+  }
+  
+  ${media('<=tablet')} {
+    padding: 1rem 1.2rem;
+    min-width: 90px;
+  }
+`;
+
+const LevelEmoji = styled.div`
+  font-size: 2.4rem;
+  line-height: 1;
+`;
+
+const LevelName = styled.div`
+  font-size: 1.4rem;
+  font-weight: 600;
+`;
+
+const LevelDesc = styled.div`
+  font-size: 1.1rem;
+  opacity: 0.8;
+`;
+
+const ContinueButton = styled.button`
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  border: none;
+  padding: 1.6rem 3rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+  margin-top: 1rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const SecondarySection = styled.div`
+  width: 100%;
+  margin-top: 3rem;
+`;
+
+const SecondaryDivider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+`;
+
+const SecondaryButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const SecondaryButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.8rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
+const BackButton = styled.button`
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #374151;
+  }
+`;
+
+const PromptMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  font-size: 1.6rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-top: 1rem;
+  padding: 1.2rem 2rem;
+  background: rgba(255, 152, 0, 0.05);
+  border: 2px dashed rgba(255, 152, 0, 0.3);
+  border-radius: 0.8rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1.4rem;
+    padding: 1rem 1.5rem;
+  }
+`;
+
+const PromptIcon = styled.span`
+  font-size: 2rem;
+  animation: ${pulse} 1.5s ease-in-out infinite;
+  
+  ${media('<=tablet')} {
+    font-size: 1.8rem;
+  }
+`;
+
+const LanguagePickerContainer = styled.div`
+  background: white;
+  border: 2px solid #ff9800;
+  border-radius: 1.2rem;
+  padding: 1.5rem;
+  margin-top: -1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const LanguagePickerGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+  
+  ${media('<=tablet')} {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    max-height: 250px;
+  }
+`;
+
+const LanguagePickerOption = styled.button<{ $isSelected: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  background: ${props => props.$isSelected ? 'rgba(255, 152, 0, 0.1)' : 'white'};
+  border: 1px solid ${props => props.$isSelected ? '#ff9800' : '#e5e7eb'};
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.3rem;
+  color: #374151;
+  text-align: left;
+  
+  &:hover {
+    background: rgba(255, 152, 0, 0.05);
+    border-color: #ff9800;
+  }
+  
+  span:first-child {
+    font-size: 1.6rem;
+  }
+  
+  span:last-child {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  
+  ${media('<=tablet')} {
+    padding: 0.6rem 0.8rem;
+    
+    span:first-child {
+      font-size: 1.4rem;
+    }
+    
+    span:last-child {
+      font-size: 1.1rem;
+    }
   }
 `;
