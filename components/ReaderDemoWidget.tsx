@@ -1,8 +1,8 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
-import { useVisitor, Language, DEFAULT_LANGUAGES } from 'contexts/VisitorContext';
+import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 
 // Type definitions
 interface ReaderDemoWidgetProps {
@@ -35,10 +35,10 @@ export default function ReaderDemoWidget({
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
-  const pageRef = useRef(null);
-  const longPressTimer = useRef(null);
-  const wordsTimerRef = useRef(null);
-  const readerContainerRef = useRef(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const readerContainerRef = useRef<HTMLDivElement>(null);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [popup, setPopup] = useState({
     visible: false,
@@ -52,8 +52,17 @@ export default function ReaderDemoWidget({
     return text.trim().split(/\s+/).length;
   };
 
+  // Define types for translations
+  interface TranslationMap {
+    [key: string]: string;
+  }
+
+  interface Translations {
+    [languageCode: string]: TranslationMap;
+  }
+
   // Translations for different languages
-  const translations = {
+  const translations: Translations = {
     de: {
       'Where there was coral before,': 'Wo früher Korallen waren,',
       'He opened his eyes': 'Er öffnete die Augen',
@@ -194,8 +203,28 @@ export default function ReaderDemoWidget({
     }
   };
 
+  // Define types for book content
+  interface Segment {
+    text: string;
+    translationKey?: string;
+    showTranslation?: boolean;
+  }
+
+  interface Paragraph {
+    segments: Segment[];
+    indent: boolean;
+  }
+
+  interface PageContent {
+    paragraphs: Paragraph[];
+  }
+
+  interface BookContent {
+    [pageNumber: number]: PageContent;
+  }
+
   // Book content (base English content) - 3 paragraphs per page
-  const bookContent = {
+  const bookContent: BookContent = {
     7: {
       paragraphs: [
         {
@@ -340,7 +369,7 @@ export default function ReaderDemoWidget({
     content.paragraphs.forEach((paragraph, pIndex) => {
       paragraph.segments.forEach((segment, sIndex) => {
         if (segment.translationKey && segment.showTranslation) {
-          const translatedText = getTranslation(segment.translationKey);
+          const translatedText = getTranslation(segment.translationKey!);
           const wordCount = getWordCount(translatedText);
           console.log(`[calculatePageWords] P${pIndex}S${sIndex}: "${segment.translationKey}" -> "${translatedText}" (${wordCount} words)`);
           totalWords += wordCount;
@@ -432,7 +461,7 @@ export default function ReaderDemoWidget({
     setPopup(prev => ({ ...prev, visible: false }));
   }, []);
 
-  const handleLongPressStart = useCallback((e: React.MouseEvent | React.TouchEvent, segment: any) => {
+  const handleLongPressStart = useCallback((e: React.MouseEvent | React.TouchEvent, segment: Segment) => {
     if ('touches' in e) {
       e.stopPropagation();
     } else {
@@ -442,7 +471,7 @@ export default function ReaderDemoWidget({
     
     if (!segment.translationKey || segment.showTranslation) return;
     
-    const target = e.currentTarget;
+    const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const pageRect = pageRef.current?.getBoundingClientRect();
     
@@ -455,7 +484,7 @@ export default function ReaderDemoWidget({
       setPopup({
         visible: true,
         text: segment.text,
-        translation: getTranslation(segment.translationKey),
+        translation: getTranslation(segment.translationKey!),
         x: x,
         y: y
       });
@@ -490,7 +519,7 @@ export default function ReaderDemoWidget({
   // Global click handler
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent | TouchEvent) => {
-      const target = e.target;
+      const target = e.target as HTMLElement;
       
       // Close translation popup if clicking outside
       if (!target.closest('.translation-popup') && popup.visible) {
@@ -512,7 +541,7 @@ export default function ReaderDemoWidget({
     };
   }, [popup.visible, hidePopup, isLanguageDropdownOpen]);
 
-  const calculatePageWordsRef = useRef<typeof calculatePageWords>();
+  const calculatePageWordsRef = useRef<typeof calculatePageWords | undefined>();
   calculatePageWordsRef.current = calculatePageWords;
 
   const visibilityTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -555,7 +584,7 @@ export default function ReaderDemoWidget({
               console.log('[visibilityTimer] Word count badges shown');
               // Then update global counter 1 second later
               wordsTimerRef.current = setTimeout(() => {
-                const page8Words = calculatePageWordsRef.current(8);
+                const page8Words = calculatePageWordsRef.current?.(8) || 0;
                 console.log('[wordsTimer] Calculated page 8 words:', page8Words);
                 setWordsRead(page8Words);
                 setJustUpdated(true);
@@ -989,7 +1018,7 @@ const successGlow = keyframes`
 `;
 
 // Styled Components
-const WidgetWrapper = styled.div`
+const WidgetWrapper = styled.div<{ $expanded: boolean }>`
   position: relative;
   width: 100%;
   ${props => props.$expanded && `
@@ -1310,7 +1339,7 @@ const ContentArea = styled.div`
   }
 `;
 
-const ParagraphContainer = styled.div`
+const ParagraphContainer = styled.div<{ $indent: boolean; $isLast: boolean }>`
   padding-left: ${props => props.$indent ? '1rem' : '0'};
   padding-right: ${props => props.$indent ? '1rem' : '0'};
   margin-bottom: ${props => props.$isLast ? '0' : '2.8rem'};
@@ -1528,7 +1557,7 @@ const LanguageSelectorContainer = styled.div`
   }
 `;
 
-const LanguageDropdown = styled.div`
+const LanguageDropdown = styled.div<{ $isOpen: boolean }>`
   background: white;
   border: 2px solid ${props => props.$isOpen ? 'rgb(255, 152, 0)' : '#e5e7eb'};
   border-radius: ${props => props.$isOpen ? '0.8rem 0.8rem 0 0' : '2rem'};
@@ -1566,7 +1595,7 @@ const LanguageName = styled.span`
   font-weight: 500;
 `;
 
-const ChevronIcon = styled.span`
+const ChevronIcon = styled.span<{ $isOpen: boolean }>`
   font-size: 0.8rem;
   color: #6b7280;
   transition: transform 0.2s ease;
@@ -1604,7 +1633,7 @@ const LanguageList = styled.div`
   }
 `;
 
-const LanguageOption = styled.div`
+const LanguageOption = styled.div<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1626,7 +1655,7 @@ const LanguageOption = styled.div`
   }
 `;
 
-const SuccessParticle = styled.div`
+const SuccessParticle = styled.div<{ $color: string; $shape: string; $delay: number }>`
   position: absolute;
   width: 8px;
   height: 8px;
@@ -1640,7 +1669,7 @@ const SuccessParticle = styled.div`
   opacity: 0;
 `;
 
-const WordsReadCounter = styled.div`
+const WordsReadCounter = styled.div<{ $hasWords: boolean; $justUpdated: boolean }>`
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
@@ -1822,7 +1851,7 @@ const CompactFormRow = styled.div`
   }
 `;
 
-const EmailInputCompact = styled.input`
+const EmailInputCompact = styled.input<{ $hasError: boolean }>`
   flex: 1;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;
@@ -1975,7 +2004,7 @@ const ButtonContainer = styled.div`
   max-width: 30rem;
 `;
 
-const EmailInputExpanded = styled.input`
+const EmailInputExpanded = styled.input<{ $hasError: boolean }>`
   width: 100%;
   padding: 1.4rem 1.8rem;
   font-size: 1.6rem;
