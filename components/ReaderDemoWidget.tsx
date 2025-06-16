@@ -3,6 +3,7 @@ import styled, { css, keyframes } from 'styled-components';
 import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
+import { apiService } from 'services/apiService';
 
 // Type definitions
 interface ReaderDemoWidgetProps {
@@ -48,6 +49,8 @@ export default function ReaderDemoWidget({
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
   const [showBookAnimation, setShowBookAnimation] = useState(false);
+  const [isLoadingSignup, setIsLoadingSignup] = useState(false);
+  const [signupError, setSignupError] = useState('');
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -500,6 +503,39 @@ export default function ReaderDemoWidget({
     window.location.href = 'https://staging.langomango.com/auth/login-google?returnUrl=/sign-up&frontendRedirectUrl=https://beta-app.langomango.com/';
   }, []);
 
+  // Handle demo signup with level selection
+  const handleLevelSelect = useCallback(async (level: string) => {
+    if (!hasSelectedTarget || isEditingTarget) return;
+    
+    setSelectedLevel(level);
+    setSignupError('');
+    setIsLoadingSignup(true);
+    setShowBookAnimation(true);
+    
+    try {
+      const response = await apiService.demoSignup({
+        nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+        targetLanguage: tempTargetLanguage.code,
+        level: level
+      });
+      
+      if (response.success && response.redirectUrl) {
+        // Wait a bit for animation before redirecting
+        setTimeout(() => {
+          window.location.href = response.redirectUrl;
+        }, 1500);
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Demo signup error:', error);
+      setSignupError(error instanceof Error ? error.message : 'Failed to create demo account. Please try again.');
+      setShowBookAnimation(false);
+      setIsLoadingSignup(false);
+      setSelectedLevel('');
+    }
+  }, [hasSelectedTarget, isEditingTarget, tempNativeLanguage, nativeLanguage, tempTargetLanguage]);
+
   const hidePopup = useCallback(() => {
     setPopup(prev => ({ ...prev, visible: false }));
   }, []);
@@ -940,21 +976,8 @@ export default function ReaderDemoWidget({
                   <LevelButtons>
                     <LevelButton 
                       $isActive={selectedLevel === 'A1'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('A1');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'A1'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('A1')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌱</LevelEmoji>
@@ -963,21 +986,8 @@ export default function ReaderDemoWidget({
                     </LevelButton>
                     <LevelButton 
                       $isActive={selectedLevel === 'A2'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('A2');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'A2'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('A2')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌿</LevelEmoji>
@@ -986,21 +996,8 @@ export default function ReaderDemoWidget({
                     </LevelButton>
                     <LevelButton 
                       $isActive={selectedLevel === 'B1'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('B1');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'B1'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('B1')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🍀</LevelEmoji>
@@ -1009,21 +1006,8 @@ export default function ReaderDemoWidget({
                     </LevelButton>
                     <LevelButton 
                       $isActive={selectedLevel === 'B2'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('B2');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'B2'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('B2')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌳</LevelEmoji>
@@ -1032,21 +1016,8 @@ export default function ReaderDemoWidget({
                     </LevelButton>
                     <LevelButton 
                       $isActive={selectedLevel === 'C1'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('C1');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'C1'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('C1')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🌲</LevelEmoji>
@@ -1055,21 +1026,8 @@ export default function ReaderDemoWidget({
                     </LevelButton>
                     <LevelButton 
                       $isActive={selectedLevel === 'C2'}
-                      onClick={() => {
-                        if (!(!hasSelectedTarget || isEditingTarget)) {
-                          setSelectedLevel('C2');
-                          setShowBookAnimation(true);
-                          setTimeout(() => {
-                            const params = new URLSearchParams({
-                              native: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              target: tempTargetLanguage.code,
-                              level: 'C2'
-                            });
-                            window.location.href = `https://beta-app.langomango.com/sign-up?${params.toString()}`;
-                          }, 2000);
-                        }
-                      }}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget}
+                      onClick={() => handleLevelSelect('C2')}
+                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                       $needsSelection={hasSelectedTarget && !selectedLevel}
                     >
                       <LevelEmoji>🎯</LevelEmoji>
@@ -1100,6 +1058,13 @@ export default function ReaderDemoWidget({
                     Now select your level to start reading
                   </PromptMessage>
                 ) : null}
+              
+              {signupError && (
+                <ErrorMessage>
+                  <ErrorIcon>⚠️</ErrorIcon>
+                  {signupError}
+                </ErrorMessage>
+              )}
               
               <SecondarySection>
                 <SecondaryDivider>
@@ -3051,6 +3016,34 @@ const PromptIcon = styled.span`
   
   ${media('<=tablet')} {
     font-size: 1.8rem;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+  color: #dc2626;
+  font-weight: 500;
+  margin-top: 1rem;
+  padding: 1.2rem 2rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.8rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+  }
+`;
+
+const ErrorIcon = styled.span`
+  font-size: 1.8rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
   }
 `;
 
