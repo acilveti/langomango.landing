@@ -84,7 +84,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   autoOpenModal = false,
   isDark = false
 }, ref) => {
-  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage } = useVisitor();
+  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -98,6 +98,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   function handleLanguageSelect(language: Language) {
     setSelectedLanguage(language);
     setContextLanguage(language); // Update context
+    setHasSelectedLanguage(true); // Mark that user has selected a language
     setIsLanguageDropdownOpen(false);
     
     // Call the immediate callback
@@ -137,7 +138,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   return (
     <LanguageSelectorContainer 
       className={className}
-      data-has-selection={!!selectedLanguage}
+      data-has-selection={hasSelectedLanguage}
       maxWidth={maxWidth}
     >
       <LanguageDropdown 
@@ -146,7 +147,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         isDark={isDark}
       >
         <SelectedLanguage>
-          {selectedLanguage ? (
+          {selectedLanguage && hasSelectedLanguage ? (
             <>
               <LanguageFlag>{selectedLanguage.flag}</LanguageFlag>
               <LanguageName isDark={isDark}>{selectedLanguage.name}</LanguageName>
@@ -177,7 +178,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       </Collapse>
 
       {/* Processing Message */}
-      {showProcessingMessage && isProcessing && selectedLanguage && (
+      {showProcessingMessage && isProcessing && selectedLanguage && hasSelectedLanguage && (
         <ProcessingMessage>
           <ProcessingIcon>⏳</ProcessingIcon>
           <ProcessingText>
@@ -187,7 +188,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       )}
 
       {/* Confirmation Message */}
-      {showConfirmationMessage && showConfirmation && !isProcessing && selectedLanguage && (
+      {showConfirmationMessage && showConfirmation && !isProcessing && selectedLanguage && hasSelectedLanguage && (
         <ConfirmationMessage>
           <ConfirmationIcon>🎉</ConfirmationIcon>
           <ConfirmationText>
