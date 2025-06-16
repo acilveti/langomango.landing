@@ -10,13 +10,15 @@ interface ReaderDemoWidgetProps {
   onInteraction?: () => void;
   onLanguageChange?: (language: Language) => void;
   useInlineSignup?: boolean;
+  signupMode?: 'panel' | 'fullscreen';
 }
 
 export default function ReaderDemoWidget({ 
   selectedLanguage: propSelectedLanguage, 
   onInteraction, 
   onLanguageChange, 
-  useInlineSignup = false 
+  useInlineSignup = false,
+  signupMode = 'panel'
 }: ReaderDemoWidgetProps) {
   const { 
     selectedLanguage: contextLanguage, 
@@ -678,8 +680,12 @@ export default function ReaderDemoWidget({
   console.log('[ReaderDemoWidget] Rendering with wordsRead:', wordsRead, 'showWordCounts:', showWordCounts);
 
   return (
-    <WidgetWrapper $expanded={showSignupExpanded} data-reader-widget="true">
-      <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''} data-reader-wrapper="true">
+    <WidgetWrapper $expanded={showSignupExpanded} $isFullscreen={signupMode === 'fullscreen'} data-reader-widget="true">
+      <ReaderWrapper 
+        className={showSignupExpanded && signupMode !== 'fullscreen' ? 'reader-wrapper' : ''} 
+        data-reader-wrapper="true"
+        $inModal={signupMode === 'fullscreen'}
+      >
         {/* Words Read Counter */}
         <WordsReadCounter $hasWords={wordsRead > 0} $justUpdated={justUpdated}>
           {justUpdated && (
@@ -697,7 +703,7 @@ export default function ReaderDemoWidget({
             <span>in {currentLanguage.name}</span>
           </WordsLabel>
         </WordsReadCounter>
-      <ReaderContainer ref={readerContainerRef}>
+      <ReaderContainer ref={readerContainerRef} $inModal={signupMode === 'fullscreen'}>
         {/* Left Navigation */}
         <NavButtonLeft 
           onClick={handlePrevPage} 
@@ -819,7 +825,7 @@ export default function ReaderDemoWidget({
       </ReaderContainer>
 
       {/* Bottom Navigation Bar */}
-      <BottomBar>
+      <BottomBar $inModal={signupMode === 'fullscreen'}>
         <PageNavigation>
           <PageInputContainer>
             <PageInput
@@ -838,13 +844,18 @@ export default function ReaderDemoWidget({
       
       {/* Inline Signup Section */}
       {useInlineSignup && showSignupExpanded && (
-        <SignupSection>
-          <CloseButton onClick={() => setShowSignupExpanded(false)} aria-label="Close signup">
+        <SignupSection $isFullscreen={signupMode === 'fullscreen'}>
+          <CloseButton 
+            onClick={() => setShowSignupExpanded(false)} 
+            aria-label="Close signup"
+            $isFullscreen={signupMode === 'fullscreen'}
+          >
             ×
           </CloseButton>
           
           {showExpandedForm ? (
-            <SignupExpanded>
+            <SignupExpandedWrapper>
+              <SignupExpanded>
               <SignupTitle>Let's continue with a more customized reading for you</SignupTitle>
               <SignupSubtitle>We'll personalize your learning experience based on your language preferences</SignupSubtitle>
               
@@ -1107,8 +1118,10 @@ export default function ReaderDemoWidget({
                 </SecondaryButtons>
               </SecondarySection>
             </SignupExpanded>
+            </SignupExpandedWrapper>
           ) : (
-            <SignupExpanded>
+            <SignupExpandedWrapper>
+              <SignupExpanded>
               <BackButton onClick={() => setShowExpandedForm(true)}>← Back</BackButton>
               <SignupTitle>✨ Create your free account</SignupTitle>
               <SignupSubtitle>Start learning languages with interactive reading</SignupSubtitle>
@@ -1144,7 +1157,8 @@ export default function ReaderDemoWidget({
               <LoginPrompt>
                 Already have an account? <LoginLink href="https://beta-app.langomango.com/login">Log in</LoginLink>
               </LoginPrompt>
-            </SignupExpanded>
+              </SignupExpanded>
+            </SignupExpandedWrapper>
           )}
         </SignupSection>
       )}
@@ -1328,10 +1342,10 @@ const successGlow = keyframes`
 `;
 
 // Styled Components
-const WidgetWrapper = styled.div<{ $expanded: boolean }>`
+const WidgetWrapper = styled.div<{ $expanded: boolean; $isFullscreen: boolean }>`
   position: relative;
   width: 100%;
-  ${props => props.$expanded && `
+  ${props => props.$expanded && !props.$isFullscreen && `
     .reader-wrapper {
       transform: scale(0.85);
       transition: transform 0.4s ease;
@@ -1339,30 +1353,32 @@ const WidgetWrapper = styled.div<{ $expanded: boolean }>`
   `}
 `;
 
-const ReaderWrapper = styled.div`
-  background: white;
-  border-radius: 1.6rem;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  max-width: 90rem;
+const ReaderWrapper = styled.div<{ $inModal?: boolean }>`
+  background: ${props => props.$inModal ? 'transparent' : 'white'};
+  border-radius: ${props => props.$inModal ? '0' : '1.6rem'};
+  overflow: ${props => props.$inModal ? 'visible' : 'hidden'};
+  box-shadow: ${props => props.$inModal ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.2)'};
+  max-width: ${props => props.$inModal ? 'none' : '90rem'};
   margin: 0 auto;
   position: relative;
-  border: 3px solid rgb(var(--secondary));
+  border: ${props => props.$inModal ? 'none' : '3px solid rgb(var(--secondary))'};
   transition: transform 0.4s ease;
   transform-origin: top center;
   width: 100%;
+  height: ${props => props.$inModal ? 'auto' : 'auto'};
   z-index: 20;
+  display: ${props => props.$inModal ? 'block' : 'block'};
   
   ${props => props.className === 'reader-wrapper' ? 'transform: scale(0.85);' : ''}
 `;
 
-const ReaderContainer = styled.div`
+const ReaderContainer = styled.div<{ $inModal?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 7rem;
   position: relative;
-  background: white;
+  background: ${props => props.$inModal ? 'transparent' : 'white'};
   
   ${media('<=tablet')} {
     padding: 1.5rem 5rem;
@@ -1788,13 +1804,13 @@ const PopupArrow = styled.div`
   pointer-events: none;
 `;
 
-const BottomBar = styled.div`
+const BottomBar = styled.div<{ $inModal?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: ${props => props.$inModal ? 'transparent' : 'white'};
   padding: 1.5rem 2rem;
-  border-radius: 0 0 1.6rem 1.6rem;
+  border-radius: ${props => props.$inModal ? '0' : '0 0 1.6rem 1.6rem'};
   border-top: 1px solid #e5e7eb;
 `;
 
@@ -2099,31 +2115,65 @@ const WordsLabel = styled.div`
 `;
 
 // Signup Section Styles
-const SignupSection = styled.div`
+const SignupSection = styled.div<{ $isFullscreen: boolean }>`
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 85vh;
   z-index: 200;
   background: white;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
-  border-radius: 2rem 2rem 0 0;
   overflow: hidden;
-  animation: slideUp 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
   
-  @keyframes slideUp {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-  
-  ${media('<=tablet')} {
+  ${props => props.$isFullscreen ? css`
+    /* Fullscreen mode - for modal */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
     height: 90vh;
-  }
+    max-width: 65rem;
+    max-height: 90vh;
+    border-radius: 1.6rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: scaleIn 0.3s ease-out;
+    
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    
+    ${media('<=tablet')} {
+      width: 95vw;
+      height: 95vh;
+    }
+  ` : css`
+    /* Panel mode - slides from bottom */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 85vh;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 2rem 2rem 0 0;
+    animation: slideUp 0.4s ease-out;
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+    
+    ${media('<=tablet')} {
+      height: 90vh;
+    }
+  `}
 `;
 
 const SignupCompact = styled.div`
@@ -2272,22 +2322,52 @@ const GoogleButtonCompact = styled.button`
   }
 `;
 
+const SignupExpandedWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
 const SignupExpanded = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.8rem;
+  gap: 1.5rem;
   max-width: 40rem;
   margin: 0 auto;
   text-align: center;
-  padding: 2.5rem;
+  padding: 2rem;
+  padding-bottom: 3rem;
   height: 100%;
   position: relative;
-  justify-content: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
   
   ${media('<=tablet')} {
-    padding: 2rem;
-    gap: 1.5rem;
+    padding: 1.5rem;
+    gap: 1.2rem;
   }
 `;
 
@@ -2297,9 +2377,11 @@ const SignupTitle = styled.h2`
   color: #1f2937;
   margin: 0;
   line-height: 1.2;
+  margin-top: 1rem;
   
   ${media('<=tablet')} {
     font-size: 1.9rem;
+    margin-top: 0.5rem;
   }
 `;
 
@@ -2419,13 +2501,13 @@ const LoginLink = styled.a`
   }
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled.button<{ $isFullscreen?: boolean }>`
   position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
+  top: ${props => props.$isFullscreen ? '2rem' : '1.5rem'};
+  right: ${props => props.$isFullscreen ? '2rem' : '1.5rem'};
   width: 3.6rem;
   height: 3.6rem;
-  background: rgba(0, 0, 0, 0.05);
+  background: ${props => props.$isFullscreen ? 'rgba(0, 0, 0, 0.08)' : 'rgba(0, 0, 0, 0.05)'};
   border: none;
   border-radius: 50%;
   font-size: 2.8rem;
@@ -2454,8 +2536,8 @@ const CloseButton = styled.button`
     width: 3.2rem;
     height: 3.2rem;
     font-size: 2.4rem;
-    top: 1.2rem;
-    right: 1.2rem;
+    top: ${props => props.$isFullscreen ? '1.5rem' : '1.2rem'};
+    right: ${props => props.$isFullscreen ? '1.5rem' : '1.2rem'};
   }
   
   ${media('<=phone')} {
@@ -2471,10 +2553,11 @@ const CloseButton = styled.button`
 const LanguageSetupContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   width: 100%;
   margin: 0 auto;
   max-width: 700px;
+  padding-bottom: 1rem;
 `;
 
 const LanguageSetupRow = styled.div`
@@ -2870,7 +2953,8 @@ const ContinueButton = styled.button`
 
 const SecondarySection = styled.div`
   width: 100%;
-  margin-top: 3rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 `;
 
 const SecondaryDivider = styled.div`

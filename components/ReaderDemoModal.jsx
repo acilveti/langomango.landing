@@ -20,7 +20,8 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
 
           <ReaderDemoWidget 
             selectedLanguage={selectedLanguage} 
-            useInlineSignup={true} 
+            useInlineSignup={true}
+            signupMode="fullscreen"
           />
         </ReaderCard>
       </ModalContainer>
@@ -50,10 +51,13 @@ const ReaderCard = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;
-  background: transparent;
+  background: white;
   width: 100%;
-  height: fit-content;
+  height: auto;
   color: rgb(var(--text));
+  overflow: visible;
+  border-radius: 1.6rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 `;
 
 const CloseIconContainer = styled.div`
