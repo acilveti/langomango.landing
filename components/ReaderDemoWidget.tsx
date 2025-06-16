@@ -1050,14 +1050,16 @@ export default function ReaderDemoWidget({
                       <LevelDesc>Mastery</LevelDesc>
                     </LevelButton>
                   </LevelButtons>
-                  
-                  {showBookAnimation && (
+                </LevelSelectorContainer>
+                
+                {showBookAnimation && (
+                  <BookAnimationWrapper>
                     <BookAnimationOverlay>
                       <BookIcon>📖</BookIcon>
                       <BookText>Preparing your customized Alice in Wonderland...</BookText>
                     </BookAnimationOverlay>
-                  )}
-                </LevelSelectorContainer>
+                  </BookAnimationWrapper>
+                )}
               </LanguageSetupContainer>
               
               {(!hasSelectedTarget || isEditingTarget) && (
@@ -2096,9 +2098,8 @@ const SignupSection = styled.div`
   background: white;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
   border-radius: 2rem 2rem 0 0;
-  overflow-y: auto;
+  overflow: hidden;
   animation: slideUp 0.4s ease-out;
-  padding: 3rem;
   
   @keyframes slideUp {
     from {
@@ -2110,7 +2111,6 @@ const SignupSection = styled.div`
   }
   
   ${media('<=tablet')} {
-    padding: 2rem;
     height: 80vh;
   }
 `;
@@ -2269,6 +2269,14 @@ const SignupExpanded = styled.div`
   max-width: 40rem;
   margin: 0 auto;
   text-align: center;
+  padding: 3rem;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  
+  ${media('<=tablet')} {
+    padding: 2rem;
+  }
 `;
 
 const SignupTitle = styled.h2`
@@ -2656,49 +2664,59 @@ const bookFadeInOut = keyframes`
   }
 `;
 
-const BookAnimationOverlay = styled.div`
+const BookAnimationWrapper = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 100;
+  border-radius: 2rem;
+`;
+
+const BookAnimationOverlay = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  z-index: 10;
   animation: ${bookFadeInOut} 2s ease-in-out;
 `;
 
 const BookIcon = styled.div`
-  font-size: 4rem;
+  font-size: 5rem;
   animation: ${bookFloat} 1.5s ease-in-out infinite;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   
   ${media('<=tablet')} {
-    font-size: 3.5rem;
+    font-size: 4rem;
   }
 `;
 
 const BookText = styled.div`
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 600;
   color: #ff9800;
   text-align: center;
   background: white;
-  padding: 0.8rem 1.6rem;
+  padding: 1rem 2rem;
   border-radius: 2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   white-space: nowrap;
   
   ${media('<=tablet')} {
-    font-size: 1.2rem;
-    padding: 0.6rem 1.2rem;
+    font-size: 1.4rem;
+    padding: 0.8rem 1.6rem;
   }
   
   ${media('<=phone')} {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     white-space: normal;
-    max-width: 200px;
+    max-width: 250px;
+    padding: 0.8rem 1.4rem;
   }
 `;
 
