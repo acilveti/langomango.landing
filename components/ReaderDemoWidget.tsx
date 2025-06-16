@@ -2093,7 +2093,7 @@ const SignupSection = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70vh;
+  height: 85vh;
   z-index: 200;
   background: white;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
@@ -2111,7 +2111,7 @@ const SignupSection = styled.div`
   }
   
   ${media('<=tablet')} {
-    height: 80vh;
+    height: 90vh;
   }
 `;
 
@@ -2265,39 +2265,40 @@ const SignupExpanded = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.8rem;
   max-width: 40rem;
   margin: 0 auto;
   text-align: center;
-  padding: 3rem;
+  padding: 2.5rem;
   height: 100%;
-  overflow-y: auto;
   position: relative;
+  justify-content: center;
   
   ${media('<=tablet')} {
     padding: 2rem;
+    gap: 1.5rem;
   }
 `;
 
 const SignupTitle = styled.h2`
-  font-size: 2.4rem;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #1f2937;
   margin: 0;
   line-height: 1.2;
   
   ${media('<=tablet')} {
-    font-size: 2rem;
+    font-size: 1.9rem;
   }
 `;
 
 const SignupSubtitle = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: #6b7280;
   margin: 0;
   
   ${media('<=tablet')} {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 `;
 
@@ -2459,9 +2460,9 @@ const CloseButton = styled.button`
 const LanguageSetupContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
   width: 100%;
-  margin: 1rem auto;
+  margin: 0 auto;
   max-width: 700px;
 `;
 
