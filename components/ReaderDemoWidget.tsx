@@ -636,8 +636,8 @@ export default function ReaderDemoWidget({
   console.log('[ReaderDemoWidget] Rendering with wordsRead:', wordsRead, 'showWordCounts:', showWordCounts);
 
   return (
-    <WidgetWrapper $expanded={showSignupExpanded}>
-      <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''}>
+    <WidgetWrapper $expanded={showSignupExpanded} data-reader-widget="true">
+      <ReaderWrapper className={showSignupExpanded ? 'reader-wrapper' : ''} data-reader-wrapper="true">
         {/* Words Read Counter */}
         <WordsReadCounter $hasWords={wordsRead > 0} $justUpdated={justUpdated}>
           {justUpdated && (

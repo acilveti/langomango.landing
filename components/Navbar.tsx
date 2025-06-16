@@ -63,11 +63,46 @@ export default function Navbar({ items }: NavbarProps) {
 
     const handleScroll = () => {
       const heroSection = document.getElementById('hero-section');
-      if (!heroSection) return;
+      if (!heroSection) {
+        console.warn('[Navbar] hero-section not found');
+        return;
+      }
       
-      // Look for the ReaderDemoWidget container - search for the widget wrapper or reader container
-      const widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"], [class*="ReaderWrapper"], [class*="ReaderContainer"]');
-      if (widgetContainers.length === 0) return;
+      // Look for the reader demo container by multiple methods
+      let widgetContainers = heroSection.querySelectorAll('.reader-demo-container');
+      
+      if (widgetContainers.length === 0) {
+        // Try data attributes on DemoContainer
+        widgetContainers = heroSection.querySelectorAll('[data-demo-container="true"]');
+      }
+      
+      if (widgetContainers.length === 0) {
+        // Try ReaderDemoWidget data attributes
+        widgetContainers = heroSection.querySelectorAll('[data-reader-widget="true"], [data-reader-wrapper="true"]');
+      }
+      
+      if (widgetContainers.length === 0) {
+        // Fallback to class name search for backwards compatibility
+        widgetContainers = heroSection.querySelectorAll('[class*="DemoContainer"], [class*="ReaderWrapper"], [class*="ReaderContainer"]');
+      }
+      
+      if (widgetContainers.length === 0) {
+        // Try one more time with a more specific search
+        const allDivs = heroSection.getElementsByTagName('div');
+        for (let i = 0; i < allDivs.length; i++) {
+          const className = allDivs[i].className;
+          if (typeof className === 'string' && 
+              (className.includes('Demo') || className.includes('Reader') || className.includes('Widget'))) {
+            widgetContainers = [allDivs[i]];
+            break;
+          }
+        }
+      }
+      
+      if (widgetContainers.length === 0) {
+        console.warn('[Navbar] No reader widget containers found');
+        return;
+      }
       
       const widget = widgetContainers[0];
       const rect = widget.getBoundingClientRect();

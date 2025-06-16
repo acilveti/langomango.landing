@@ -95,7 +95,7 @@ export default function Hero() {
           <Description>
             {t('home:hero.description')}
           </Description>
-          <MobileDemoContainer ref={mobileDemoContainerRef}>
+          <MobileDemoContainer ref={mobileDemoContainerRef} className="reader-demo-container">
             <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </MobileDemoContainer>
         </MobileContents>
@@ -161,7 +161,7 @@ export default function Hero() {
         </TextColumn>
         
         <DemoColumn>
-          <DemoContainer ref={demoContainerRef}>
+          <DemoContainer ref={demoContainerRef} className="reader-demo-container">
             <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} />
           </DemoContainer>
         </DemoColumn>
@@ -246,7 +246,9 @@ const CustomButtonGroup = styled(ButtonGroup)`
 
 
 
-const DemoContainer = styled.div`
+const DemoContainer = styled.div.attrs({
+  'data-demo-container': 'true'
+})`
   width: 100%;
   max-width: 60rem;
   border-radius: 1.6rem;
@@ -257,7 +259,9 @@ const DemoContainer = styled.div`
   z-index: 15;
 `;
 
-const MobileDemoContainer = styled.div`
+const MobileDemoContainer = styled.div.attrs({
+  'data-demo-container': 'true'
+})`
   width: 100%;
   margin: 2rem 0;
   border-radius: 1.2rem;
