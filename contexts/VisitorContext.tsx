@@ -96,8 +96,10 @@ const detectBrowserLanguage = (): Language | null => {
   const browserLang = navigator.language || (navigator as any).userLanguage || 'en';
   const langCode = browserLang.split('-')[0].toLowerCase();
   
-  // Find matching language in our list
-  return DEFAULT_LANGUAGES.find(lang => lang.code === langCode) || null;
+  // Find matching language in our list, default to English if not found
+  return DEFAULT_LANGUAGES.find(lang => lang.code === langCode) || 
+         DEFAULT_LANGUAGES.find(lang => lang.code === 'en') || 
+         null;
 };
 
 // Helper function to get referral source from URL parameters or document referrer
@@ -151,9 +153,10 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     const detectedLang = detectBrowserLanguage();
     setNativeLanguage(detectedLang);
     
-    // If no default language is set, use the detected language
-    if (!defaultLanguage && detectedLang) {
-      setSelectedLanguage(detectedLang);
+    // If no default language is set, use German as default
+    if (!defaultLanguage) {
+      const germanLang = DEFAULT_LANGUAGES.find(lang => lang.code === 'de');
+      setSelectedLanguage(germanLang || DEFAULT_LANGUAGES[0]);
     }
     
     // Detect referral source
@@ -199,7 +202,7 @@ export const getLanguageByCode = (code: string, languages: Language[] = DEFAULT_
   return languages.find(lang => lang.code === code);
 };
 
-// Helper function to get default language
+// Helper function to get default language (German)
 export const getDefaultLanguage = (): Language => {
   return DEFAULT_LANGUAGES.find(lang => lang.code === 'de') || DEFAULT_LANGUAGES[0];
 };
