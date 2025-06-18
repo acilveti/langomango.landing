@@ -52,6 +52,7 @@ export default function ReaderDemoWidget({
   const [showBookAnimation, setShowBookAnimation] = useState(false);
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [signupError, setSignupError] = useState('');
+  const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -337,19 +338,24 @@ export default function ReaderDemoWidget({
         setHasClicked(true);
         // Hide word counts temporarily
         setShowWordCounts(false);
-        // Wait 3 seconds then show word counts again before updating global counter
+        setIsCalculatingWords(true); // Start loading animation
+        // Wait 2.9 seconds (just before 3 seconds) to stop loading
         setTimeout(() => {
-          setShowWordCounts(true);
-          // Update global counter 1 second after word counts appear
+          setIsCalculatingWords(false); // Stop loading animation
+          // Show word counts after a brief delay
           setTimeout(() => {
-            // Calculate total words from both pages
-            const page8Words = calculatePageWords(8);
-            const page9Words = calculatePageWords(9);
-            setWordsRead(page8Words + page9Words);
-            setJustUpdated(true);
-            setTimeout(() => setJustUpdated(false), 1000);
-          }, 1000);
-        }, 3000);
+            setShowWordCounts(true);
+            // Update global counter 1 second after word counts appear
+            setTimeout(() => {
+              // Calculate total words from both pages
+              const page8Words = calculatePageWords(8);
+              const page9Words = calculatePageWords(9);
+              setWordsRead(page8Words + page9Words);
+              setJustUpdated(true);
+              setTimeout(() => setJustUpdated(false), 1000);
+            }, 1000);
+          }, 100); // Small delay after loading completes
+        }, 2900); // Stop just before 3 seconds
       }
     }
   }, [currentPage, totalPages, handleInteraction, hasClicked, calculatePageWords]);
@@ -550,20 +556,25 @@ export default function ReaderDemoWidget({
           // If not already timing, start the 2-second visibility timer
           if (!visibilityTimerRef.current) {
             console.log('[checkVisibility] Setting 2-second visibility timer');
+            setIsCalculatingWords(true); // Start loading animation
             visibilityTimerRef.current = setTimeout(() => {
               console.log('[visibilityTimer] 2 seconds elapsed, updating word counts');
               hasStartedTimerRef.current = true;
-              // Show word counts first
-              setShowWordCounts(true);
-              console.log('[visibilityTimer] Word count badges shown');
-              // Then update global counter 1 second later
-              wordsTimerRef.current = setTimeout(() => {
-                const page8Words = calculatePageWordsRef.current?.(8) || 0;
-                console.log('[wordsTimer] Calculated page 8 words:', page8Words);
-                setWordsRead(page8Words);
-                setJustUpdated(true);
-                setTimeout(() => setJustUpdated(false), 1000);
-              }, 1000); // 1 second after word counts appear
+              // Stop loading animation just before showing word counts
+              setIsCalculatingWords(false);
+              // Show word counts after a brief delay
+              setTimeout(() => {
+                setShowWordCounts(true);
+                console.log('[visibilityTimer] Word count badges shown');
+                // Then update global counter 1 second later
+                wordsTimerRef.current = setTimeout(() => {
+                  const page8Words = calculatePageWordsRef.current?.(8) || 0;
+                  console.log('[wordsTimer] Calculated page 8 words:', page8Words);
+                  setWordsRead(page8Words);
+                  setJustUpdated(true);
+                  setTimeout(() => setJustUpdated(false), 1000);
+                }, 1000); // 1 second after word counts appear
+              }, 100); // Small delay after loading completes
             }, 2000); // Must be visible for 2 seconds
           }
         } else {
@@ -572,6 +583,7 @@ export default function ReaderDemoWidget({
             console.log('[checkVisibility] Reader not fully visible, clearing timer');
             clearTimeout(visibilityTimerRef.current);
             visibilityTimerRef.current = null;
+            setIsCalculatingWords(false); // Stop loading animation if reader is scrolled away
           }
         }
       }
@@ -755,7 +767,7 @@ export default function ReaderDemoWidget({
       </ReaderContainer>
 
       {/* Bottom Navigation Bar */}
-      <BottomBar $inModal={signupMode === 'fullscreen'}>
+      <BottomBar $inModal={signupMode === 'fullscreen'} $isLoading={isCalculatingWords}>
         <PageNavigation>
           <PageInputContainer>
             <PageInput
@@ -1031,6 +1043,15 @@ export default function ReaderDemoWidget({
 }
 
 // Animation Keyframes
+const loadingFill = keyframes`
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+`;
+
 const vibrateWithIntervals = keyframes`
   0%, 2% { transform: translateY(-50%) translateX(0); }
   2.5% { transform: translateY(-50%) translateX(-3px); }
@@ -1665,7 +1686,7 @@ const PopupArrow = styled.div`
   pointer-events: none;
 `;
 
-const BottomBar = styled.div<{ $inModal?: boolean }>`
+const BottomBar = styled.div<{ $inModal?: boolean; $isLoading?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1673,6 +1694,22 @@ const BottomBar = styled.div<{ $inModal?: boolean }>`
   padding: 1.5rem 2rem;
   border-radius: ${props => props.$inModal ? '0' : '0 0 1.6rem 1.6rem'};
   border-top: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  
+  /* Loading bar animation */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: #22c55e;
+    width: ${props => props.$isLoading ? '100%' : '0%'};
+    animation: ${props => props.$isLoading ? css`${loadingFill} 2s ease-out forwards` : 'none'};
+    transition: width 0.3s ease-out;
+    opacity: ${props => props.$isLoading ? '0.8' : '0'};
+  }
 `;
 
 const PageNavigation = styled.div`
