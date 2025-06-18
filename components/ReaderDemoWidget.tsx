@@ -85,6 +85,7 @@ export default function ReaderDemoWidget({
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
   const readerContainerRef = useRef<HTMLDivElement>(null);
+  const readerWrapperRef = useRef<HTMLDivElement>(null);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [popup, setPopup] = useState({
     visible: false,
@@ -532,53 +533,122 @@ export default function ReaderDemoWidget({
   const visibilityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedTimerRef = useRef(false);
 
-  // Auto-scroll to reader when it first becomes visible
+  // Smooth easing function for scroll animation
+  const easeInOutQuad = (t: number): number => {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  };
+
+  // Custom smooth scroll implementation
+  const smoothScrollTo = (targetY: number, duration: number = 1500) => {
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    let animationId: number | null = null;
+    let isCancelled = false;
+
+    // Cancel scroll on user interaction
+    const cancelScroll = () => {
+      isCancelled = true;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+
+    // Listen for user scroll/touch to cancel animation
+    const handleUserInteraction = () => {
+      cancelScroll();
+      window.removeEventListener('wheel', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
+    };
+    
+    window.addEventListener('wheel', handleUserInteraction, { passive: true });
+    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+
+    const animateScroll = (currentTime: number) => {
+      if (isCancelled) return;
+      
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeProgress = easeInOutQuad(progress);
+      
+      window.scrollTo(0, startY + distance * easeProgress);
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animateScroll);
+      } else {
+        // Cleanup listeners when animation completes
+        window.removeEventListener('wheel', handleUserInteraction);
+        window.removeEventListener('touchstart', handleUserInteraction);
+      }
+    };
+    
+    animationId = requestAnimationFrame(animateScroll);
+  };
+
+  // Auto-scroll to reader when it becomes visible
   useEffect(() => {
     // Only auto-scroll if not in fullscreen mode and haven't scrolled yet
-    if (readerContainerRef.current && !hasAutoScrolled && signupMode !== 'fullscreen') {
-      // Use IntersectionObserver to detect when reader enters viewport
+    if (!hasAutoScrolled && signupMode !== 'fullscreen' && readerWrapperRef.current) {
+      // Use IntersectionObserver on the reader wrapper itself
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
-            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-              // Reader is at least 10% visible
+            // Trigger when reader is at least 10% visible
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
               const rect = entry.target.getBoundingClientRect();
               const windowHeight = window.innerHeight;
-              const elementCenter = rect.top + rect.height / 2;
-              const windowCenter = windowHeight / 2;
-              const scrollDistance = elementCenter - windowCenter;
               
-              // Only scroll if the reader is not already centered (with some tolerance)
-              if (Math.abs(scrollDistance) > 100) {
-                const currentScrollY = window.scrollY;
-                const targetScrollY = currentScrollY + scrollDistance;
+              // Calculate exact center positions
+              const readerHeight = rect.height;
+              const readerTop = rect.top;
+              const readerCenter = readerTop + (readerHeight / 2);
+              const viewportCenter = windowHeight / 2;
+              
+              // Calculate how much we need to scroll
+              const currentScrollY = window.scrollY;
+              const scrollOffset = readerCenter - viewportCenter;
+              const targetScrollY = currentScrollY + scrollOffset;
+              
+              console.log('[Auto-scroll] Reader dimensions:', {
+                readerTop,
+                readerHeight,
+                readerCenter,
+                viewportCenter,
+                scrollOffset,
+                targetScrollY
+              });
+              
+              // Only scroll if the reader is not already centered (with tight tolerance)
+              if (Math.abs(scrollOffset) > 20) {
+                console.log('[Auto-scroll] Initiating scroll to center reader');
                 
-                // Smooth scroll to center with a slight delay for better UX
+                // Small delay then scroll
                 setTimeout(() => {
-                  window.scrollTo({
-                    top: targetScrollY,
-                    behavior: 'smooth'
-                  });
+                  smoothScrollTo(targetScrollY, 1500); // 1.5 seconds for smooth scroll
                   setHasAutoScrolled(true);
-                }, 300);
+                }, 200); // Small delay for better UX
+              } else {
+                // Already centered, just mark as scrolled
+                console.log('[Auto-scroll] Reader already centered');
+                setHasAutoScrolled(true);
               }
               
-              // Disconnect observer after first scroll
+              // Disconnect observer after first trigger
               observer.disconnect();
             }
           });
         },
         {
-          threshold: [0.1], // Trigger when 10% visible
-          rootMargin: '0px'
+          threshold: [0.1, 0.15], // Trigger when 10-15% is visible
+          rootMargin: '0px' // No early trigger
         }
       );
       
-      observer.observe(readerContainerRef.current);
+      observer.observe(readerWrapperRef.current);
       
       return () => observer.disconnect();
     }
-  }, [hasAutoScrolled, signupMode]); // Re-run if these change
+  }, [hasAutoScrolled, signupMode]); // Simple dependencies
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
@@ -680,6 +750,7 @@ export default function ReaderDemoWidget({
   return (
     <WidgetWrapper $expanded={showSignupExpanded} $isFullscreen={signupMode === 'fullscreen'} data-reader-widget="true">
       <ReaderWrapper 
+        ref={readerWrapperRef}
         className={showSignupExpanded && signupMode !== 'fullscreen' ? 'reader-wrapper' : ''} 
         data-reader-wrapper="true"
         $inModal={signupMode === 'fullscreen'}
