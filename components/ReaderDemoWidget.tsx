@@ -53,6 +53,7 @@ export default function ReaderDemoWidget({
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [signupError, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
+  const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -116,6 +117,7 @@ export default function ReaderDemoWidget({
     setShowWordCounts(false);
     setHasClicked(false);
     setJustUpdated(false);
+    setShouldAnimateButton(true); // Reset button animation state
     
     // Clear any running timers
     if (wordsTimerRef.current) {
@@ -339,9 +341,11 @@ export default function ReaderDemoWidget({
         // Hide word counts temporarily
         setShowWordCounts(false);
         setIsCalculatingWords(true); // Start loading animation
+        setShouldAnimateButton(false); // Stop button animation during loading
         // Wait 2.9 seconds (just before 3 seconds) to stop loading
         setTimeout(() => {
           setIsCalculatingWords(false); // Stop loading animation
+          setShouldAnimateButton(true); // Start button animation after loading
           // Show word counts after a brief delay
           setTimeout(() => {
             setShowWordCounts(true);
@@ -557,11 +561,13 @@ export default function ReaderDemoWidget({
           if (!visibilityTimerRef.current) {
             console.log('[checkVisibility] Setting 2-second visibility timer');
             setIsCalculatingWords(true); // Start loading animation
+            setShouldAnimateButton(false); // Stop button animation during loading
             visibilityTimerRef.current = setTimeout(() => {
               console.log('[visibilityTimer] 2 seconds elapsed, updating word counts');
               hasStartedTimerRef.current = true;
               // Stop loading animation just before showing word counts
               setIsCalculatingWords(false);
+              setShouldAnimateButton(true); // Start button animation after loading
               // Show word counts after a brief delay
               setTimeout(() => {
                 setShowWordCounts(true);
@@ -584,6 +590,7 @@ export default function ReaderDemoWidget({
             clearTimeout(visibilityTimerRef.current);
             visibilityTimerRef.current = null;
             setIsCalculatingWords(false); // Stop loading animation if reader is scrolled away
+            setShouldAnimateButton(true); // Re-enable button animation
           }
         }
       }
@@ -661,6 +668,7 @@ export default function ReaderDemoWidget({
           onClick={handleNextPage} 
           disabled={currentPage === totalPages}
           aria-label="Next page"
+          $shouldAnimate={shouldAnimateButton}
         >
           &#8250;
           <PulseRing />
@@ -1399,21 +1407,23 @@ const ArrowIndicator = styled.div`
   }
 `;
 
-const NavButtonRight = styled.button`
+const NavButtonRight = styled.button<{ $shouldAnimate?: boolean }>`
   position: absolute;
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
-  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-  border: 2px solid #ff9800;
+  background: ${props => props.$shouldAnimate 
+    ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' 
+    : 'white'};
+  border: ${props => props.$shouldAnimate ? '2px solid #ff9800' : '1px solid #e5e7eb'};
   border-radius: 50%;
   font-size: 2.8rem;
-  font-weight: 600;
+  font-weight: ${props => props.$shouldAnimate ? '600' : '300'};
   line-height: 1;
-  color: white;
+  color: ${props => props.$shouldAnimate ? 'white' : '#4b5563'};
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 10;
   display: flex;
@@ -1423,37 +1433,43 @@ const NavButtonRight = styled.button`
   height: 4.5rem;
   overflow: visible;
   
-  /* Always apply animations with will-change for performance */
+  /* Apply animations conditionally based on $shouldAnimate prop */
   will-change: transform;
-  animation: ${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite;
-  animation-delay: 1s, 1s;
+  animation: ${props => props.$shouldAnimate ? css`${vibrateWithIntervals} 6s infinite, ${glow} 2s ease-in-out infinite` : 'none'};
+  animation-delay: ${props => props.$shouldAnimate ? '0.5s, 0.5s' : '0s'};
   animation-fill-mode: both;
   
   ${PulseRing} {
-    animation: ${pulse} 2s ease-out infinite;
+    animation: ${props => props.$shouldAnimate ? css`${pulse} 2s ease-out infinite` : 'none'};
+    animation-delay: ${props => props.$shouldAnimate ? '0.5s' : '0s'};
   }
   
   ${HintText} {
-    animation: ${fadeInOut} 4s ease-in-out infinite;
-    animation-delay: 2s;
+    animation: ${props => props.$shouldAnimate ? css`${fadeInOut} 4s ease-in-out infinite` : 'none'};
+    animation-delay: ${props => props.$shouldAnimate ? '1s' : '0s'};
   }
   
   ${ArrowIndicator} {
-    opacity: 1;
+    opacity: ${props => props.$shouldAnimate ? '1' : '0'};
   }
   
   &:hover:not(:disabled) {
-    animation-play-state: paused, paused;
+    animation-play-state: ${props => props.$shouldAnimate ? 'paused, paused' : 'running, running'};
     transform: translateY(-50%) scale(1.15);
-    box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
+    box-shadow: ${props => props.$shouldAnimate 
+      ? '0 8px 24px rgba(255, 152, 0, 0.4)' 
+      : '0 6px 16px rgba(0, 0, 0, 0.2)'};
+    background: ${props => props.$shouldAnimate 
+      ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' 
+      : '#f3f4f6'};
     
     ${PulseRing} {
-      animation-play-state: paused;
+      animation-play-state: ${props => props.$shouldAnimate ? 'paused' : 'running'};
     }
     
     ${HintText} {
-      opacity: 1;
-      animation: none;
+      opacity: ${props => props.$shouldAnimate ? '1' : '0'};
+      animation: ${props => props.$shouldAnimate ? 'none' : 'none'};
     }
   }
 
