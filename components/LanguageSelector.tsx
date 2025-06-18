@@ -1,16 +1,10 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { useVisitor } from 'contexts/VisitorContext';
+import { useVisitor, DEFAULT_LANGUAGES, Language } from 'contexts/VisitorContext';
 import LanguageSelectorModal from './LanguageSelectorModal';
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
-
-interface Language {
-  code: string;
-  name: string;
-  flag: string;
-}
 
 interface LanguageSelectorProps {
   languages?: Language[];
@@ -31,44 +25,7 @@ interface LanguageSelectorRef {
   resetStates: () => void;
 }
 
-const DEFAULT_LANGUAGES: Language[] = [
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
-  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
-  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
-  { code: 'it', name: 'Italian', flag: '🇮🇹' },
-  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
-  { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
-  { code: 'no', name: 'Norwegian', flag: '🇳🇴' },
-  { code: 'da', name: 'Danish', flag: '🇩🇰' },
-  { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
-  { code: 'pl', name: 'Polish', flag: '🇵🇱' },
-  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
-  { code: 'th', name: 'Thai', flag: '🇹🇭' },
-  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳' },
-  { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
-  { code: 'ms', name: 'Malay', flag: '🇲🇾' },
-  { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-  { code: 'el', name: 'Greek', flag: '🇬🇷' },
-  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
-  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
-  { code: 'cs', name: 'Czech', flag: '🇨🇿' },
-  { code: 'sk', name: 'Slovak', flag: '🇸🇰' },
-  { code: 'bg', name: 'Bulgarian', flag: '🇧🇬' },
-  { code: 'hr', name: 'Croatian', flag: '🇭🇷' },
-  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
-  { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
-  { code: 'et', name: 'Estonian', flag: '🇪🇪' },
-  { code: 'lv', name: 'Latvian', flag: '🇱🇻' },
-  { code: 'lt', name: 'Lithuanian', flag: '🇱🇹' },
-  { code: 'eu', name: 'Basque', flag: '🇪🇸' },
-];
+
 
 const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(({
   languages = DEFAULT_LANGUAGES,
@@ -199,7 +156,7 @@ LanguageSelector.displayName = 'LanguageSelector';
 export default LanguageSelector;
 
 // Export types for external use
-export type { Language, LanguageSelectorProps, LanguageSelectorRef };
+export type { LanguageSelectorProps, LanguageSelectorRef };
 
 // Animations
 const spin = keyframes`
