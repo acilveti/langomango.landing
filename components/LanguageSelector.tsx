@@ -1,7 +1,9 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState, lazy, Suspense } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import Collapse from 'components/Collapse';
 import { useVisitor } from 'contexts/VisitorContext';
+
+// Lazy load the modal to improve initial page load
+const LanguageSelectorModal = lazy(() => import('./LanguageSelectorModal'));
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
@@ -86,7 +88,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
 }, ref) => {
   const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -99,7 +101,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setSelectedLanguage(language);
     setContextLanguage(language); // Update context
     setHasSelectedLanguage(true); // Mark that user has selected a language
-    setIsLanguageDropdownOpen(false);
+    setIsModalOpen(false);
     
     // Call the immediate callback
     onLanguageSelect(language);
@@ -127,7 +129,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setShowConfirmation(false);
     setIsProcessing(false);
     setSelectedLanguage(null);
-    setIsLanguageDropdownOpen(false);
+    setIsModalOpen(false);
   };
 
   // Expose reset function via ref
@@ -137,45 +139,41 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
 
   return (
     <LanguageSelectorContainer 
-      className={className}
+      className={`language-selector-container ${className || ''}`}
       data-has-selection={hasSelectedLanguage}
       maxWidth={maxWidth}
     >
-      <LanguageDropdown 
-        onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)} 
-        isOpen={isLanguageDropdownOpen}
+      <LanguageDropdown
+        onClick={() => setIsModalOpen(true)}
         isDark={isDark}
       >
         <SelectedLanguage>
           {selectedLanguage && hasSelectedLanguage ? (
             <>
-              <LanguageFlag>{selectedLanguage.flag}</LanguageFlag>
-              <LanguageName isDark={isDark}>{selectedLanguage.name}</LanguageName>
+              <SelectedLanguageFlag>{selectedLanguage.flag}</SelectedLanguageFlag>
+              <SelectedLanguageName isDark={isDark}>{selectedLanguage.name}</SelectedLanguageName>
               {isProcessing && <ProcessingSpinner />}
               {showConfirmation && !isProcessing && <CheckmarkIcon>✓</CheckmarkIcon>}
             </>
           ) : (
             <PlaceholderText isDark={isDark}>{placeholder}</PlaceholderText>
           )}
-          <ChevronIcon isOpen={isLanguageDropdownOpen} isDark={isDark}>▼</ChevronIcon>
+          <ChevronIcon isDark={isDark}>▼</ChevronIcon>
         </SelectedLanguage>
       </LanguageDropdown>
 
-      <Collapse isOpen={isLanguageDropdownOpen} duration={300}>
-        <LanguageList isDark={isDark}>
-          {languages.map((language) => (
-            <LanguageOption
-              key={language.code}
-              isSelected={selectedLanguage?.code === language.code}
-              onClick={() => handleLanguageSelect(language)}
-              isDark={isDark}
-            >
-              <LanguageFlag>{language.flag}</LanguageFlag>
-              <LanguageName isDark={isDark}>{language.name}</LanguageName>
-            </LanguageOption>
-          ))}
-        </LanguageList>
-      </Collapse>
+      {/* Language Selection Modal */}
+      <Suspense fallback={null}>
+        <LanguageSelectorModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          languages={languages}
+          selectedLanguage={selectedLanguage}
+          onLanguageSelect={handleLanguageSelect}
+          isDark={isDark}
+          hasUserSelected={hasSelectedLanguage}
+        />
+      </Suspense>
 
       {/* Processing Message */}
       {showProcessingMessage && isProcessing && selectedLanguage && hasSelectedLanguage && (
@@ -321,18 +319,18 @@ const LanguageSelectorContainer = styled.div<{ maxWidth: string }>`
   position: relative;
   /* Ensure messages don't affect container height */
   min-height: 60px;
-  /* Allow overflow for messages */
+  /* Allow overflow for messages and dropdown */
   overflow: visible;
 `;
 
-const LanguageDropdown = styled.div<{ isOpen: boolean; isDark?: boolean }>`
+const LanguageDropdown = styled.div<{ isDark?: boolean }>`
   border: 2px solid ${props => props.isDark ? 'transparent' : '#e5e7eb'};
   border-radius: 0.5rem;
   background: ${props => props.isDark ? 'rgb(255, 152, 0)' : 'white'};
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   ${props => props.isDark && `
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   `}
@@ -347,14 +345,6 @@ const LanguageDropdown = styled.div<{ isOpen: boolean; isDark?: boolean }>`
       background: rgb(255, 162, 0);
     `}
   }
-
-  ${(props) =>
-    props.isOpen &&
-    `
-    border-color: ${props.isDark ? 'transparent' : 'rgb(255,152,0)'};
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  `}
 
   // Add vibration and border color animation when no language is selected
   ${LanguageSelectorContainer}:not([data-has-selection="true"]) & {
@@ -394,16 +384,10 @@ const PlaceholderText = styled.span<{ isDark?: boolean }>`
   animation: ${placeholderPulse} 2s ease-in-out infinite;
 `;
 
-const ChevronIcon = styled.span<{ isOpen: boolean; isDark?: boolean }>`
+const ChevronIcon = styled.span<{ isDark?: boolean }>`
   transition: transform 0.2s ease;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.9)' : '#6b7280'};
   font-size: 0.8rem;
-
-  ${(props) =>
-    props.isOpen &&
-    `
-    transform: rotate(180deg);
-  `}
 `;
 
 const ProcessingSpinner = styled.div`
@@ -424,69 +408,33 @@ const CheckmarkIcon = styled.span`
   animation: ${checkmarkBounce} 0.5s ease-out;
 `;
 
-const LanguageList = styled.div<{ isDark?: boolean }>`
-  border: 2px solid ${props => props.isDark ? 'transparent' : 'rgb(255, 152, 0)'};
-  border-top: none;
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-  background: ${props => props.isDark ? 'rgba(0, 0, 0, 0.9)' : 'white'};
-  max-height: 200px;
-  overflow-y: auto;
-  ${props => props.isDark && `
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  `}
-
-  /* Custom scrollbar for dark mode */
-  ${props => props.isDark && `
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 152, 0, 0.5);
-      border-radius: 4px;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 152, 0, 0.7);
-    }
-  `}
-`;
-
-const LanguageOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: ${(props) => {
-    if (props.isSelected) {
-      return props.isDark ? 'rgba(255,152,0,0.3)' : 'rgba(255,152,0,0.1)';
-    }
-    return 'transparent';
-  }};
-  color: ${props => props.isDark ? 'white' : 'inherit'};
-
-  &:hover {
-    background: ${props => props.isDark ? 'rgba(255, 152, 0, 0.2)' : 'rgba(255, 152, 0, 0.05)'};
-    transform: translateX(2px);
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid ${props => props.isDark ? 'rgba(255, 255, 255, 0.1)' : '#f3f4f6'};
-  }
-`;
-
 const LanguageFlag = styled.span`
+  font-size: 1.8rem;
+  line-height: 1;
+  
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+  }
+`;
+
+const SelectedLanguageFlag = styled(LanguageFlag)`
   font-size: 1.2rem;
   margin-right: 0.75rem;
 `;
 
 const LanguageName = styled.span<{ isDark?: boolean }>`
+  font-size: 0.9rem;
+  font-weight: ${props => props.isDark ? '500' : '500'};
+  color: ${props => props.isDark ? 'white' : '#374151'};
+  line-height: 1.2;
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
+`;
+
+const SelectedLanguageName = styled(LanguageName)`
   font-size: 1.2rem;
-  font-weight: ${props => props.isDark ? '500' : '400'};
-  color: ${props => props.isDark ? 'white' : 'inherit'};
 `;
 
 const ProcessingMessage = styled.div`

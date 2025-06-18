@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PortalProps {
@@ -7,22 +7,32 @@ interface PortalProps {
 }
 
 export default function Portal({ children, id = 'portal-root' }: PortalProps) {
-  const el = useRef<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const portalRoot = document.getElementById(id) || document.body;
-    if (!el.current) {
-      el.current = document.createElement('div');
+    setMounted(true);
+
+    // Create portal root if it doesn't exist
+    let portalRoot = document.getElementById(id);
+    if (!portalRoot) {
+      portalRoot = document.createElement('div');
+      portalRoot.setAttribute('id', id);
+      document.body.appendChild(portalRoot);
     }
 
-    portalRoot.appendChild(el.current);
-
     return () => {
-      if (el.current && portalRoot) {
-        portalRoot.removeChild(el.current);
+      // Clean up only if no other portals are using this root
+      const portalRoot = document.getElementById(id);
+      if (portalRoot && portalRoot.childNodes.length === 0) {
+        document.body.removeChild(portalRoot);
       }
     };
   }, [id]);
 
-  return el.current ? createPortal(children, el.current) : null;
+  if (!mounted) return null;
+
+  const portalRoot = document.getElementById(id);
+  if (!portalRoot) return null;
+
+  return createPortal(children, portalRoot);
 }
