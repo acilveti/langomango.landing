@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
+import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService } from 'services/apiService';
-import { readerTranslations, getFallbackTranslation } from 'data/readerTranslations';
+import { media } from 'utils/media';
 
 // Type definitions
 interface ReaderDemoWidgetProps {
