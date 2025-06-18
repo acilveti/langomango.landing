@@ -54,6 +54,7 @@ export default function ReaderDemoWidget({
   const [signupError, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -530,6 +531,54 @@ export default function ReaderDemoWidget({
 
   const visibilityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedTimerRef = useRef(false);
+
+  // Auto-scroll to reader when it first becomes visible
+  useEffect(() => {
+    // Only auto-scroll if not in fullscreen mode and haven't scrolled yet
+    if (readerContainerRef.current && !hasAutoScrolled && signupMode !== 'fullscreen') {
+      // Use IntersectionObserver to detect when reader enters viewport
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+              // Reader is at least 10% visible
+              const rect = entry.target.getBoundingClientRect();
+              const windowHeight = window.innerHeight;
+              const elementCenter = rect.top + rect.height / 2;
+              const windowCenter = windowHeight / 2;
+              const scrollDistance = elementCenter - windowCenter;
+              
+              // Only scroll if the reader is not already centered (with some tolerance)
+              if (Math.abs(scrollDistance) > 100) {
+                const currentScrollY = window.scrollY;
+                const targetScrollY = currentScrollY + scrollDistance;
+                
+                // Smooth scroll to center with a slight delay for better UX
+                setTimeout(() => {
+                  window.scrollTo({
+                    top: targetScrollY,
+                    behavior: 'smooth'
+                  });
+                  setHasAutoScrolled(true);
+                }, 300);
+              }
+              
+              // Disconnect observer after first scroll
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          threshold: [0.1], // Trigger when 10% visible
+          rootMargin: '0px'
+        }
+      );
+      
+      observer.observe(readerContainerRef.current);
+      
+      return () => observer.disconnect();
+    }
+  }, [hasAutoScrolled, signupMode]); // Re-run if these change
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
