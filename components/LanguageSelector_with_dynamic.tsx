@@ -154,11 +154,11 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         onClick={() => setIsModalOpen(true)}
         isDark={isDark}
       >
-        <SelectedLanguage>
+        <SelectedLanguageWrapper>
           {selectedLanguage && hasSelectedLanguage ? (
             <>
               <SelectedLanguageFlag>{selectedLanguage.flag}</SelectedLanguageFlag>
-              <SelectedLanguageName isDark={isDark}>{selectedLanguage.name}</SelectedLanguageName>
+              <SelectedLanguageText isDark={isDark}>{selectedLanguage.name}</SelectedLanguageText>
               {isProcessing && <ProcessingSpinner />}
               {showConfirmation && !isProcessing && <CheckmarkIcon>✓</CheckmarkIcon>}
             </>
@@ -166,7 +166,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
             <PlaceholderText isDark={isDark}>{placeholder}</PlaceholderText>
           )}
           <ChevronIcon isDark={isDark}>▼</ChevronIcon>
-        </SelectedLanguage>
+        </SelectedLanguageWrapper>
       </LanguageDropdown>
 
       {/* Language Selection Modal */}
@@ -218,6 +218,14 @@ const spin = keyframes`
   100% {
     transform: rotate(360deg);
   }
+`;
+
+const SelectedLanguageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
 `;
 
 const fadeInUp = keyframes`
@@ -345,4 +353,99 @@ const LanguageDropdown = styled.div<{ isDark?: boolean }>`
     transform: translateY(-2px);
     box-shadow: ${props => props.isDark 
       ? '0 8px 16px rgba(0, 0, 0, 0.2)' 
-      : '0
+      : '0 4px 10px rgba(0, 0, 0, 0.1)'};
+  }
+`;
+
+const SelectedLanguageFlag = styled.span`
+  font-size: 1.5rem;
+`;
+
+const SelectedLanguageText = styled.span<{ isDark?: boolean }>`
+  font-size: 1rem;
+  color: ${props => props.isDark ? 'white' : '#374151'};
+  font-weight: 500;
+`;
+
+const ProcessingSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+  margin-left: auto;
+`;
+
+const CheckmarkIcon = styled.span`
+  color: #22c55e;
+  font-size: 1.2rem;
+  margin-left: auto;
+  animation: ${checkmarkBounce} 0.4s ease-out;
+`;
+
+const PlaceholderText = styled.span<{ isDark?: boolean }>`
+  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.8)' : '#9ca3af'};
+  font-size: 1rem;
+`;
+
+const ChevronIcon = styled.span<{ isDark?: boolean }>`
+  color: ${props => props.isDark ? 'white' : '#6b7280'};
+  font-size: 0.75rem;
+  margin-left: auto;
+  transition: transform 0.3s ease;
+  
+  ${LanguageDropdown}:hover & {
+    transform: translateY(2px);
+  }
+`;
+
+const ProcessingMessage = styled.div`
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: #eff6ff;
+  border: 1px solid #3b82f6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: ${fadeInUp} 0.3s ease-out;
+  z-index: 10;
+`;
+
+const ProcessingIcon = styled.span`
+  font-size: 1.2rem;
+`;
+
+const ProcessingText = styled.span`
+  color: #1e40af;
+  font-size: 0.875rem;
+`;
+
+const ConfirmationMessage = styled.div`
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: ${fadeInUp} 0.3s ease-out, ${pulse} 2s ease-out infinite;
+  z-index: 10;
+`;
+
+const ConfirmationIcon = styled.span`
+  font-size: 1.2rem;
+`;
+
+const ConfirmationText = styled.span`
+  color: #166534;
+  font-size: 0.875rem;
+`;
