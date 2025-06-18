@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { useVisitor, DEFAULT_LANGUAGES, Language } from 'contexts/VisitorContext';
+import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import LanguageSelectorModal from './LanguageSelectorModal';
 
 // Define the proper type for objectFit
