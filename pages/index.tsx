@@ -35,7 +35,8 @@ import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackP
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
-import LanguageSelector, { Language } from 'components/LanguageSelector';
+import LanguageSelector from 'components/LanguageSelector';
+import { Language } from 'contexts/VisitorContext';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import ReaderDemoWidget from 'components/ReaderDemoWidget';
 import { useVisitor } from 'contexts/VisitorContext';
