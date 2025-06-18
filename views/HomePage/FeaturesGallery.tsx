@@ -11,7 +11,8 @@ import { useTranslation } from 'next-i18next';
 import ExpandingButton from 'components/ExpandingButton';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import LanguageRegistrationModal from 'components/LanguageRegistrationModal';
-import LanguageSelector, { Language } from 'components/LanguageSelector'; // Import the new component
+import LanguageSelector from 'components/LanguageSelector'; // Import the new component
+import { Language } from 'contexts/VisitorContext';
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';

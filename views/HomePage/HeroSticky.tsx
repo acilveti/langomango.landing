@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import LanguageSelector from 'components/LanguageSelector';
-import type { Language } from 'components/LanguageSelector';
+import type { Language } from 'contexts/VisitorContext';
 import ReaderDemo from 'components/ReaderDemoModal';
 import Portal from 'components/Portal';
 
