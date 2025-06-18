@@ -4,6 +4,7 @@ import { media } from 'utils/media';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { apiService } from 'services/apiService';
+import { readerTranslations, getFallbackTranslation } from 'data/readerTranslations';
 
 // Type definitions
 interface ReaderDemoWidgetProps {
@@ -94,124 +95,12 @@ export default function ReaderDemoWidget({
     return text.trim().split(/\s+/).length;
   };
 
-  // Define types for translations
-  interface TranslationMap {
-    [key: string]: string;
-  }
-
-  interface Translations {
-    [languageCode: string]: TranslationMap;
-  }
-
-  // Translations for different languages
-  const translations: Translations = {
-    de: {
-      'Where there was coral before,': 'Wo früher Korallen waren,',
-      'He opened his eyes': 'Er öffnete die Augen',
-      'The storm had grown worse': 'Der Sturm war schlimmer geworden',
-      'Joan struggled to his feet': 'Joan kämpfte sich auf die Füße',
-      'The door opened': 'Die Tür öffnete sich',
-      'His eyes burned from the salt': 'Seine Augen brannten vom Salz',
-      'Through the spray and darkness': 'Durch die Gischt und Dunkelheit',
-      'The ship groaned': 'Das Schiff ächzte',
-      'The deck was chaos': 'Das Deck war ein Chaos'
-    },
-    es: {
-      'Where there was coral before,': 'Donde antes había coral,',
-      'He opened his eyes': 'Abrió los ojos',
-      'The storm had grown worse': 'La tormenta había empeorado',
-      'Joan struggled to his feet': 'Joan luchó para ponerse de pie',
-      'The door opened': 'La puerta se abrió',
-      'His eyes burned from the salt': 'Sus ojos ardían por la sal',
-      'Through the spray and darkness': 'A través del rocío y la oscuridad',
-      'The ship groaned': 'El barco crujió',
-      'The deck was chaos': 'La cubierta era un caos'
-    },
-    fr: {
-      'Where there was coral before,': 'Là où il y avait du corail avant,',
-      'He opened his eyes': 'Il ouvrit les yeux',
-      'The storm had grown worse': 'La tempête avait empiré',
-      'Joan struggled to his feet': 'Joan se leva avec difficulté',
-      'The door opened': 'La porte s\'ouvrit',
-      'His eyes burned from the salt': 'Ses yeux brûlaient à cause du sel',
-      'Through the spray and darkness': 'À travers les embruns et l\'obscurité',
-      'The ship groaned': 'Le navire gémit',
-      'The deck was chaos': 'Le pont était le chaos'
-    },
-    it: {
-      'Where there was coral before,': 'Dove prima c\'era il corallo,',
-      'He opened his eyes': 'Aprì gli occhi',
-      'The storm had grown worse': 'La tempesta era peggiorata',
-      'Joan struggled to his feet': 'Joan si alzò a fatica',
-      'The door opened': 'La porta si aprì',
-      'His eyes burned from the salt': 'I suoi occhi bruciavano per il sale',
-      'Through the spray and darkness': 'Attraverso gli spruzzi e l\'oscurità',
-      'The ship groaned': 'La nave gemette',
-      'The deck was chaos': 'Il ponte era il caos'
-    },
-    pt: {
-      'Where there was coral before,': 'Onde antes havia coral,',
-      'He opened his eyes': 'Ele abriu os olhos',
-      'The storm had grown worse': 'A tempestade havia piorado',
-      'Joan struggled to his feet': 'Joan lutou para se levantar',
-      'The door opened': 'A porta se abriu',
-      'His eyes burned from the salt': 'Seus olhos ardiam do sal',
-      'Through the spray and darkness': 'Através do spray e da escuridão',
-      'The ship groaned': 'O navio gemeu',
-      'The deck was chaos': 'O convés era o caos'
-    },
-    zh: {
-      'Where there was coral before,': '以前有珊瑚的地方，',
-      'He opened his eyes': '他睁开了眼睛',
-      'The storm had grown worse': '暴风雨变得更糟了',
-      'Joan struggled to his feet': '琼挣扎着站起来',
-      'The door opened': '门打开了',
-      'His eyes burned from the salt': '他的眼睛被盐灼伤',
-      'Through the spray and darkness': '穿过浪花和黑暗',
-      'The ship groaned': '船呻吟着',
-      'The deck was chaos': '甲板一片混乱'
-    },
-    ja: {
-      'Where there was coral before,': '以前サンゴがあった場所に、',
-      'He opened his eyes': '彼は目を開いた',
-      'The storm had grown worse': '嵐はさらに悪化していた',
-      'Joan struggled to his feet': 'ジョアンは立ち上がろうと奮闘した',
-      'The door opened': 'ドアが開いた',
-      'His eyes burned from the salt': '彼の目は塩で焼けるようだった',
-      'Through the spray and darkness': '飛沫と暗闇を通して',
-      'The ship groaned': '船がうめいた',
-      'The deck was chaos': 'デッキは大混乱だった'
-    },
-    ko: {
-      'Where there was coral before,': '이전에 산호가 있던 곳에,',
-      'He opened his eyes': '그는 눈을 떴다',
-      'The storm had grown worse': '폭풍은 더욱 심해졌다',
-      'Joan struggled to his feet': '조안은 일어서려고 애썼다',
-      'The door opened': '문이 열렸다',
-      'His eyes burned from the salt': '그의 눈은 소금으로 타는 듯했다',
-      'Through the spray and darkness': '물보라와 어둠을 통해',
-      'The ship groaned': '배가 신음했다',
-      'The deck was chaos': '갑판은 혼돈이었다'
-    },
-    ru: {
-      'Where there was coral before,': 'Там, где раньше были кораллы,',
-      'He opened his eyes': 'Он открыл глаза',
-      'The storm had grown worse': 'Шторм усилился',
-      'Joan struggled to his feet': 'Жоан с трудом поднялся на ноги',
-      'The door opened': 'Дверь открылась',
-      'His eyes burned from the salt': 'Его глаза жгла соль',
-      'Through the spray and darkness': 'Сквозь брызги и темноту',
-      'The ship groaned': 'Корабль застонал',
-      'The deck was chaos': 'На палубе царил хаос'
-    }
-  };
-
   // Function to get translation based on selected language
   const getTranslation = (englishText: string) => {
     if (!currentLanguage || !englishText) return englishText;
     const langCode = currentLanguage.code;
-    const langTranslations = translations[langCode];
-    return langTranslations?.[englishText] || translations.de[englishText] || englishText;
+    const langTranslations = readerTranslations[langCode];
+    return langTranslations?.[englishText] || getFallbackTranslation(englishText);
   };
 
   // Handle language selection
