@@ -1363,6 +1363,8 @@ const ReaderContainer = styled.div<{ $inModal?: boolean }>`
   
   ${media('<=phone')} {
     padding: 1.5rem 4rem;
+    flex-direction: column;
+    gap: 2rem;
   }
 `;
 
@@ -1611,11 +1613,6 @@ const BookContent = styled.div`
     padding: 1.5rem 0.5rem;
     max-width: 100%;
     min-height: 30rem;
-  }
-  
-  ${media('<=phone')} {
-    padding: 1.5rem 1rem;
-    max-width: calc(100% - 8rem);
   }
 `;
 
