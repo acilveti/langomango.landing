@@ -539,33 +539,43 @@ export default function ReaderDemoWidget({
   };
 
   // Custom smooth scroll implementation
-  const smoothScrollTo = (targetY: number, duration: number = 1500) => {
+  const smoothScrollTo = (targetY: number, duration: number = 300) => {
     const startY = window.scrollY;
     const distance = targetY - startY;
     const startTime = performance.now();
     let animationId: number | null = null;
     let isCancelled = false;
 
-    // Cancel scroll on user interaction
-    const cancelScroll = () => {
-      isCancelled = true;
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
+    // Disable user scrolling
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
     };
 
-    // Listen for user scroll/touch to cancel animation
-    const handleUserInteraction = () => {
-      cancelScroll();
-      window.removeEventListener('wheel', handleUserInteraction);
-      window.removeEventListener('touchstart', handleUserInteraction);
-    };
+    // Add listeners to prevent scrolling
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+    window.addEventListener('keydown', preventScroll, { passive: false });
     
-    window.addEventListener('wheel', handleUserInteraction, { passive: true });
-    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    // Also prevent scrollbar interaction
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    const cleanup = () => {
+      // Re-enable scrolling
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+      window.removeEventListener('keydown', preventScroll);
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
 
     const animateScroll = (currentTime: number) => {
-      if (isCancelled) return;
+      if (isCancelled) {
+        cleanup();
+        return;
+      }
       
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -576,9 +586,8 @@ export default function ReaderDemoWidget({
       if (progress < 1) {
         animationId = requestAnimationFrame(animateScroll);
       } else {
-        // Cleanup listeners when animation completes
-        window.removeEventListener('wheel', handleUserInteraction);
-        window.removeEventListener('touchstart', handleUserInteraction);
+        // Animation complete, re-enable scrolling
+        cleanup();
       }
     };
     
@@ -589,66 +598,40 @@ export default function ReaderDemoWidget({
   useEffect(() => {
     // Only auto-scroll if not in fullscreen mode and haven't scrolled yet
     if (!hasAutoScrolled && signupMode !== 'fullscreen' && readerWrapperRef.current) {
-      // Use IntersectionObserver on the reader wrapper itself
       const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(entry => {
-            // Trigger when reader is at least 10% visible
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
-              const rect = entry.target.getBoundingClientRect();
-              const windowHeight = window.innerHeight;
+        ([entry]) => {
+          // Trigger when 10% is visible
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
+            const rect = entry.target.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const readerCenter = rect.top + (rect.height / 2);
+            const viewportCenter = windowHeight / 2;
+            const scrollOffset = readerCenter - viewportCenter;
+            
+            // Only scroll if not already centered
+            if (Math.abs(scrollOffset) > 30) {
+              const targetScrollY = window.scrollY + scrollOffset;
               
-              // Calculate exact center positions
-              const readerHeight = rect.height;
-              const readerTop = rect.top;
-              const readerCenter = readerTop + (readerHeight / 2);
-              const viewportCenter = windowHeight / 2;
-              
-              // Calculate how much we need to scroll
-              const currentScrollY = window.scrollY;
-              const scrollOffset = readerCenter - viewportCenter;
-              const targetScrollY = currentScrollY + scrollOffset;
-              
-              console.log('[Auto-scroll] Reader dimensions:', {
-                readerTop,
-                readerHeight,
-                readerCenter,
-                viewportCenter,
-                scrollOffset,
-                targetScrollY
-              });
-              
-              // Only scroll if the reader is not already centered (with tight tolerance)
-              if (Math.abs(scrollOffset) > 20) {
-                console.log('[Auto-scroll] Initiating scroll to center reader');
-                
-                // Small delay then scroll
-                setTimeout(() => {
-                  smoothScrollTo(targetScrollY, 1500); // 1.5 seconds for smooth scroll
-                  setHasAutoScrolled(true);
-                }, 200); // Small delay for better UX
-              } else {
-                // Already centered, just mark as scrolled
-                console.log('[Auto-scroll] Reader already centered');
-                setHasAutoScrolled(true);
-              }
-              
-              // Disconnect observer after first trigger
-              observer.disconnect();
+              // Start scrolling immediately with fast animation
+              smoothScrollTo(targetScrollY, 300); // 0.3 seconds - very fast
             }
-          });
+            
+            setHasAutoScrolled(true);
+            observer.disconnect();
+          }
         },
         {
-          threshold: [0.1, 0.15], // Trigger when 10-15% is visible
-          rootMargin: '0px' // No early trigger
+          threshold: 0.1, // Trigger when 10% visible
+          rootMargin: '0px'
         }
       );
       
+      // Start observing immediately
       observer.observe(readerWrapperRef.current);
       
       return () => observer.disconnect();
     }
-  }, [hasAutoScrolled, signupMode]); // Simple dependencies
+  }, [hasAutoScrolled, signupMode]);
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
