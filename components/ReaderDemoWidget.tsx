@@ -14,6 +14,7 @@ interface ReaderDemoWidgetProps {
   useInlineSignup?: boolean;
   signupMode?: 'panel' | 'fullscreen';
   onSignupVisibilityChange?: (isVisible: boolean) => void;
+  isFullRegister?: boolean;
 }
 
 export default function ReaderDemoWidget({ 
@@ -22,7 +23,8 @@ export default function ReaderDemoWidget({
   onLanguageChange, 
   useInlineSignup = false,
   signupMode = 'panel',
-  onSignupVisibilityChange
+  onSignupVisibilityChange,
+  isFullRegister = true
 }: ReaderDemoWidgetProps) {
   const { 
     selectedLanguage: contextLanguage, 
@@ -55,6 +57,8 @@ export default function ReaderDemoWidget({
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+  const [registrationEmail, setRegistrationEmail] = useState('');
+  const [hasRegistered, setHasRegistered] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -407,6 +411,7 @@ export default function ReaderDemoWidget({
   // Handle demo signup with level selection
   const handleLevelSelect = useCallback(async (level: string) => {
     if (!hasSelectedTarget || isEditingTarget) return;
+    if (isFullRegister && !hasRegistered) return;
     
     setSelectedLevel(level);
     setSignupError('');
@@ -983,7 +988,36 @@ export default function ReaderDemoWidget({
                   </LanguagePickerContainer>
                 )}
                 
-                <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
+                {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
+                  <CompactRegistrationSection>
+                    <EmailRegistrationInputCompact
+                      type="email"
+                      placeholder="Email"
+                      value={registrationEmail}
+                      onChange={(e) => setRegistrationEmail(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail)) {
+                          setHasRegistered(true);
+                        }
+                      }}
+                    />
+                    <OrDividerCompact>or</OrDividerCompact>
+                    <GoogleSignupButtonCompact onClick={() => {
+                      handleGoogleSignup();
+                      setHasRegistered(true);
+                    }}>
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      Continue with Google
+                    </GoogleSignupButtonCompact>
+                  </CompactRegistrationSection>
+                )}
+                
+                <LevelSelectorContainer $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered)}>
                   <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
                   <LevelButtons>
                     <LevelButton 
@@ -1064,6 +1098,11 @@ export default function ReaderDemoWidget({
               <PromptIcon>👆</PromptIcon>
               Please select your target language to continue
               </PromptMessage>
+              ) : (isFullRegister && !hasRegistered) ? (
+                <PromptMessage>
+                  <PromptIcon>📧</PromptIcon>
+                  Please create an account to continue
+                </PromptMessage>
               ) : (!selectedLevel && hasSelectedTarget) ? (
                   <PromptMessage>
                     <PromptIcon>🎯</PromptIcon>
@@ -3175,6 +3214,318 @@ const LanguagePickerOption = styled.button<{ $isSelected: boolean }>`
     
     span:last-child {
       font-size: 1.1rem;
+    }
+  }
+`;
+
+// Registration Section Styles
+const RegistrationSection = styled.div<{ $isComplete: boolean }>`
+  background: ${props => props.$isComplete ? '#f0fdf4' : '#f8f9fa'};
+  border: 2px solid ${props => props.$isComplete ? '#22c55e' : '#e5e7eb'};
+  border-radius: 1.2rem;
+  padding: 2rem;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+  
+  ${media('<=tablet')} {
+    padding: 1.5rem;
+  }
+`;
+
+const RegistrationHeader = styled.div`
+  text-align: center;
+  margin-bottom: 1.5rem;
+`;
+
+const RegistrationTitle = styled.h3`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+  }
+`;
+
+const RegistrationSubtitle = styled.p`
+  font-size: 1.3rem;
+  color: #6b7280;
+  margin: 0;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+  }
+`;
+
+const RegistrationOptions = styled.div`
+  display: flex;
+  gap: 2rem;
+  align-items: stretch;
+  
+  ${media('<=tablet')} {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+`;
+
+const RegistrationColumn = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const RegistrationMethod = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+`;
+
+const MethodLabel = styled.label`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+`;
+
+const EmailRegistrationInput = styled.input`
+  padding: 1.2rem 1.5rem;
+  font-size: 1.4rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.8rem;
+  outline: none;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+const EmailSignupButton = styled.button`
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 1.2rem 2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover:not(:disabled) {
+    background: #f57c00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+  }
+`;
+
+const OrDivider = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: 100%;
+    background: #e5e7eb;
+  }
+  
+  ${media('<=tablet')} {
+    &::before {
+      width: 100%;
+      height: 1px;
+    }
+  }
+`;
+
+const OrText = styled.span`
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  color: #6b7280;
+  font-size: 1.2rem;
+  font-weight: 500;
+  z-index: 1;
+  position: relative;
+`;
+
+const GoogleSignupButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1.2rem 2rem;
+  background: white;
+  border: 2px solid #e1e5e9;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const GoogleNote = styled.p`
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+  text-align: center;
+`;
+
+// Compact Registration Section Styles
+const CompactRegistrationSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  max-width: 550px;
+  margin: 0 auto;
+  
+  ${media('<=tablet')} {
+    gap: 0.8rem;
+    max-width: 100%;
+    padding: 1rem 0.5rem;
+  }
+  
+  ${media('<=phone')} {
+    gap: 0.6rem;
+  }
+`;
+
+const EmailRegistrationInputCompact = styled.input`
+  flex: 1.5;
+  min-width: 280px;
+  padding: 0.9rem 1.2rem;
+  font-size: 1.3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.8rem;
+  outline: none;
+  transition: all 0.2s ease;
+  background: white;
+  
+  &:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+  
+  ${media('<=tablet')} {
+    min-width: 140px;
+    flex: 1;
+    padding: 0.8rem 1rem;
+    font-size: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    min-width: 120px;
+    padding: 0.7rem 0.8rem;
+    font-size: 1.1rem;
+    
+    &::placeholder {
+      font-size: 1rem;
+    }
+  }
+`;
+
+const OrDividerCompact = styled.span`
+  color: #6b7280;
+  font-size: 1.2rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  padding: 0 0.5rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
+    padding: 0 0.3rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+    padding: 0 0.2rem;
+  }
+`;
+
+const GoogleSignupButtonCompact = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.4rem;
+  background: white;
+  border: 2px solid #e1e5e9;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 200px;
+  
+  &:hover {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+  
+  ${media('<=tablet')} {
+    min-width: auto;
+    padding: 0.8rem 1rem;
+    font-size: 1.2rem;
+    gap: 0.5rem;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  
+  ${media('<=phone')} {
+    padding: 0.7rem 0.8rem;
+    font-size: 1.1rem;
+    gap: 0.4rem;
+    
+    svg {
+      width: 14px;
+      height: 14px;
     }
   }
 `;
