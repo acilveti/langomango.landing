@@ -59,6 +59,7 @@ export default function ReaderDemoWidget({
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
   const [hasRegistered, setHasRegistered] = useState(false);
+  const [hasValidEmail, setHasValidEmail] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -66,6 +67,18 @@ export default function ReaderDemoWidget({
   // Initialize temp language states after currentLanguage is defined
   const [tempNativeLanguage, setTempNativeLanguage] = useState(nativeLanguage);
   const [tempTargetLanguage, setTempTargetLanguage] = useState(currentLanguage);
+  
+  // Update valid email state when email changes
+  useEffect(() => {
+    console.log('Email changed:', registrationEmail);
+    if (registrationEmail) {
+      const isValid = validateEmail(registrationEmail);
+      console.log('Is valid email:', isValid);
+      setHasValidEmail(isValid);
+    } else {
+      setHasValidEmail(false);
+    }
+  }, [registrationEmail]);
   
   // Check if we should show the language as not selected (if it's still the default German and user hasn't actively selected)
   useEffect(() => {
@@ -410,8 +423,16 @@ export default function ReaderDemoWidget({
 
   // Handle demo signup with level selection
   const handleLevelSelect = useCallback(async (level: string) => {
+    console.log('handleLevelSelect called:', {
+      hasSelectedTarget,
+      isEditingTarget,
+      isFullRegister,
+      hasRegistered,
+      hasValidEmail
+    });
+    
     if (!hasSelectedTarget || isEditingTarget) return;
-    if (isFullRegister && !hasRegistered) return;
+    if (isFullRegister && !hasRegistered && !hasValidEmail) return;
     
     setSelectedLevel(level);
     setSignupError('');
@@ -440,7 +461,7 @@ export default function ReaderDemoWidget({
       setIsLoadingSignup(false);
       setSelectedLevel('');
     }
-  }, [hasSelectedTarget, isEditingTarget, tempNativeLanguage, nativeLanguage, tempTargetLanguage]);
+  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage]);
 
   const hidePopup = useCallback(() => {
     setPopup(prev => ({ ...prev, visible: false }));
@@ -989,7 +1010,7 @@ export default function ReaderDemoWidget({
                 )}
                 
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasRegistered}>
+                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}>
                     <EmailRegistrationInputCompact
                       type="email"
                       placeholder="Email"
@@ -1000,7 +1021,8 @@ export default function ReaderDemoWidget({
                           setHasRegistered(true);
                         }
                       }}
-                      $needsAttention={hasSelectedTarget && !hasRegistered}
+                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                      $isValid={hasValidEmail}
                     />
                     <OrDividerCompact>or</OrDividerCompact>
                     <GoogleSignupButtonCompact 
@@ -1008,7 +1030,7 @@ export default function ReaderDemoWidget({
                         handleGoogleSignup();
                         setHasRegistered(true);
                       }}
-                      $needsAttention={hasSelectedTarget && !hasRegistered}
+                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
                     >
                       <svg viewBox="0 0 24 24" width="16" height="16">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1021,14 +1043,14 @@ export default function ReaderDemoWidget({
                   </CompactRegistrationSection>
                 )}
                 
-                <LevelSelectorContainer $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered)}>
+                <LevelSelectorContainer $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail)}>
                   <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
                   <LevelButtons>
                     <LevelButton 
                       $isActive={selectedLevel === 'A1'}
                       onClick={() => handleLevelSelect('A1')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🌱</LevelEmoji>
                       <LevelName>A1</LevelName>
@@ -1037,8 +1059,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'A2'}
                       onClick={() => handleLevelSelect('A2')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🌿</LevelEmoji>
                       <LevelName>A2</LevelName>
@@ -1047,8 +1069,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'B1'}
                       onClick={() => handleLevelSelect('B1')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🍀</LevelEmoji>
                       <LevelName>B1</LevelName>
@@ -1057,8 +1079,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'B2'}
                       onClick={() => handleLevelSelect('B2')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🌳</LevelEmoji>
                       <LevelName>B2</LevelName>
@@ -1067,8 +1089,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'C1'}
                       onClick={() => handleLevelSelect('C1')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🌲</LevelEmoji>
                       <LevelName>C1</LevelName>
@@ -1077,8 +1099,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'C2'}
                       onClick={() => handleLevelSelect('C2')}
-                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered && !hasValidEmail) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered || hasValidEmail)}
                     >
                       <LevelEmoji>🎯</LevelEmoji>
                       <LevelName>C2</LevelName>
@@ -1102,10 +1124,10 @@ export default function ReaderDemoWidget({
               <PromptIcon>👆</PromptIcon>
               Please select your target language to continue
               </PromptMessage>
-              ) : (isFullRegister && !hasRegistered) ? (
+              ) : (isFullRegister && !hasRegistered && !hasValidEmail) ? (
                 <PromptMessage>
                   <PromptIcon>📧</PromptIcon>
-                  Please create an account to continue
+                  Please enter your email or sign in with Google
                 </PromptMessage>
               ) : (!selectedLevel && hasSelectedTarget) ? (
                   <PromptMessage>
@@ -3541,11 +3563,11 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean }>`
   }
 `;
 
-const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean }>`
+const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; $isValid?: boolean }>`
   width: 160px;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;
-  border: 2px solid ${props => props.$needsAttention ? '#ff9800' : '#e5e7eb'};
+  border: 2px solid ${props => props.$isValid ? '#22c55e' : props.$needsAttention ? '#ff9800' : '#e5e7eb'};
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.3s ease;
@@ -3553,7 +3575,7 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean }
   position: relative;
   z-index: 20;
   
-  ${props => props.$needsAttention && css`
+  ${props => props.$needsAttention && !props.$isValid && css`
     animation: ${levelPulse} 2s ease-in-out infinite;
     border-color: #ff9800;
     
@@ -3572,9 +3594,14 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean }
     }
   `}
   
+  ${props => props.$isValid && css`
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  `}
+  
   &:focus {
-    border-color: #ff9800;
-    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+    border-color: ${props => props.$isValid ? '#22c55e' : '#ff9800'};
+    box-shadow: 0 0 0 3px ${props => props.$isValid ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 152, 0, 0.1)'};
     width: calc(100% - 2rem);
     position: absolute;
     left: 1rem;
