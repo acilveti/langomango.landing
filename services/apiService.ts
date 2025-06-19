@@ -1,4 +1,5 @@
 // API configuration
+//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 // Type definitions
@@ -37,6 +38,27 @@ export interface DemoSignupResponse {
 export interface ApiError {
   error: string;
   success: false;
+}
+
+export interface DemoSignupEmailRequest {
+  email: string;
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+}
+
+export interface DemoSignupEmailResponse {
+  success: boolean;
+  token: string;
+  user: DemoUserInfo;
+  redirectUrl: string;
+}
+
+export interface RegisterWithGoogleRequest {
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+  referralCode?: string;
 }
 
 // API service class
@@ -91,6 +113,32 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+
+  // Demo signup with email endpoint
+  async demoSignupWithEmail(data: DemoSignupEmailRequest): Promise<DemoSignupEmailResponse> {
+    return this.request<DemoSignupEmailResponse>('/auth/demo-signup-email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Helper to get the Google login URL with language preferences
+  getGoogleLoginUrl(params: RegisterWithGoogleRequest): string {
+    const queryParams = new URLSearchParams({
+      returnUrl: '/sign-up',
+      frontendRedirectUrl: window.location.origin,
+      ...(params.referralCode && { referralCode: params.referralCode })
+    });
+    
+    // Store language preferences in session storage for after redirect
+    sessionStorage.setItem('languagePreferences', JSON.stringify({
+      nativeLanguage: params.nativeLanguage,
+      targetLanguage: params.targetLanguage,
+      level: params.level
+    }));
+    
+    return `${this.baseUrl}/auth/login-google?${queryParams.toString()}`;
   }
 }
 

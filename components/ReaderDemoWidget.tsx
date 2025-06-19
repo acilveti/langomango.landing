@@ -438,6 +438,8 @@ export default function ReaderDemoWidget({
   }, [email]);
 
   const handleGoogleSignup = useCallback(() => {
+    // For the compact registration section in the main flow
+    // We'll trigger the registration after Google auth completes
     window.location.href = 'https://staging.langomango.com/auth/login-google?returnUrl=/sign-up&frontendRedirectUrl=https://beta-app.langomango.com/';
   }, []);
 
@@ -452,28 +454,67 @@ export default function ReaderDemoWidget({
     setShowBookAnimation(true);
     
     try {
-      const response = await apiService.demoSignup({
-        nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-        targetLanguage: tempTargetLanguage.code,
-        level: level
-      });
-      
-      if (response.success && response.redirectUrl) {
-        // Wait a bit for animation before redirecting
-        setTimeout(() => {
-          window.location.href = response.redirectUrl;
-        }, 1500);
+      if (isFullRegister && (hasRegistered || hasValidEmail)) {
+        // Registered user flow - register with email and language preferences
+        if (registrationEmail && hasValidEmail) {
+          const response = await apiService.demoSignupWithEmail({
+            email: registrationEmail,
+            nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+            targetLanguage: tempTargetLanguage.code,
+            level: level
+          });
+          
+          if (response.success && response.token) {
+            // Store token in localStorage
+            localStorage.setItem('token', response.token);
+            
+            // Redirect to app
+            if (response.redirectUrl) {
+              setTimeout(() => {
+                window.location.href = response.redirectUrl;
+              }, 1500);
+            } else {
+              // Fallback redirect
+              const appUrl = 'https://beta-app.langomango.com';
+              setTimeout(() => {
+                window.location.href = `${appUrl}/reader`;
+              }, 1500);
+            }
+          }
+        } else if (hasRegistered) {
+          // Google signup flow - redirect to Google OAuth
+          const googleUrl = apiService.getGoogleLoginUrl({
+            nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+            targetLanguage: tempTargetLanguage.code,
+            level: level
+          });
+          window.location.href = googleUrl;
+        }
       } else {
-        throw new Error('Invalid response from server');
+        // Demo user flow
+        const response = await apiService.demoSignup({
+          nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+          targetLanguage: tempTargetLanguage.code,
+          level: level
+        });
+        
+        if (response.success && response.redirectUrl) {
+          // Wait a bit for animation before redirecting
+          setTimeout(() => {
+            window.location.href = response.redirectUrl;
+          }, 1500);
+        } else {
+          throw new Error('Invalid response from server');
+        }
       }
     } catch (error) {
-      console.error('Demo signup error:', error);
-      setSignupError(error instanceof Error ? error.message : 'Failed to create demo account. Please try again.');
+      console.error('Signup error:', error);
+      setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
       setShowBookAnimation(false);
       setIsLoadingSignup(false);
       setSelectedLevel('');
     }
-  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage]);
+  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage, registrationEmail]);
 
   const hidePopup = useCallback(() => {
     setPopup(prev => ({ ...prev, visible: false }));
