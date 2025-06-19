@@ -61,6 +61,15 @@ export default function ReaderDemoWidget({
   const [hasRegistered, setHasRegistered] = useState(false);
   const [hasValidEmail, setHasValidEmail] = useState(false);
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
+  const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
+  
+  // Auto-open target language picker immediately when signup is shown
+  useEffect(() => {
+    if (showSignupExpanded && !hasSelectedTarget && !hasAutoOpenedLanguage) {
+      setIsEditingTarget(true);
+      setHasAutoOpenedLanguage(true);
+    }
+  }, [showSignupExpanded, hasSelectedTarget, hasAutoOpenedLanguage]);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
