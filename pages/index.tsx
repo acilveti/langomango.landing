@@ -61,6 +61,22 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
 
   // Check for OAuth return on mount
   useEffect(() => {
+    // Extract token from URL hash if present
+    const hash = window.location.hash;
+    if (hash && hash.includes('token=')) {
+      const tokenMatch = hash.match(/token=([^&]+)/);
+      if (tokenMatch && tokenMatch[1]) {
+        const token = decodeURIComponent(tokenMatch[1]);
+        console.log('Found JWT token in URL, storing in localStorage');
+        localStorage.setItem('token', token);
+        
+        // Clean up the hash from URL
+        const newUrl = new URL(window.location.href);
+        newUrl.hash = '';
+        window.history.replaceState({}, document.title, newUrl.toString());
+      }
+    }
+    
     // Parse URL more carefully to handle hash fragments
     const urlParams = new URLSearchParams(window.location.search);
     let state = urlParams.get('state');

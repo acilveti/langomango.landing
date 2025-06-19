@@ -666,20 +666,41 @@ export default function ReaderDemoWidget({
             }
           }
         } else if (hasRegistered) {
-          // Google signup flow - user already authenticated, create demo account
-          const response = await apiService.demoSignup({
-            nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-            targetLanguage: tempTargetLanguage.code,
-            level: level
-          });
+          // Google signup flow - user already authenticated, update their profile
+          // Check if we have a token from OAuth callback
+          const token = localStorage.getItem('token');
           
-          if (response.success && response.redirectUrl) {
-            // Wait a bit for animation before redirecting
-            setTimeout(() => {
-              window.location.href = response.redirectUrl;
-            }, 1500);
+          if (token) {
+            // User is authenticated, update their existing profile
+            const response = await apiService.updateDemoProfile({
+              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+              targetLanguage: tempTargetLanguage.code,
+              level: level
+            }, token);
+            
+            if (response.success && response.redirectUrl) {
+              // Wait a bit for animation before redirecting
+              setTimeout(() => {
+                window.location.href = response.redirectUrl;
+              }, 1500);
+            } else {
+              throw new Error('Invalid response from server');
+            }
           } else {
-            throw new Error('Invalid response from server');
+            // Fallback to demo signup if no token (shouldn't happen)
+            const response = await apiService.demoSignup({
+              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+              targetLanguage: tempTargetLanguage.code,
+              level: level
+            });
+            
+            if (response.success && response.redirectUrl) {
+              setTimeout(() => {
+                window.location.href = response.redirectUrl;
+              }, 1500);
+            } else {
+              throw new Error('Invalid response from server');
+            }
           }
         }
       } else {

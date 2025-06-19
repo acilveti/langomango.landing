@@ -1,5 +1,6 @@
 // API configuration
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
+//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 // Type definitions
 export interface DemoSignupRequest {
@@ -60,6 +61,18 @@ export interface RegisterWithGoogleRequest {
   referralCode?: string;
 }
 
+export interface UpdateDemoProfileRequest {
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+}
+
+export interface UpdateDemoProfileResponse {
+  success: boolean;
+  redirectUrl: string;
+  message: string;
+}
+
 // API service class
 class ApiService {
   private baseUrl: string;
@@ -74,14 +87,17 @@ class ApiService {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
-    const defaultOptions: RequestInit = {
+    const defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    const config: RequestInit = {
+      ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...defaultHeaders,
         ...options.headers,
       },
     };
-
-    const config = { ...defaultOptions, ...options };
 
     try {
       const response = await fetch(url, config);
@@ -119,6 +135,17 @@ class ApiService {
     return this.request<DemoSignupEmailResponse>('/auth/demo-signup-email', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  // Update demo profile endpoint for authenticated users
+  async updateDemoProfile(data: UpdateDemoProfileRequest, token: string): Promise<UpdateDemoProfileResponse> {
+    return this.request<UpdateDemoProfileResponse>('/auth/update-demo-profile', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
   }
 
