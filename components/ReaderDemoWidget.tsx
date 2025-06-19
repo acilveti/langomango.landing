@@ -989,7 +989,7 @@ export default function ReaderDemoWidget({
                 )}
                 
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                  <CompactRegistrationSection>
+                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasRegistered}>
                     <EmailRegistrationInputCompact
                       type="email"
                       placeholder="Email"
@@ -1000,12 +1000,16 @@ export default function ReaderDemoWidget({
                           setHasRegistered(true);
                         }
                       }}
+                      $needsAttention={hasSelectedTarget && !hasRegistered}
                     />
                     <OrDividerCompact>or</OrDividerCompact>
-                    <GoogleSignupButtonCompact onClick={() => {
-                      handleGoogleSignup();
-                      setHasRegistered(true);
-                    }}>
+                    <GoogleSignupButtonCompact 
+                      onClick={() => {
+                        handleGoogleSignup();
+                        setHasRegistered(true);
+                      }}
+                      $needsAttention={hasSelectedTarget && !hasRegistered}
+                    >
                       <svg viewBox="0 0 24 24" width="16" height="16">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -1023,8 +1027,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'A1'}
                       onClick={() => handleLevelSelect('A1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🌱</LevelEmoji>
                       <LevelName>A1</LevelName>
@@ -1033,8 +1037,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'A2'}
                       onClick={() => handleLevelSelect('A2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🌿</LevelEmoji>
                       <LevelName>A2</LevelName>
@@ -1043,8 +1047,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'B1'}
                       onClick={() => handleLevelSelect('B1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🍀</LevelEmoji>
                       <LevelName>B1</LevelName>
@@ -1053,8 +1057,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'B2'}
                       onClick={() => handleLevelSelect('B2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🌳</LevelEmoji>
                       <LevelName>B2</LevelName>
@@ -1063,8 +1067,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'C1'}
                       onClick={() => handleLevelSelect('C1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🌲</LevelEmoji>
                       <LevelName>C1</LevelName>
@@ -1073,8 +1077,8 @@ export default function ReaderDemoWidget({
                     <LevelButton 
                       $isActive={selectedLevel === 'C2'}
                       onClick={() => handleLevelSelect('C2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
+                      $isDisabled={(!hasSelectedTarget || isEditingTarget) || (isFullRegister && !hasRegistered) || isLoadingSignup}
+                      $needsSelection={hasSelectedTarget && !selectedLevel && (!isFullRegister || hasRegistered)}
                     >
                       <LevelEmoji>🎯</LevelEmoji>
                       <LevelName>C2</LevelName>
@@ -3422,14 +3426,14 @@ const OrDividerCompact = styled.span`
   }
 `;
 
-const GoogleSignupButtonCompact = styled.button`
+const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
   padding: 0.9rem 1.4rem;
   background: white;
-  border: 2px solid #e1e5e9;
+  border: 2px solid ${props => props.$needsAttention ? '#ff9800' : '#e1e5e9'};
   border-radius: 0.8rem;
   font-size: 1.3rem;
   font-weight: 500;
@@ -3438,12 +3442,39 @@ const GoogleSignupButtonCompact = styled.button`
   transition: all 0.3s ease;
   white-space: nowrap;
   width: 160px;
+  position: relative;
+  
+  ${props => props.$needsAttention && css`
+    animation: ${levelPulse} 2s ease-in-out infinite;
+    animation-delay: 0.5s;
+    border-color: #ff9800;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid #ff9800;
+      border-radius: 0.8rem;
+      opacity: 0;
+      animation: ${levelPulseRing} 2s ease-in-out infinite;
+      animation-delay: 0.5s;
+      pointer-events: none;
+    }
+  `}
   
   &:hover {
     background: #f8f9fa;
     border-color: #d1d5db;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation-play-state: paused;
+    
+    &::after {
+      animation-play-state: paused;
+    }
   }
   
   svg {
@@ -3475,7 +3506,7 @@ const GoogleSignupButtonCompact = styled.button`
   }
 `;
 
-const CompactRegistrationSection = styled.div`
+const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3510,11 +3541,11 @@ const CompactRegistrationSection = styled.div`
   }
 `;
 
-const EmailRegistrationInputCompact = styled.input`
+const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean }>`
   width: 160px;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid ${props => props.$needsAttention ? '#ff9800' : '#e5e7eb'};
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.3s ease;
@@ -3522,12 +3553,36 @@ const EmailRegistrationInputCompact = styled.input`
   position: relative;
   z-index: 20;
   
+  ${props => props.$needsAttention && css`
+    animation: ${levelPulse} 2s ease-in-out infinite;
+    border-color: #ff9800;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid #ff9800;
+      border-radius: 0.8rem;
+      opacity: 0;
+      animation: ${levelPulseRing} 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+  `}
+  
   &:focus {
     border-color: #ff9800;
     box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
     width: calc(100% - 2rem);
     position: absolute;
     left: 1rem;
+    animation: none;
+    
+    &::after {
+      display: none;
+    }
   }
   
   &::placeholder {
