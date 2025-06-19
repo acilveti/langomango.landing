@@ -60,6 +60,7 @@ export default function ReaderDemoWidget({
   const [registrationEmail, setRegistrationEmail] = useState('');
   const [hasRegistered, setHasRegistered] = useState(false);
   const [hasValidEmail, setHasValidEmail] = useState(false);
+  const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
   
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
@@ -70,13 +71,23 @@ export default function ReaderDemoWidget({
   
   // Update valid email state when email changes
   useEffect(() => {
-    console.log('Email changed:', registrationEmail);
     if (registrationEmail) {
       const isValid = validateEmail(registrationEmail);
-      console.log('Is valid email:', isValid);
       setHasValidEmail(isValid);
+      
+      // Show green border for 3 seconds when valid email is entered
+      if (isValid) {
+        setShowValidEmailIndicator(true);
+        const timer = setTimeout(() => {
+          setShowValidEmailIndicator(false);
+        }, 3000);
+        return () => clearTimeout(timer);
+      } else {
+        setShowValidEmailIndicator(false);
+      }
     } else {
       setHasValidEmail(false);
+      setShowValidEmailIndicator(false);
     }
   }, [registrationEmail]);
   
@@ -423,14 +434,6 @@ export default function ReaderDemoWidget({
 
   // Handle demo signup with level selection
   const handleLevelSelect = useCallback(async (level: string) => {
-    console.log('handleLevelSelect called:', {
-      hasSelectedTarget,
-      isEditingTarget,
-      isFullRegister,
-      hasRegistered,
-      hasValidEmail
-    });
-    
     if (!hasSelectedTarget || isEditingTarget) return;
     if (isFullRegister && !hasRegistered && !hasValidEmail) return;
     
@@ -1022,7 +1025,7 @@ export default function ReaderDemoWidget({
                         }
                       }}
                       $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
-                      $isValid={hasValidEmail}
+                      $isValid={showValidEmailIndicator}
                     />
                     <OrDividerCompact>or</OrDividerCompact>
                     <GoogleSignupButtonCompact 
