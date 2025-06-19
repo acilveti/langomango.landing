@@ -1,6 +1,5 @@
 // API configuration
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
 
 // Type definitions
 export interface DemoSignupRequest {
@@ -127,16 +126,18 @@ class ApiService {
   getGoogleLoginUrl(params: RegisterWithGoogleRequest): string {
     const queryParams = new URLSearchParams({
       returnUrl: '/sign-up',
-      frontendRedirectUrl: window.location.origin,
+      frontendRedirectUrl: 'https://beta-app.langomango.com/',
       ...(params.referralCode && { referralCode: params.referralCode })
     });
     
     // Store language preferences in session storage for after redirect
-    sessionStorage.setItem('languagePreferences', JSON.stringify({
-      nativeLanguage: params.nativeLanguage,
-      targetLanguage: params.targetLanguage,
-      level: params.level
-    }));
+    if (params.nativeLanguage || params.targetLanguage || params.level) {
+      sessionStorage.setItem('languagePreferences', JSON.stringify({
+        nativeLanguage: params.nativeLanguage,
+        targetLanguage: params.targetLanguage,
+        level: params.level
+      }));
+    }
     
     return `${this.baseUrl}/auth/login-google?${queryParams.toString()}`;
   }

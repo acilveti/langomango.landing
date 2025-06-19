@@ -57,6 +57,39 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [showReaderDemo, setShowReaderDemo] = useState(false);
   const languageSelectorRef = useRef<any>(null);
   const [darkenAmount, setDarkenAmount] = useState(0);
+  const [oauthReturnData, setOauthReturnData] = useState<{registered: boolean} | null>(null);
+
+  // Check for OAuth return on mount
+  useEffect(() => {
+    // Parse URL more carefully to handle hash fragments
+    const urlParams = new URLSearchParams(window.location.search);
+    let state = urlParams.get('state');
+    
+    // If state contains extra path info, extract just the state value
+    if (state && state.includes('/')) {
+      state = state.split('/')[0];
+    }
+    
+    console.log('Landing page checking for OAuth return, state:', state);
+    
+    // Check if we're returning from OAuth signup flow
+    if (state === 'oauth_signup_return') {
+      console.log('Detected OAuth signup return, opening reader demo modal');
+      
+      // Clean up URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('state');
+      // Also remove any hash fragment with token
+      newUrl.hash = '';
+      window.history.replaceState({}, document.title, newUrl.toString());
+      
+      // Set flag for reader demo widget to know it's an OAuth return
+      setOauthReturnData({ registered: true });
+      
+      // Open the modal immediately
+      setShowReaderDemo(true);
+    }
+  }, []);
 
   const handleLanguageSelect = useCallback((language: Language) => {
     console.log('Language selected:', language);
@@ -330,12 +363,14 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         <ReaderDemoModal 
           onClose={() => {
             setShowReaderDemo(false);
+            setOauthReturnData(null);
             // Reset language selector after closing modal
             if (languageSelectorRef.current) {
               languageSelectorRef.current.resetStates();
             }
           }} 
           selectedLanguage={selectedLanguage}
+          isOauthReturn={!!oauthReturnData}
         />
       )}
 

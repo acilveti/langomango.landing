@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 // Language type definition (same as in LanguageSelector)
 export interface Language {
@@ -143,20 +143,53 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   defaultLanguage = null,
   availableLanguages = DEFAULT_LANGUAGES 
 }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(defaultLanguage);
+  const [selectedLanguage, setSelectedLanguageState] = useState<Language | null>(defaultLanguage);
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
-  const [hasSelectedLanguage, setHasSelectedLanguage] = useState<boolean>(false);
+  const [hasSelectedLanguage, setHasSelectedLanguageState] = useState<boolean>(false);
 
+  // Load persisted data from localStorage on mount
   useEffect(() => {
-    // Detect native language on mount
-    const detectedLang = detectBrowserLanguage();
-    setNativeLanguage(detectedLang);
+    if (typeof window === 'undefined') return;
+
+    // Load persisted language preferences
+    const persistedData = localStorage.getItem('languagePreferences');
+    if (persistedData) {
+      try {
+        const data = JSON.parse(persistedData);
+        console.log('Loading persisted language preferences:', data);
+        
+        // Restore selected language
+        if (data.selectedLanguage) {
+          const lang = DEFAULT_LANGUAGES.find(l => l.code === data.selectedLanguage);
+          if (lang) {
+            setSelectedLanguageState(lang);
+            setHasSelectedLanguageState(true);
+          }
+        }
+        
+        // Restore native language
+        if (data.nativeLanguage) {
+          const lang = DEFAULT_LANGUAGES.find(l => l.code === data.nativeLanguage);
+          if (lang) {
+            setNativeLanguage(lang);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse persisted language preferences:', e);
+      }
+    }
     
-    // If no default language is set, use German as default
-    if (!defaultLanguage) {
+    // If no persisted native language, detect it
+    if (!nativeLanguage) {
+      const detectedLang = detectBrowserLanguage();
+      setNativeLanguage(detectedLang);
+    }
+    
+    // If no selected language, use German as default
+    if (!selectedLanguage && !persistedData) {
       const germanLang = DEFAULT_LANGUAGES.find(lang => lang.code === 'de');
-      setSelectedLanguage(germanLang || DEFAULT_LANGUAGES[0]);
+      setSelectedLanguageState(germanLang || DEFAULT_LANGUAGES[0]);
     }
     
     // Detect referral source
@@ -167,7 +200,56 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     if (source !== 'direct') {
       document.cookie = `referral_source=${source}; path=/; max-age=2592000`; // 30 days
     }
-  }, [defaultLanguage]);
+  }, []);
+
+  // Custom setSelectedLanguage that also persists to localStorage
+  const setSelectedLanguage = (language: Language | null) => {
+    setSelectedLanguageState(language);
+    
+    // Persist to localStorage
+    if (typeof window !== 'undefined') {
+      const currentData = localStorage.getItem('languagePreferences');
+      let data: any = {};
+      
+      try {
+        if (currentData) {
+          data = JSON.parse(currentData);
+        }
+      } catch (e) {
+        console.error('Failed to parse existing preferences:', e);
+      }
+      
+      data.selectedLanguage = language?.code || null;
+      if (nativeLanguage) {
+        data.nativeLanguage = nativeLanguage.code;
+      }
+      
+      localStorage.setItem('languagePreferences', JSON.stringify(data));
+      console.log('Persisted language preferences:', data);
+    }
+  };
+  
+  // Custom setHasSelectedLanguage that also persists
+  const setHasSelectedLanguage = (value: boolean) => {
+    setHasSelectedLanguageState(value);
+    
+    // Update localStorage
+    if (typeof window !== 'undefined') {
+      const currentData = localStorage.getItem('languagePreferences');
+      let data: any = {};
+      
+      try {
+        if (currentData) {
+          data = JSON.parse(currentData);
+        }
+      } catch (e) {
+        console.error('Failed to parse existing preferences:', e);
+      }
+      
+      data.hasSelected = value;
+      localStorage.setItem('languagePreferences', JSON.stringify(data));
+    }
+  };
 
   const value: VisitorContextType = {
     selectedLanguage,

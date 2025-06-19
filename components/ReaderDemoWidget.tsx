@@ -6,115 +6,115 @@ import { apiService } from 'services/apiService';
 
 // Import all styled components from the styles file
 import {
-  WidgetWrapper,
-  ReaderWrapper,
-  ReaderContainer,
-  NavButtonLeft,
-  NavButtonRight,
-  PulseRing,
-  HintText,
+  ArrowIcon,
   ArrowIndicator,
+  BackButton,
+  BookAnimationOverlay,
+  BookAnimationWrapper,
   BookContent,
-  ContentArea,
-  ParagraphContainer,
-  TranslatableText,
-  InlineTranslation,
-  OriginalText,
-  WordCountBadge,
-  TranslationText,
-  TranslationPopup,
-  PopupText,
-  PopupArrow,
+  BookIcon,
+  BookText,
   BottomBar,
-  PageNavigation,
-  PageNavButton,
-  PageInputContainer,
-  PageInput,
-  PageTotal,
-  LanguageSelectorContainer,
-  LanguageDropdown,
-  SelectedLanguage,
-  LanguageFlag,
-  LanguageName,
+  ButtonContainer,
   ChevronIcon,
-  LanguageList,
-  LanguageOption,
-  SuccessParticle,
-  WordsReadCounter,
-  WordsNumber,
-  WordsLabel,
-  SignupSection,
-  SignupCompact,
-  PromptText,
+  CloseButton,
   CompactFormRow,
-  EmailInputCompact,
-  SignupButtonCompact,
-  ErrorTextCompact,
+  CompactRegistrationSection,
+  ContentArea,
+  ContinueButton,
   DividerCompact,
   DividerLine,
   DividerText,
-  GoogleButtonCompact,
-  SignupExpandedWrapper,
-  SignupExpanded,
-  SignupTitle,
-  SignupSubtitle,
-  ButtonContainer,
+  EmailInputCompact,
   EmailInputExpanded,
+  EmailRegistrationInput,
+  EmailRegistrationInputCompact,
+  EmailSignupButton,
+  ErrorIcon,
+  ErrorMessage,
   ErrorText,
-  PrimaryButton,
+  ErrorTextCompact,
   GoogleButton,
-  LoginPrompt,
-  LoginLink,
-  CloseButton,
-  LanguageSetupContainer,
-  LanguageSetupRow,
+  GoogleButtonCompact,
+  GoogleNote,
+  GoogleSignupButton,
+  GoogleSignupButtonCompact,
+  HintText,
+  InlineTranslation,
   LanguageBox,
   LanguageBoxLabel,
   LanguageDisplay,
+  LanguageDropdown,
+  LanguageFlag,
+  LanguageList,
+  LanguageName,
   LanguageNote,
-  ArrowIcon,
-  LevelSelectorContainer,
-  BookAnimationWrapper,
-  BookAnimationOverlay,
-  BookIcon,
-  BookText,
-  LevelLabel,
-  LevelButtons,
-  LevelButton,
-  LevelEmoji,
-  LevelName,
-  LevelDesc,
-  ContinueButton,
-  SecondarySection,
-  SecondaryDivider,
-  SecondaryButtons,
-  SecondaryButton,
-  BackButton,
-  PromptMessage,
-  PromptIcon,
-  ErrorMessage,
-  ErrorIcon,
+  LanguageOption,
   LanguagePickerContainer,
   LanguagePickerGrid,
   LanguagePickerOption,
-  RegistrationSection,
-  RegistrationHeader,
-  RegistrationTitle,
-  RegistrationSubtitle,
-  RegistrationOptions,
-  RegistrationColumn,
-  RegistrationMethod,
+  LanguageSelectorContainer,
+  LanguageSetupContainer,
+  LanguageSetupRow,
+  LevelButton,
+  LevelButtons,
+  LevelDesc,
+  LevelEmoji,
+  LevelLabel,
+  LevelName,
+  LevelSelectorContainer,
+  LoginLink,
+  LoginPrompt,
   MethodLabel,
-  EmailRegistrationInput,
-  EmailSignupButton,
+  NavButtonLeft,
+  NavButtonRight,
   OrDivider,
-  OrText,
-  GoogleSignupButton,
-  GoogleNote,
   OrDividerCompact,
-  GoogleSignupButtonCompact,
-  CompactRegistrationSection,
-  EmailRegistrationInputCompact
+  OrText,
+  OriginalText,
+  PageInput,
+  PageInputContainer,
+  PageNavButton,
+  PageNavigation,
+  PageTotal,
+  ParagraphContainer,
+  PopupArrow,
+  PopupText,
+  PrimaryButton,
+  PromptIcon,
+  PromptMessage,
+  PromptText,
+  PulseRing,
+  ReaderContainer,
+  ReaderWrapper,
+  RegistrationColumn,
+  RegistrationHeader,
+  RegistrationMethod,
+  RegistrationOptions,
+  RegistrationSection,
+  RegistrationSubtitle,
+  RegistrationTitle,
+  SecondaryButton,
+  SecondaryButtons,
+  SecondaryDivider,
+  SecondarySection,
+  SelectedLanguage,
+  SignupButtonCompact,
+  SignupCompact,
+  SignupExpanded,
+  SignupExpandedWrapper,
+  SignupSection,
+  SignupSubtitle,
+  SignupTitle,
+  SuccessParticle,
+  TranslatableText,
+  TranslationPopup,
+  TranslationText,
+  WidgetWrapper,
+  WordCountBadge,
+  WordsLabel,
+  WordsNumber,
+  WordsReadCounter
 } from './ReaderDemoWidget.styles';
 
 // Type definitions
@@ -126,6 +126,7 @@ interface ReaderDemoWidgetProps {
   signupMode?: 'panel' | 'fullscreen';
   onSignupVisibilityChange?: (isVisible: boolean) => void;
   isFullRegister?: boolean;
+  openSignupDirectly?: boolean; // New prop to open signup immediately
 }
 
 export default function ReaderDemoWidget({ 
@@ -135,7 +136,8 @@ export default function ReaderDemoWidget({
   useInlineSignup = false,
   signupMode = 'panel',
   onSignupVisibilityChange,
-  isFullRegister = true
+  isFullRegister = true,
+  openSignupDirectly = false // New prop with default value
 }: ReaderDemoWidgetProps) {
   const { 
     selectedLanguage: contextLanguage, 
@@ -169,10 +171,68 @@ export default function ReaderDemoWidget({
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
-  const [hasRegistered, setHasRegistered] = useState(false);
+  const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
   const [hasValidEmail, setHasValidEmail] = useState(false);
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
+  
+  // Handle opening signup directly if prop is set OR if returning from OAuth
+  useEffect(() => {
+    console.log('ReaderDemoWidget mounted with props:', {
+      openSignupDirectly,
+      useInlineSignup,
+      signupMode,
+      isFullRegister
+    });
+    
+    // Check sessionStorage for OAuth return
+    const returnToWidget = sessionStorage.getItem('returnToWidget');
+    const registrationFlow = sessionStorage.getItem('registrationFlow');
+    
+    console.log('OAuth return check:', {
+      returnToWidget,
+      registrationFlow,
+      openSignupDirectly
+    });
+    
+    const shouldOpenSignup = openSignupDirectly || returnToWidget === 'true' || registrationFlow === 'google';
+    
+    if (shouldOpenSignup && useInlineSignup) {
+      console.log('ReaderDemoWidget: Opening signup (prop or OAuth return)');
+      console.log('Current language from context:', {
+        nativeLanguage: nativeLanguage?.name,
+        selectedLanguage: contextLanguage?.name,
+        hasSelectedLanguage
+      });
+      
+      // If OAuth return, handle the data
+      if (openSignupDirectly || returnToWidget === 'true' || registrationFlow === 'google') {
+        console.log('Setting hasRegistered to true');
+        // Clear the flags
+        sessionStorage.removeItem('returnToWidget');
+        sessionStorage.removeItem('registrationFlow');
+        
+        // Mark as registered
+        setHasRegistered(true);
+        
+        // Language preferences are already restored from localStorage by VisitorContext
+        // Just ensure we have the selected language marked as selected
+        if (contextLanguage && !hasSelectedLanguage) {
+          setHasSelectedLanguage(true);
+          setHasSelectedTarget(true);
+        }
+      }
+      
+      // Add a small delay to ensure component is fully mounted
+      setTimeout(() => {
+        console.log('Setting showSignupExpanded to true');
+        setShowSignupExpanded(true);
+        if (onSignupVisibilityChange) {
+          onSignupVisibilityChange(true);
+        }
+      }, 300); // Increased delay
+    }
+  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange]);
   
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
@@ -215,19 +275,27 @@ export default function ReaderDemoWidget({
   useEffect(() => {
     if (!hasSelectedLanguage && currentLanguage.code === 'de') {
       setHasSelectedTarget(false);
-    } else if (hasSelectedLanguage) {
+    } else if (hasSelectedLanguage || openSignupDirectly) {
       setHasSelectedTarget(true);
     }
-  }, [hasSelectedLanguage, currentLanguage.code]);
+  }, [hasSelectedLanguage, currentLanguage.code, openSignupDirectly]);
   
   // Update temp languages when context changes
   useEffect(() => {
-    setTempNativeLanguage(nativeLanguage);
+    if (nativeLanguage) {
+      setTempNativeLanguage(nativeLanguage);
+    }
   }, [nativeLanguage]);
   
   useEffect(() => {
-    setTempTargetLanguage(currentLanguage);
-  }, [currentLanguage]);
+    if (currentLanguage) {
+      setTempTargetLanguage(currentLanguage);
+      // If we have a selected language from context, ensure it's marked as selected
+      if (hasSelectedLanguage && currentLanguage.code !== 'de') {
+        setHasSelectedTarget(true);
+      }
+    }
+  }, [currentLanguage, hasSelectedLanguage]);
   
   const pageRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -549,9 +617,14 @@ export default function ReaderDemoWidget({
   }, [email]);
 
   const handleGoogleSignup = useCallback(() => {
-    // For the compact registration section in the main flow
-    // We'll trigger the registration after Google auth completes
-    window.location.href = 'https://staging.langomango.com/auth/login-google?returnUrl=/sign-up&frontendRedirectUrl=https://beta-app.langomango.com/';
+    // For the secondary signup flow
+    const baseUrl = 'https://staging.langomango.com';
+    const returnUrl = encodeURIComponent('/sign-up');
+    const frontendRedirectUrl = encodeURIComponent('https://beta-app.langomango.com/');
+    const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
+    
+    console.log('Redirecting to Google OAuth (secondary flow):', googleAuthUrl);
+    window.location.href = googleAuthUrl;
   }, []);
 
   // Handle demo signup with level selection
@@ -593,13 +666,21 @@ export default function ReaderDemoWidget({
             }
           }
         } else if (hasRegistered) {
-          // Google signup flow - redirect to Google OAuth
-          const googleUrl = apiService.getGoogleLoginUrl({
+          // Google signup flow - user already authenticated, create demo account
+          const response = await apiService.demoSignup({
             nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
             targetLanguage: tempTargetLanguage.code,
             level: level
           });
-          window.location.href = googleUrl;
+          
+          if (response.success && response.redirectUrl) {
+            // Wait a bit for animation before redirecting
+            setTimeout(() => {
+              window.location.href = response.redirectUrl;
+            }, 1500);
+          } else {
+            throw new Error('Invalid response from server');
+          }
         }
       } else {
         // Demo user flow
@@ -1191,8 +1272,28 @@ export default function ReaderDemoWidget({
                     <OrDividerCompact>or</OrDividerCompact>
                     <GoogleSignupButtonCompact 
                       onClick={() => {
-                        handleGoogleSignup();
-                        setHasRegistered(true);
+                        // Language preferences are already being persisted to localStorage by VisitorContext
+                        // Just ensure they're up to date
+                        if (tempTargetLanguage) {
+                          setContextLanguage(tempTargetLanguage);
+                        }
+                        
+                        // Mark that we're in the registration flow and need to return
+                        sessionStorage.setItem('registrationFlow', 'google');
+                        sessionStorage.setItem('returnToWidget', 'true');
+                        
+                        // Get current page URL and add state parameter
+                        const currentUrl = new URL(window.location.href);
+                        // Add state to indicate we should open signup modal on return
+                        currentUrl.searchParams.set('state', 'oauth_signup_return');
+                        
+                        // Build the Google OAuth URL
+                        const baseUrl = 'https://staging.langomango.com';
+                        // Don't include /landing-callback in returnUrl, just use root
+                        const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${encodeURIComponent('/')}&frontendRedirectUrl=${encodeURIComponent(currentUrl.toString())}`;
+                        
+                        console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
+                        window.location.href = googleAuthUrl;
                       }}
                       $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
                     >
@@ -1204,6 +1305,34 @@ export default function ReaderDemoWidget({
                       </svg>
                       <span>Google</span>
                     </GoogleSignupButtonCompact>
+                  </CompactRegistrationSection>
+                )}
+                
+                {/* Debug log */}
+                {console.log('Registration section render:', {
+                  isFullRegister,
+                  hasSelectedTarget,
+                  isEditingTarget,
+                  hasRegistered,
+                  shouldShowRegistration: isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered,
+                  shouldShowCompleted: isFullRegister && hasSelectedTarget && !isEditingTarget && hasRegistered
+                })}
+                
+                {isFullRegister && hasSelectedTarget && !isEditingTarget && hasRegistered && (
+                  <CompactRegistrationSection $isCompleted={true}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#22c55e',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Signed in with Google</span>
+                    </div>
                   </CompactRegistrationSection>
                 )}
                 

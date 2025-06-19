@@ -2311,7 +2311,7 @@ const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean }>`
   }
 `;
 
-const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean }>`
+const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean; $isCompleted?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2322,21 +2322,16 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean }>`
   width: 100%;
   max-width: 500px;
   
-  &:focus-within {
-    ${OrDividerCompact} {
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    ${GoogleSignupButtonCompact} {
-      opacity: 0;
-      pointer-events: none;
-    }
-  }
+  ${props => props.$isCompleted && css`
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 0.8rem;
+    padding: 1.2rem;
+  `}
   
   ${media('<=tablet')} {
     gap: 0.8rem;
-    padding: 1rem 0.5rem;
+    padding: ${props => props.$isCompleted ? '1rem' : '1rem 0.5rem'};
     max-width: 400px;
   }
   
@@ -2385,9 +2380,6 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; 
   &:focus {
     border-color: ${props => props.$isValid ? '#22c55e' : '#ff9800'};
     box-shadow: 0 0 0 3px ${props => props.$isValid ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 152, 0, 0.1)'};
-    width: calc(100% - 2rem);
-    position: absolute;
-    left: 1rem;
     animation: none;
     
     &::after {
@@ -2403,22 +2395,12 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; 
     width: 140px;
     padding: 0.8rem 1rem;
     font-size: 1.2rem;
-    
-    &:focus {
-      width: calc(100% - 1rem);
-      left: 0.5rem;
-    }
   }
   
   ${media('<=phone')} {
     width: 120px;
     padding: 0.7rem 0.8rem;
     font-size: 1.1rem;
-    
-    &:focus {
-      width: calc(100% - 1rem);
-      left: 0.5rem;
-    }
     
     &::placeholder {
       font-size: 1rem;

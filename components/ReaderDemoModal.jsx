@@ -7,8 +7,10 @@ import Overlay from './Overlay';
 import useEscClose from 'hooks/useEscKey';
 
 // Reader Demo Modal component
-export default function ReaderDemoModal({ onClose, selectedLanguage }) {
+export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false }) {
   const [showSignup, setShowSignup] = useState(false);
+  
+  console.log('ReaderDemoModal mounted with isOauthReturn:', isOauthReturn);
   
   useEscClose({ onClose });
 
@@ -31,6 +33,8 @@ export default function ReaderDemoModal({ onClose, selectedLanguage }) {
             useInlineSignup={true}
             signupMode="fullscreen"
             onSignupVisibilityChange={handleSignupShow}
+            isFullRegister={true}
+            openSignupDirectly={isOauthReturn}
           />
         </ReaderCard>
       </ModalContainer>
