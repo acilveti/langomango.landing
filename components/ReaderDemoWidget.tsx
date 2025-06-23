@@ -3,6 +3,7 @@ import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService } from 'services/apiService';
+import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
 
 // Import all styled components from the styles file
 import {
@@ -637,6 +638,15 @@ export default function ReaderDemoWidget({
     setShowBookAnimation(true);
     
     try {
+      // Track Reddit pixel signup event
+      trackRedditConversion(RedditEventTypes.SIGNUP, {
+        signup_type: 'demo',
+        native_language: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+        target_language: tempTargetLanguage.code,
+        level: level,
+        source: 'reader_widget'
+      });
+      
       const response = await apiService.demoSignup({
         nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
         targetLanguage: tempTargetLanguage.code,
