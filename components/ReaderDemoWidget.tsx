@@ -3,7 +3,7 @@ import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService } from 'services/apiService';
-import { trackRedditConversion, RedditEventTypes } from 'utils/redditPixel';
+import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 // Import all styled components from the styles file
 import {
