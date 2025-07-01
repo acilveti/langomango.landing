@@ -1087,15 +1087,20 @@ export default function ReaderDemoWidget({
                   } else if (segment.translationKey && segment.showTranslation) {
                     const translatedText = getTranslation(segment.translationKey);
                     const wordCount = getWordCount(translatedText);
+                    // Calculate animation delay based on segment position
+                    const animationDelay = index * 0.15 + segmentIndex * 0.1;
                     return (
                       <InlineTranslation key={key}>
-                        {showWordCounts && (
-                          <WordCountBadge key={`badge-${key}`}>
-                            {wordCount} words in {currentLanguage.name}
-                          </WordCountBadge>
-                        )}
-                        <OriginalText>{segment.text}</OriginalText>
-                        <TranslationText>{translatedText}</TranslationText>
+                        <WordCountBadge 
+                          key={`badge-${key}`}
+                          $isVisible={showWordCounts}
+                          $animationDelay={animationDelay}
+                          style={{ opacity: showWordCounts ? 1 : 0, visibility: showWordCounts ? 'visible' : 'hidden' }}
+                        >
+                          {wordCount} words in {currentLanguage.name}
+                        </WordCountBadge>
+                        <OriginalText $isVisible={showWordCounts} $animationDelay={animationDelay}>{segment.text}</OriginalText>
+                        <TranslationText $isVisible={showWordCounts} $animationDelay={animationDelay}>{translatedText}</TranslationText>
                       </InlineTranslation>
                     );
                   } else {

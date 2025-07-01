@@ -137,6 +137,42 @@ const slideInFade = keyframes`
   }
 `;
 
+const bounceIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-20px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  70% {
+    transform: scale(0.9) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+`;
+
+const shimmer = keyframes`
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+`;
+
+const badgeGlow = keyframes`
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  }
+`;
+
 const sparkle = keyframes`
   0%, 100% {
     opacity: 0;
@@ -550,6 +586,16 @@ const TranslatableText = styled.span`
 const InlineTranslation = styled.span`
   display: inline-block;
   position: relative;
+  /* Reserve space for word count badge to prevent layout shift */
+  padding-top: 2.5rem;
+  
+  ${media('<=tablet')} {
+    padding-top: 2.2rem;
+  }
+  
+  ${media('<=phone')} {
+    padding-top: 2rem;
+  }
 `;
 
 const TranslationHeader = styled.div`
@@ -559,11 +605,15 @@ const TranslationHeader = styled.div`
   margin-bottom: 0.2rem;
 `;
 
-const OriginalText = styled.span`
+const OriginalText = styled.span<{ $isVisible?: boolean; $animationDelay?: number }>`
   display: block;
   font-weight: bold;
   font-size: 1.8rem;
   line-height: 3rem;
+  
+  ${props => props.$isVisible && css`
+    animation: ${fadeInUp} 0.5s ease-out ${(props.$animationDelay || 0) + 0.1}s both;
+  `}
 
   ${media('<=tablet')} {
     font-size: 1.6rem;
@@ -571,46 +621,107 @@ const OriginalText = styled.span`
   }
 `;
 
-const WordCountBadge = styled.span`
-  display: block;
+const WordCountBadge = styled.span<{ $isVisible?: boolean; $animationDelay?: number }>`
+  position: absolute;
+  top: 0;
+  left: 0;
   font-size: 0.95rem;
   color: #2563eb;
-  background: #dbeafe;
+  background: linear-gradient(
+    90deg,
+    #dbeafe 0%,
+    #bfdbfe 45%,
+    #dbeafe 50%,
+    #bfdbfe 55%,
+    #dbeafe 100%
+  );
+  background-size: 200% 100%;
   padding: 0.2rem 0.6rem;
   border-radius: 0.5rem;
   font-weight: 600;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  animation: ${slideInFade} 0.5s ease-out;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
   white-space: nowrap;
-  margin-bottom: 0.5rem;
   width: fit-content;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+  
+  /* Apply animations when visible */
+  ${props => props.$isVisible && css`
+    animation: 
+      ${bounceIn} 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) ${props.$animationDelay || 0}s both,
+      ${shimmer} 2s ease-in-out ${(props.$animationDelay || 0) + 0.6}s,
+      ${badgeGlow} 2s ease-in-out ${(props.$animationDelay || 0) + 0.6}s;
+  `}
   
   &::before {
     content: '+';
     margin-right: 0.2rem;
     font-weight: 700;
+    display: inline-block;
+    ${props => props.$isVisible && css`
+      animation: ${pulse} 1s ease-out ${(props.$animationDelay || 0) + 0.3}s;
+    `}
+  }
+  
+  /* Sparkle effect */
+  &::after {
+    content: '✨';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 1.2rem;
+    opacity: 0;
+    ${props => props.$isVisible && css`
+      animation: ${sparkle} 1s ease-out ${(props.$animationDelay || 0) + 0.4}s forwards;
+    `}
   }
   
   ${media('<=tablet')} {
     font-size: 0.85rem;
     padding: 0.15rem 0.5rem;
-    margin-bottom: 0.4rem;
+    
+    &::after {
+      font-size: 1rem;
+      top: -6px;
+      right: -6px;
+    }
   }
   
   ${media('<=phone')} {
     font-size: 0.8rem;
     padding: 0.1rem 0.4rem;
-    margin-bottom: 0.3rem;
+    
+    &::after {
+      font-size: 0.9rem;
+      top: -5px;
+      right: -5px;
+    }
   }
 `;
 
-const TranslationText = styled.span`
+const fadeInUp = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const TranslationText = styled.span<{ $isVisible?: boolean; $animationDelay?: number }>`
   display: block;
   font-size: 1.8rem;
   line-height: 3rem;
   border-bottom: 1px dotted #ccc;
   padding-bottom: 1px;
+  
+  ${props => props.$isVisible && css`
+    animation: ${fadeInUp} 0.5s ease-out ${(props.$animationDelay || 0) + 0.2}s both;
+  `}
 
   ${media('<=tablet')} {
     font-size: 1.6rem;
