@@ -554,7 +554,7 @@ const ContentArea = styled.div`
 const ParagraphContainer = styled.div<{ $indent: boolean; $isLast: boolean }>`
   padding-left: ${props => props.$indent ? '1rem' : '0'};
   padding-right: ${props => props.$indent ? '1rem' : '0'};
-  margin-bottom: ${props => props.$isLast ? '0' : '2.8rem'};
+  margin-bottom: ${props => props.$isLast ? '0' : '1.5rem'};
   text-align: justify;
   text-justify: inter-word;
   width: 100%;
@@ -565,7 +565,7 @@ const ParagraphContainer = styled.div<{ $indent: boolean; $isLast: boolean }>`
   ${media('<=tablet')} {
     padding-left: ${props => props.$indent ? '0.1rem' : '0'};
     padding-right: ${props => props.$indent ? '0.1rem' : '0'};
-    margin-bottom: ${props => props.$isLast ? '0' : '2rem'};
+    margin-bottom: ${props => props.$isLast ? '0' : '1.2rem'};
   }
 `;
 
@@ -587,16 +587,6 @@ const TranslatableText = styled.span`
 const InlineTranslation = styled.span`
   display: inline-block;
   position: relative;
-  /* Reserve space for word count badge to prevent layout shift */
-  padding-top: 1.8rem;
-  
-  ${media('<=tablet')} {
-    padding-top: 1.6rem;
-  }
-  
-  ${media('<=phone')} {
-    padding-top: 1.4rem;
-  }
 `;
 
 const TranslationHeader = styled.div`

@@ -512,7 +512,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ', illuminating the mountainous waves that surrounded them. Each flash revealed the true danger of their situation.'
+              text: ', illuminating the mountainous waves that surrounded them. Each blinding flash revealed the true danger of their desperate situation.'
             }
           ],
           indent: true
@@ -520,20 +520,20 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'The captain appeared on deck',
-              translationKey: 'The captain appeared on deck',
+              text: 'The captain appeared on deck, his weathered face grim but determined. He began barking orders that were barely audible over the howling wind.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: '"All hands on deck!" he roared',
+              translationKey: '"All hands on deck!" he roared',
               showTranslation: true
             },
             {
-              text: ', his weathered face grim but determined. He began barking orders that were barely audible over the howling wind.'
-            }
-          ],
-          indent: true
-        },
-        {
-          segments: [
-            {
-              text: '"All hands on deck!" he roared, and even the most exhausted sailors found new strength in his commanding presence.'
+              text: ', and even the most exhausted sailors found new strength in his commanding presence.'
             }
           ],
           indent: true
@@ -558,12 +558,7 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'A massive wave crashed over the bow',
-              translationKey: 'A massive wave crashed over the bow',
-              showTranslation: true
-            },
-            {
-              text: ', sending torrents of seawater across the deck. Several men were swept off their feet, sliding dangerously toward the rails.'
+              text: 'A massive wave crashed over the bow, sending torrents of seawater across the deck. Several men were swept off their feet.'
             }
           ],
           indent: true
@@ -571,7 +566,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'Time seemed to slow as Joan watched a young sailor lose his grip and begin sliding toward certain death in the churning sea below.'
+              text: 'Time seemed to slow',
+              translationKey: 'Time seemed to slow',
+              showTranslation: true
+            },
+            {
+              text: ' as Joan watched a young sailor lose his grip and begin sliding toward certain death in the churning sea below.'
             }
           ],
           indent: true
@@ -596,12 +596,7 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'They slid together',
-              translationKey: 'They slid together',
-              showTranslation: true
-            },
-            {
-              text: ' until Joan\'s boot caught against a cleat, stopping their deadly momentum. The young sailor\'s eyes were wide with terror and gratitude.'
+              text: 'They slid together until Joan\'s boot caught against a cleat, stopping their deadly momentum. The young sailor\'s eyes were wide with terror.'
             }
           ],
           indent: true
@@ -609,7 +604,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: '"Hold on, lad," Joan gasped, pulling them both back to safety as another wave threatened to claim them both.'
+              text: '"Hold on, lad," Joan gasped',
+              translationKey: '"Hold on, lad," Joan gasped',
+              showTranslation: true
+            },
+            {
+              text: ', pulling them both back to safety as another massive wave threatened to claim them both.'
             }
           ],
           indent: true
