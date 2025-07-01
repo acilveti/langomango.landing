@@ -176,6 +176,7 @@ export default function ReaderDemoWidget({
   const [hasValidEmail, setHasValidEmail] = useState(false);
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
+  const scrollLockCleanupRef = useRef<(() => void) | null>(null);
   
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
@@ -557,6 +558,8 @@ export default function ReaderDemoWidget({
       // Update words read on first click
       if (!hasClicked) {
         setHasClicked(true);
+        // Lock scroll immediately when starting the animation
+        lockScroll();
         // Hide word counts temporarily
         setShowWordCounts(false);
         setIsCalculatingWords(true); // Start loading animation
@@ -575,7 +578,11 @@ export default function ReaderDemoWidget({
               const page9Words = calculatePageWords(9);
               setWordsRead(page8Words + page9Words);
               setJustUpdated(true);
-              setTimeout(() => setJustUpdated(false), 1000);
+              setTimeout(() => {
+                setJustUpdated(false);
+                // Unlock scroll after the entire animation is complete
+                unlockScroll();
+              }, 1000);
             }, 1000);
           }, 100); // Small delay after loading completes
         }, 2900); // Stop just before 3 seconds
@@ -771,45 +778,42 @@ export default function ReaderDemoWidget({
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   };
 
+  // Simple scroll lock function
+  const lockScroll = () => {
+    // Prevent scrolling events
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Add listeners
+    document.addEventListener('wheel', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('keydown', preventScroll, { passive: false });
+    
+    // Store cleanup function
+    scrollLockCleanupRef.current = () => {
+      document.removeEventListener('wheel', preventScroll);
+      document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('keydown', preventScroll);
+      scrollLockCleanupRef.current = null;
+    };
+  };
+
+  const unlockScroll = () => {
+    if (scrollLockCleanupRef.current) {
+      scrollLockCleanupRef.current();
+    }
+  };
+
   // Custom smooth scroll implementation
   const smoothScrollTo = (targetY: number, duration: number = 300) => {
     const startY = window.scrollY;
     const distance = targetY - startY;
     const startTime = performance.now();
     let animationId: number | null = null;
-    let isCancelled = false;
-
-    // Disable user scrolling
-    const preventScroll = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    };
-
-    // Add listeners to prevent scrolling
-    window.addEventListener('wheel', preventScroll, { passive: false });
-    window.addEventListener('touchmove', preventScroll, { passive: false });
-    window.addEventListener('keydown', preventScroll, { passive: false });
-    
-    // Also prevent scrollbar interaction
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-
-    const cleanup = () => {
-      // Re-enable scrolling
-      window.removeEventListener('wheel', preventScroll);
-      window.removeEventListener('touchmove', preventScroll);
-      window.removeEventListener('keydown', preventScroll);
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
 
     const animateScroll = (currentTime: number) => {
-      if (isCancelled) {
-        cleanup();
-        return;
-      }
-      
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const easeProgress = easeInOutQuad(progress);
@@ -818,9 +822,6 @@ export default function ReaderDemoWidget({
       
       if (progress < 1) {
         animationId = requestAnimationFrame(animateScroll);
-      } else {
-        // Animation complete, re-enable scrolling
-        cleanup();
       }
     };
     
@@ -895,6 +896,8 @@ export default function ReaderDemoWidget({
           // If not already timing, start the 2-second visibility timer
           if (!visibilityTimerRef.current) {
             console.log('[checkVisibility] Setting 2-second visibility timer');
+            // Lock scroll immediately when starting the animation
+            lockScroll();
             setIsCalculatingWords(true); // Start loading animation
             setShouldAnimateButton(false); // Stop button animation during loading
             visibilityTimerRef.current = setTimeout(() => {
@@ -913,7 +916,11 @@ export default function ReaderDemoWidget({
                   console.log('[wordsTimer] Calculated page 8 words:', page8Words);
                   setWordsRead(page8Words);
                   setJustUpdated(true);
-                  setTimeout(() => setJustUpdated(false), 1000);
+                  setTimeout(() => {
+                    setJustUpdated(false);
+                    // Unlock scroll after the entire animation is complete
+                    unlockScroll();
+                  }, 1000);
                 }, 1000); // 1 second after word counts appear
               }, 100); // Small delay after loading completes
             }, 2000); // Must be visible for 2 seconds
@@ -926,6 +933,8 @@ export default function ReaderDemoWidget({
             visibilityTimerRef.current = null;
             setIsCalculatingWords(false); // Stop loading animation if reader is scrolled away
             setShouldAnimateButton(true); // Re-enable button animation
+            // Unlock scroll if it was locked
+            unlockScroll();
           }
         }
       }
@@ -956,6 +965,8 @@ export default function ReaderDemoWidget({
         clearTimeout(wordsTimerRef.current);
         wordsTimerRef.current = null;
       }
+      // Ensure scroll is unlocked on cleanup
+      unlockScroll();
     };
   }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
