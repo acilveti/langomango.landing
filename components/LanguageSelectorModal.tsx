@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
@@ -35,7 +35,6 @@ export default function LanguageSelectorModal({
   useEscClose({ onClose: isOpen ? onClose : () => {} });
 
   const handleLanguageSelect = useCallback((language: Language) => {
-    console.log('[LanguageSelectorModal] Language selected:', language.name, 'requireLevel:', requireLevel);
     if (requireLevel) {
       setTempSelectedLanguage(language);
       setShowLevelSelection(true);
@@ -46,7 +45,6 @@ export default function LanguageSelectorModal({
   }, [onLanguageSelect, onClose, requireLevel]);
 
   const handleLevelSelect = useCallback((level: string) => {
-    console.log('[LanguageSelectorModal] Level selected:', level, 'for language:', tempSelectedLanguage?.name);
     if (tempSelectedLanguage) {
       setSelectedLevel(level);
       onLanguageSelect(tempSelectedLanguage, level);
@@ -57,12 +55,15 @@ export default function LanguageSelectorModal({
       setSelectedLevel('');
     }
   }, [tempSelectedLanguage, onLanguageSelect, onClose]);
-
-  const handleBack = useCallback(() => {
-    setShowLevelSelection(false);
-    setTempSelectedLanguage(null);
-    setSelectedLevel('');
-  }, []);
+  
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setShowLevelSelection(false);
+      setTempSelectedLanguage(null);
+      setSelectedLevel('');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -77,18 +78,13 @@ export default function LanguageSelectorModal({
           
           <ModalHeader>
             <ModalTitle isDark={isDark}>
-              {showLevelSelection ? `Select Your ${tempSelectedLanguage?.name} Level` : 'Select Your Language'}
+              {showLevelSelection && tempSelectedLanguage ? `Select Your ${tempSelectedLanguage.name} Level` : 'Select Your Language'}
             </ModalTitle>
             <ModalSubtitle isDark={isDark}>
               {showLevelSelection ? 'Choose your proficiency level' : 'Choose the language you want to learn'}
             </ModalSubtitle>
           </ModalHeader>
           
-          {showLevelSelection && (
-            <BackButton onClick={handleBack} isDark={isDark}>
-              ← Back to languages
-            </BackButton>
-          )}
           
           {showLevelSelection ? (
             <LevelGrid>
@@ -398,28 +394,6 @@ const SelectedBadge = styled.span<{ isDark?: boolean }>`
     padding: 0.1rem 0.4rem;
     top: 0.3rem;
     right: 0.3rem;
-  }
-`;
-
-const BackButton = styled.button<{ isDark?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 0 2rem 1rem;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: ${props => props.isDark ? 'white' : '#374151'};
-  }
-  
-  ${media('<=tablet')} {
-    font-size: 1.2rem;
-    padding: 0 1.5rem 0.8rem;
   }
 `;
 

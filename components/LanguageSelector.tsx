@@ -56,7 +56,6 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   }, [contextLanguage]);
 
   function handleLanguageSelect(language: Language, level?: string) {
-    console.log('[LanguageSelector] handleLanguageSelect called with:', language.name, 'level:', level);
     setSelectedLanguage(language);
     setSelectedLevel(level);
     setContextLanguage(language); // Update context

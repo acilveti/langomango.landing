@@ -36,7 +36,7 @@ import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
 import LanguageSelector from 'components/LanguageSelector';
-import { Language } from 'contexts/VisitorContext';
+import { Language, DEFAULT_LANGUAGES } from 'contexts/VisitorContext';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import ReaderDemoWidget from 'components/ReaderDemoWidget';
 import { useVisitor } from 'contexts/VisitorContext';
@@ -107,13 +107,17 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
     }
   }, []);
 
-  const handleLanguageSelect = useCallback((language: Language) => {
-    console.log('Language selected:', language);
+  const handleLanguageSelect = useCallback((language: Language, level?: string) => {
+    console.log('Language selected:', language, 'Level:', level);
     setSelectedLanguage(language);
+    // Store level in sessionStorage if needed
+    if (level) {
+      sessionStorage.setItem('selectedLevel', level);
+    }
   }, []);
 
-  const handleLanguageProcessingComplete = useCallback((language: Language) => {
-    console.log('Processing complete for language:', language);
+  const handleLanguageProcessingComplete = useCallback((language: Language, level?: string) => {
+    console.log('Processing complete for language:', language, 'Level:', level);
     setShowReaderDemo(true);
   }, []);
 
@@ -316,6 +320,21 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         </div>
         {/* Add the HeroSticky component at the very beginning */}
         <WhiteBackgroundContainer className="white-background-container">
+          {/* Language Selector with Level Selection */}
+          <LanguageSelectorSection>
+            <SelectorTitle>Choose your learning language and level</SelectorTitle>
+            <LanguageSelector
+              ref={languageSelectorRef}
+              languages={DEFAULT_LANGUAGES}
+              onLanguageSelect={handleLanguageSelect}
+              onProcessingComplete={handleLanguageProcessingComplete}
+              placeholder="Select language"
+              maxWidth="400px"
+              isDark={false}
+              requireLevel={true}
+            />
+          </LanguageSelectorSection>
+          
           <HeroSection id="hero-section">
             <Hero />
           </HeroSection>
@@ -535,20 +554,29 @@ const LanguageSelectorSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   background: rgb(var(--secondBackground));
   gap: 2rem;
+  
+  ${media('<=tablet')} {
+    padding: 3rem 1.5rem;
+  }
 `;
 
 const SelectorTitle = styled.h2`
-  font-size: 2.4rem;
+  font-size: 2.8rem;
   font-weight: bold;
   color: rgb(var(--text));
   text-align: center;
   margin: 0;
+  line-height: 1.2;
   
   ${media('<=tablet')} {
-    font-size: 2rem;
+    font-size: 2.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.8rem;
   }
 `;
 
@@ -588,6 +616,23 @@ const ReaderDemoButton = styled.button`
     padding: 1.4rem 2.8rem;
   }
 `;
+
+/* Example: How to use LanguageSelector with level selection:
+   
+   <LanguageSelectorSection>
+     <SelectorTitle>Choose your learning language and level</SelectorTitle>
+     <LanguageSelector
+       ref={languageSelectorRef}
+       languages={DEFAULT_LANGUAGES}
+       onLanguageSelect={handleLanguageSelect}
+       onProcessingComplete={handleLanguageProcessingComplete}
+       placeholder="Select language"
+       maxWidth="400px"
+       isDark={false}
+       requireLevel={true}  // This enables level selection after language
+     />
+   </LanguageSelectorSection>
+*/
 
 const CustomAutofitGrid = styled(AutofitGrid)`
   --autofit-grid-item-size: 40rem;

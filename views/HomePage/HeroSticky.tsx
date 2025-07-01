@@ -113,19 +113,23 @@ export default function HeroSticky({
         </Title>
         <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
-          onLanguageSelect={(language: Language) => {
-            console.log('Language selected:', language);
+          onLanguageSelect={(language: Language, level?: string) => {
+            console.log('Language selected:', language, 'Level:', level);
             setSelectedLanguage(language);
-            // Store the full language object with all properties
+            // Store the level if needed
+            if (level) {
+              sessionStorage.setItem('selectedLevel', level);
+            }
           }}
-          onProcessingComplete={(language: Language) => {
-            console.log('Processing complete for:', language);
+          onProcessingComplete={(language: Language, level?: string) => {
+            console.log('Processing complete for:', language, 'Level:', level);
             // Open the reader demo modal after processing
             setIsReaderDemoOpened(true);
           }}
           placeholder="Select your target language"
           maxWidth="400px"
           isDark={true}
+          requireLevel={true}
         />
       </ContentWrapper>
       
