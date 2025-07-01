@@ -5,7 +5,6 @@ import { getFallbackTranslation, readerTranslations } from 'data/readerTranslati
 import { apiService } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
-// Import all styled components from the styles file
 import {
   ArrowIcon,
   ArrowIndicator,
@@ -26,6 +25,7 @@ import {
   DividerCompact,
   DividerLine,
   DividerText,
+  EducationalContent,
   EmailInputCompact,
   EmailInputExpanded,
   EmailRegistrationInput,
@@ -66,6 +66,9 @@ import {
   LevelSelectorContainer,
   LoginLink,
   LoginPrompt,
+  MessageIcon,
+  MessageText,
+  MessageTitle,
   MethodLabel,
   NavButtonLeft,
   NavButtonRight,
@@ -95,6 +98,7 @@ import {
   RegistrationSection,
   RegistrationSubtitle,
   RegistrationTitle,
+  ScientificNote,
   SecondaryButton,
   SecondaryButtons,
   SecondaryDivider,
@@ -176,6 +180,7 @@ export default function ReaderDemoWidget({
   const [hasValidEmail, setHasValidEmail] = useState(false);
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
+  const [showEducationalMessage, setShowEducationalMessage] = useState(false);
   const scrollLockCleanupRef = useRef<(() => void) | null>(null);
   
   // Handle opening signup directly if prop is set OR if returning from OAuth
@@ -558,34 +563,40 @@ export default function ReaderDemoWidget({
       // Update words read on first click
       if (!hasClicked) {
         setHasClicked(true);
-        // Lock scroll immediately when starting the animation
+        // Show educational message in place of content
+        setShowEducationalMessage(true);
         lockScroll();
-        // Hide word counts temporarily
-        setShowWordCounts(false);
-        setIsCalculatingWords(true); // Start loading animation
-        setShouldAnimateButton(false); // Stop button animation during loading
-        // Wait 2.9 seconds (just before 3 seconds) to stop loading
+        
+        // After 5 seconds, hide message and continue with word counting
         setTimeout(() => {
-          setIsCalculatingWords(false); // Stop loading animation
-          setShouldAnimateButton(true); // Start button animation after loading
-          // Show word counts after a brief delay
+          setShowEducationalMessage(false);
+          // Hide word counts temporarily
+          setShowWordCounts(false);
+          setIsCalculatingWords(true); // Start loading animation
+          setShouldAnimateButton(false); // Stop button animation during loading
+          // Wait 2.9 seconds (just before 3 seconds) to stop loading
           setTimeout(() => {
-            setShowWordCounts(true);
-            // Update global counter 1 second after word counts appear
+            setIsCalculatingWords(false); // Stop loading animation
+            setShouldAnimateButton(true); // Start button animation after loading
+            // Show word counts after a brief delay
             setTimeout(() => {
-              // Calculate total words from both pages
-              const page8Words = calculatePageWords(8);
-              const page9Words = calculatePageWords(9);
-              setWordsRead(page8Words + page9Words);
-              setJustUpdated(true);
+              setShowWordCounts(true);
+              // Update global counter 1 second after word counts appear
               setTimeout(() => {
-                setJustUpdated(false);
-                // Unlock scroll after the entire animation is complete
-                unlockScroll();
+                // Calculate total words from both pages
+                const page8Words = calculatePageWords(8);
+                const page9Words = calculatePageWords(9);
+                setWordsRead(page8Words + page9Words);
+                setJustUpdated(true);
+                setTimeout(() => {
+                  setJustUpdated(false);
+                  // Unlock scroll after the entire animation is complete
+                  unlockScroll();
+                }, 1000);
               }, 1000);
-            }, 1000);
-          }, 100); // Small delay after loading completes
-        }, 2900); // Stop just before 3 seconds
+            }, 100); // Small delay after loading completes
+          }, 2900); // Stop just before 3 seconds
+        }, 5000); // Extended to 5 seconds
       }
     }
   }, [currentPage, totalPages, handleInteraction, hasClicked, calculatePageWords]);
@@ -1059,8 +1070,20 @@ export default function ReaderDemoWidget({
 
         {/* Book Content */}
         <BookContent ref={pageRef}>
-          <ContentArea>
-            {currentContent.paragraphs.map((paragraph, index) => (
+          {showEducationalMessage ? (
+            <ContentArea>
+              <EducationalContent>
+                <MessageText>
+                  You will be exposed to your target language while you read.
+                </MessageText>
+                <MessageText>
+                  Did you know that there are required <strong>10-30</strong> exposures to a word to learn it?
+                </MessageText>
+              </EducationalContent>
+            </ContentArea>
+          ) : (
+            <ContentArea>
+              {currentContent.paragraphs.map((paragraph, index) => (
               <ParagraphContainer 
                 key={index} 
                 $indent={paragraph.indent}
@@ -1109,7 +1132,8 @@ export default function ReaderDemoWidget({
                 })}
               </ParagraphContainer>
             ))}
-          </ContentArea>
+              </ContentArea>
+          )}
 
           {/* Translation Popup */}
           {popup.visible && (

@@ -587,14 +587,14 @@ const InlineTranslation = styled.span`
   display: inline-block;
   position: relative;
   /* Reserve space for word count badge to prevent layout shift */
-  padding-top: 2.5rem;
+  padding-top: 1.8rem;
   
   ${media('<=tablet')} {
-    padding-top: 2.2rem;
+    padding-top: 1.6rem;
   }
   
   ${media('<=phone')} {
-    padding-top: 2rem;
+    padding-top: 1.4rem;
   }
 `;
 
@@ -701,6 +701,28 @@ const WordCountBadge = styled.span<{ $isVisible?: boolean; $animationDelay?: num
   }
 `;
 
+// Add gradient animation for text
+const gradientShift = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`;
+
+const glowPulse = keyframes`
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(255, 152, 0, 0.5), 0 0 40px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(255, 152, 0, 0.8), 0 0 60px rgba(255, 152, 0, 0.5);
+  }
+`;
+
 const fadeInUp = keyframes`
   0% {
     opacity: 0;
@@ -709,6 +731,29 @@ const fadeInUp = keyframes`
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+`;
+
+// Educational message animations
+const messageSlideIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  40%, 90% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
   }
 `;
 
@@ -2519,6 +2564,170 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; 
   }
 `;
 
+// Educational content inside book
+const EducationalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  height: 100%;
+  min-height: 100%;
+  animation: ${fadeInUp} 0.5s ease-out;
+`;
+
+const MessageIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: ${bounceIn} 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  ${media('<=tablet')} {
+    font-size: 3.5rem;
+    margin-bottom: 1.2rem;
+  }
+`;
+
+const MessageTitle = styled.h3`
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: ${fadeInUp} 0.6s ease-out 0.2s both;
+  
+  ${media('<=tablet')} {
+    font-size: 1.9rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+`;
+
+const MessageText = styled.p`
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 3rem;
+  margin: 0 0 3rem 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 100%;
+  padding: 0 2rem;
+  animation: ${fadeInUp} 0.8s ease-out 0.3s both;
+  color: #1f2937;
+  position: relative;
+  
+  /* First message - gradient text */
+  &:first-of-type {
+    background: linear-gradient(
+      90deg,
+      #ff9800 0%,
+      #f57c00 25%,
+      #ff9800 50%,
+      #f57c00 75%,
+      #ff9800 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: 
+      ${fadeInUp} 0.8s ease-out 0.3s both,
+      ${gradientShift} 3s linear infinite,
+      ${glowPulse} 2s ease-in-out infinite;
+    font-size: 2.4rem;
+    font-weight: 700;
+    filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
+  }
+  
+  /* Second message - emphasis styling */
+  &:last-of-type {
+    margin-bottom: 0;
+    animation-delay: 0.6s;
+    font-size: 2rem;
+    color: #374151;
+    
+    /* Style the numbers */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ff9800, transparent);
+      animation: ${fadeInUp} 0.8s ease-out 1s both;
+    }
+  }
+  
+  /* Highlight the "10-30" part */
+  strong {
+    color: #ff9800;
+    font-weight: 800;
+    font-size: 1.1em;
+    text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+    display: inline-block;
+    animation: ${pulse} 2s ease-in-out infinite;
+    animation-delay: 1.5s;
+  }
+  
+  ${media('<=tablet')} {
+    font-size: 1.8rem;
+    line-height: 2.6rem;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+    
+    &:first-of-type {
+      font-size: 2rem;
+    }
+    
+    &:last-of-type {
+      font-size: 1.6rem;
+    }
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.4rem;
+    line-height: 2.2rem;
+    padding: 0 0.5rem;
+    
+    &:first-of-type {
+      font-size: 1.6rem;
+    }
+    
+    &:last-of-type {
+      font-size: 1.3rem;
+    }
+  }
+`;
+
+const ScientificNote = styled.p`
+  font-size: 1.2rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 2rem 0 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: ${fadeInUp} 0.6s ease-out 0.8s both;
+  
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+  }
+`;
+
 // Export all styled components
 export {
   WidgetWrapper,
@@ -2630,5 +2839,10 @@ export {
   OrDividerCompact,
   GoogleSignupButtonCompact,
   CompactRegistrationSection,
-  EmailRegistrationInputCompact
+  EmailRegistrationInputCompact,
+  EducationalContent,
+  MessageIcon,
+  MessageTitle,
+  MessageText,
+  ScientificNote
 };
