@@ -320,21 +320,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
         </div>
         {/* Add the HeroSticky component at the very beginning */}
         <WhiteBackgroundContainer className="white-background-container">
-          {/* Language Selector with Level Selection */}
-          <LanguageSelectorSection>
-            <SelectorTitle>Choose your learning language and level</SelectorTitle>
-            <LanguageSelector
-              ref={languageSelectorRef}
-              languages={DEFAULT_LANGUAGES}
-              onLanguageSelect={handleLanguageSelect}
-              onProcessingComplete={handleLanguageProcessingComplete}
-              placeholder="Select language"
-              maxWidth="400px"
-              isDark={false}
-              requireLevel={true}
-            />
-          </LanguageSelectorSection>
-          
           <HeroSection id="hero-section">
             <Hero />
           </HeroSection>

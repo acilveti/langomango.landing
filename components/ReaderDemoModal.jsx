@@ -10,8 +10,6 @@ import useEscClose from 'hooks/useEscKey';
 export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false }) {
   const [showSignup, setShowSignup] = useState(false);
   
-  console.log('ReaderDemoModal mounted with isOauthReturn:', isOauthReturn);
-  
   useEscClose({ onClose });
 
   const handleSignupShow = useCallback((isShowing) => {

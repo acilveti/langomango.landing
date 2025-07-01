@@ -167,6 +167,7 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('');
+  const [demoLevel, setDemoLevel] = useState<string>(''); // Track level for demo content
   const [showExpandedForm, setShowExpandedForm] = useState(true);
   const [isEditingNative, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
@@ -193,6 +194,14 @@ export default function ReaderDemoWidget({
   const [fixedHeight, setFixedHeight] = useState<number | null>(null);
   const bookContentRef = useRef<HTMLDivElement>(null);
   
+  // Get level from sessionStorage on mount
+  useEffect(() => {
+    const storedLevel = sessionStorage.getItem('selectedLevel');
+    if (storedLevel) {
+      setDemoLevel(storedLevel);
+    }
+  }, []);
+
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
     console.log('ReaderDemoWidget mounted with props:', {
@@ -365,6 +374,7 @@ export default function ReaderDemoWidget({
       
       // Store the selected level
       setSelectedLevel(level);
+      setDemoLevel(level);
       sessionStorage.setItem('selectedLevel', level);
       
       // Close dropdowns
@@ -417,8 +427,217 @@ export default function ReaderDemoWidget({
     [pageNumber: number]: PageContent;
   }
 
-  // Book content (base English content) - 3 paragraphs per page
-  const bookContent: BookContent = {
+  // Determine if we should show words only or sentences based on level
+  const showWordsOnly = !demoLevel || demoLevel === 'A1' || demoLevel === 'A2';
+  
+  // Book content for WORDS ONLY (A1, A2, or unset)
+  const bookContentWords: BookContent = {
+    8: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'He opened his',
+            },
+            {
+              text: ' eyes',
+              translationKey: 'eyes',
+              showTranslation: true
+            },
+            {
+              text: ' and found himself facing the boatswain who, a few inches away and with water running down his face, was shouting at him at the top of his lungs.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'The',
+            },
+            {
+              text: ' storm',
+              translationKey: 'storm',
+              showTranslation: true
+            },
+            {
+              text: ' had grown worse during the night, and the waves crashed over the deck with tremendous force.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'Joan struggled to his',
+            },
+            {
+              text: ' feet',
+              translationKey: 'feet',
+              showTranslation: true
+            },
+            {
+              text: ', his body aching from being thrown against the bulkhead.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    },
+    9: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'The',
+            },
+            {
+              text: ' deck',
+              translationKey: 'deck',
+              showTranslation: true
+            },
+            {
+              text: ' was chaos. Men ran in all directions, some trying to secure loose cargo while others fought to control the sails.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'Through the spray and',
+            },
+            {
+              text: ' darkness',
+              translationKey: 'darkness',
+              showTranslation: true
+            },
+            {
+              text: ', Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'The',
+            },
+            {
+              text: ' ship',
+              translationKey: 'ship',
+              showTranslation: true
+            },
+            {
+              text: ' groaned under the assault of wind and waves, its timbers creaking ominously.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    },
+    10: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'Lightning',
+              translationKey: 'lightning',
+              showTranslation: true
+            },
+            {
+              text: ' split the sky, illuminating the mountainous waves that surrounded them.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'The',
+            },
+            {
+              text: ' captain',
+              translationKey: 'captain',
+              showTranslation: true
+            },
+            {
+              text: ' appeared on deck, his weathered face grim but determined.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: '"All hands on',
+            },
+            {
+              text: ' deck',
+              translationKey: 'deck', 
+              showTranslation: true
+            },
+            {
+              text: '!" he roared, and even the most exhausted sailors found new strength.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    },
+    11: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'Joan grabbed a',
+            },
+            {
+              text: ' rope',
+              translationKey: 'rope',
+              showTranslation: true
+            },
+            {
+              text: ' and joined the others in securing the cargo.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'A massive',
+            },
+            {
+              text: ' wave',
+              translationKey: 'wave',
+              showTranslation: true
+            },
+            {
+              text: ' crashed over the bow, sending torrents of seawater across the deck.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'Time',
+              translationKey: 'time',
+              showTranslation: true
+            },
+            {
+              text: ' seemed to slow as Joan watched a young sailor lose his grip and begin sliding toward the rails.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    }
+  };
+
+  // Book content for SENTENCES (B1, B2, C1, C2)
+  const bookContentSentences: BookContent = {
     8: {
       paragraphs: [
         {
@@ -846,6 +1065,8 @@ export default function ReaderDemoWidget({
     if (!hasSelectedTarget || isEditingTarget) return;
     
     setSelectedLevel(level);
+    setDemoLevel(level); // Update demo level for content display
+    sessionStorage.setItem('selectedLevel', level);
     setSignupError('');
     setIsLoadingSignup(true);
     setShowBookAnimation(true);
@@ -1206,10 +1427,10 @@ export default function ReaderDemoWidget({
     }
   }, [fixedHeight]);
 
+  // Choose content based on level
+  const bookContent = showWordsOnly ? bookContentWords : bookContentSentences;
   const currentContent = bookContent[currentPage] || bookContent[8];
   
-  console.log('[ReaderDemoWidget] Rendering with wordsRead:', wordsRead, 'showWordCounts:', showWordCounts);
-
   return (
     <WidgetWrapper $expanded={showSignupExpanded} $isFullscreen={signupMode === 'fullscreen'} data-reader-widget="true">
       <ReaderWrapper 
