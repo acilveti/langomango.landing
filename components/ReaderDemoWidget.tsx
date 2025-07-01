@@ -335,7 +335,14 @@ export default function ReaderDemoWidget({
     if (!currentLanguage || !englishText) return englishText;
     const langCode = currentLanguage.code;
     const langTranslations = readerTranslations[langCode];
-    return langTranslations?.[englishText] || getFallbackTranslation(englishText);
+    
+    // Try to get translation from the main translations object
+    if (langTranslations && langTranslations[englishText]) {
+      return langTranslations[englishText];
+    }
+    
+    // If not found, use the fallback function which will return the original text
+    return getFallbackTranslation(englishText);
   };
 
   // Handle language selection
