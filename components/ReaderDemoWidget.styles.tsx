@@ -601,6 +601,7 @@ const OriginalText = styled.span<{ $isVisible?: boolean; $animationDelay?: numbe
   font-weight: bold;
   font-size: 1.8rem;
   line-height: 3rem;
+  margin-left: 1.5rem;
   
   ${props => props.$isVisible && css`
     animation: ${fadeInUp} 0.5s ease-out ${(props.$animationDelay || 0) + 0.1}s both;
@@ -609,6 +610,13 @@ const OriginalText = styled.span<{ $isVisible?: boolean; $animationDelay?: numbe
   ${media('<=tablet')} {
     font-size: 1.6rem;
     line-height: 2.8rem;
+    margin-left: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.4rem;
+    line-height: 2.6rem;
+    margin-left: 1rem;
   }
 `;
 
@@ -732,6 +740,7 @@ const TranslationText = styled.span<{ $isVisible?: boolean; $animationDelay?: nu
   line-height: 3rem;
   border-bottom: 1px dotted #ccc;
   padding-bottom: 1px;
+  margin-left: 1.5rem;
   
   ${props => props.$isVisible && css`
     animation: ${fadeInUp} 0.5s ease-out ${(props.$animationDelay || 0) + 0.2}s both;
@@ -740,6 +749,13 @@ const TranslationText = styled.span<{ $isVisible?: boolean; $animationDelay?: nu
   ${media('<=tablet')} {
     font-size: 1.6rem;
     line-height: 2.8rem;
+    margin-left: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.4rem;
+    line-height: 2.6rem;
+    margin-left: 1rem;
   }
 `;
 

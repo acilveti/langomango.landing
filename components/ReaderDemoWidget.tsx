@@ -400,39 +400,6 @@ export default function ReaderDemoWidget({
 
   // Book content (base English content) - 3 paragraphs per page
   const bookContent: BookContent = {
-    7: {
-      paragraphs: [
-        {
-          segments: [
-            {
-              text: 'The morning sun cast long shadows across the water as I dove beneath the waves. The anchor chain stretched taut below me, disappearing into the coral reef.'
-            }
-          ],
-          indent: true
-        },
-        {
-          segments: [
-            {
-              text: 'I had been working',
-              translationKey: 'I had been working',
-              showTranslation: true
-            },
-            {
-              text: ' for hours, my lungs burning with each dive. The coral had grown thick around the anchor over the years.'
-            }
-          ],
-          indent: true
-        },
-        {
-          segments: [
-            {
-              text: 'I had to release that stupid anchor that I hated so much. But I had no other choice, so I struck the coral again and again with all the force I could muster underwater.'
-            }
-          ],
-          indent: true
-        }
-      ]
-    },
     8: {
       paragraphs: [
         {
@@ -451,7 +418,15 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: ' The storm had grown worse, during the night, and the waves crashed over the deck with tremendous force.'
+              text: 'The',
+            },
+            {
+              text: ' storm',
+              translationKey: 'storm',
+              showTranslation: true
+            },
+            {
+              text: ' had grown worse during the night, and the waves crashed over the deck with tremendous force.'
             }
           ],
           indent: true
@@ -489,7 +464,15 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'Through the spray and darkness, Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
+              text: 'Through the spray and',
+            },
+            {
+              text: ' darkness',
+              translationKey: 'darkness',
+              showTranslation: true
+            },
+            {
+              text: ', Joan could barely make out the torn mainsail flapping wildly in the wind like a wounded bird.'
             }
           ],
           indent: true
@@ -497,12 +480,15 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'The ship groaned',
-              translationKey: 'The ship groaned',
+              text: 'The',
+            },
+            {
+              text: ' ship',
+              translationKey: 'ship',
               showTranslation: true
             },
             {
-              text: ' under the assault of wind and waves, its timbers creaking ominously.'
+              text: ' groaned under the assault of wind and waves, its timbers creaking ominously.'
             }
           ],
           indent: true
@@ -527,12 +513,15 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'The captain appeared on deck',
-              translationKey: 'The captain appeared on deck',
+              text: 'The',
+            },
+            {
+              text: ' captain',
+              translationKey: 'captain',
               showTranslation: true
             },
             {
-              text: ', his weathered face grim but determined.'
+              text: ' appeared on deck, his weathered face grim but determined.'
             }
           ],
           indent: true
@@ -540,12 +529,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: '"All hands on deck!" he roared',
-              translationKey: '"All hands on deck!" he roared',
+              text: '"All hands on deck!"',
+              translationKey: '"All hands on deck!"',
               showTranslation: true
             },
             {
-              text: ', and even the most exhausted sailors found new strength.'
+              text: ' he roared, and even the most exhausted sailors found new strength.'
             }
           ],
           indent: true
@@ -570,12 +559,15 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'A massive wave crashed over the bow',
-              translationKey: 'A massive wave crashed over the bow',
+              text: 'A massive',
+            },
+            {
+              text: ' wave',
+              translationKey: 'wave',
               showTranslation: true
             },
             {
-              text: ', sending torrents of seawater across the deck.'
+              text: ' crashed over the bow, sending torrents of seawater across the deck.'
             }
           ],
           indent: true
@@ -589,49 +581,6 @@ export default function ReaderDemoWidget({
             },
             {
               text: ' as Joan watched a young sailor lose his grip and begin sliding toward the rails.'
-            }
-          ],
-          indent: true
-        }
-      ]
-    },
-    12: {
-      paragraphs: [
-        {
-          segments: [
-            {
-              text: 'Without thinking, Joan released his rope',
-              translationKey: 'Without thinking, Joan released his rope',
-              showTranslation: true
-            },
-            {
-              text: ' and dove across the slippery deck.'
-            }
-          ],
-          indent: true
-        },
-        {
-          segments: [
-            {
-              text: 'His fingers caught the boy\'s collar',
-              translationKey: 'His fingers caught the boy\'s collar',
-              showTranslation: true
-            },
-            {
-              text: ' just as he reached the edge.'
-            }
-          ],
-          indent: true
-        },
-        {
-          segments: [
-            {
-              text: '"Hold on, lad," Joan gasped',
-              translationKey: '"Hold on, lad," Joan gasped',
-              showTranslation: true
-            },
-            {
-              text: ', pulling them both back to safety.'
             }
           ],
           indent: true
@@ -1276,9 +1225,9 @@ export default function ReaderDemoWidget({
         <NavButtonRight 
           key={`nav-right-${currentPage}`}
           onClick={handleNextPage} 
-          disabled={currentPage >= 12} // Disable after page 12
+          disabled={currentPage >= 11} // Disable after page 11
           aria-label="Next page"
-          $shouldAnimate={shouldAnimateButton && currentPage < 12}
+          $shouldAnimate={shouldAnimateButton && currentPage < 11}
         >
           &#8250;
           <PulseRing />
