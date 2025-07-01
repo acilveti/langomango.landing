@@ -188,6 +188,8 @@ export default function ReaderDemoWidget({
   const [isHidingThirdEducationalMessage, setIsHidingThirdEducationalMessage] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const scrollLockCleanupRef = useRef<(() => void) | null>(null);
+  const [fixedHeight, setFixedHeight] = useState<number | null>(null);
+  const bookContentRef = useRef<HTMLDivElement>(null);
   
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
@@ -1186,6 +1188,20 @@ export default function ReaderDemoWidget({
     };
   }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
+  // Measure and fix the height once content is mounted
+  useEffect(() => {
+    if (bookContentRef.current && !fixedHeight) {
+      // Wait a bit for content to fully render
+      setTimeout(() => {
+        if (bookContentRef.current) {
+          const height = bookContentRef.current.offsetHeight;
+          // Add 20px safety margin
+          setFixedHeight(height + 20);
+        }
+      }, 100);
+    }
+  }, [fixedHeight]);
+
   const currentContent = bookContent[currentPage] || bookContent[8];
   
   console.log('[ReaderDemoWidget] Rendering with wordsRead:', wordsRead, 'showWordCounts:', showWordCounts);
@@ -1272,7 +1288,13 @@ export default function ReaderDemoWidget({
         </LanguageSelectorContainer>
 
         {/* Book Content */}
-        <BookContent ref={pageRef}>
+        <BookContent 
+          ref={(el) => {
+            pageRef.current = el;
+            bookContentRef.current = el;
+          }}
+          style={fixedHeight ? { height: `${fixedHeight}px`, minHeight: `${fixedHeight}px`, maxHeight: `${fixedHeight}px` } : {}}
+        >
           {showEducationalMessage ? (
             <ContentArea>
               <EducationalContent $isHiding={isHidingEducationalMessage} style={{ '--duration': '5s' } as any}>

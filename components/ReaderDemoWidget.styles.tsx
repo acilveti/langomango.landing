@@ -536,6 +536,7 @@ const ContentArea = styled.div`
   color: #1f2937;
   width: 100%;
   max-width: 100%;
+  height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -2574,7 +2575,6 @@ const EducationalContent = styled.div<{ $isHiding?: boolean }>`
   padding: 2rem;
   padding-bottom: 6rem; /* Add extra bottom padding for AutoAdvanceNote */
   height: 100%;
-  min-height: 100%;
   background: linear-gradient(to bottom, #fafafa, #f5f5f5);
   position: relative;
   
