@@ -701,28 +701,6 @@ const WordCountBadge = styled.span<{ $isVisible?: boolean; $animationDelay?: num
   }
 `;
 
-// Add gradient animation for text
-const gradientShift = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`;
-
-const glowPulse = keyframes`
-  0%, 100% {
-    text-shadow: 0 0 20px rgba(255, 152, 0, 0.5), 0 0 40px rgba(255, 152, 0, 0.3);
-  }
-  50% {
-    text-shadow: 0 0 30px rgba(255, 152, 0, 0.8), 0 0 60px rgba(255, 152, 0, 0.5);
-  }
-`;
-
 const fadeInUp = keyframes`
   0% {
     opacity: 0;
@@ -2564,6 +2542,16 @@ const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; 
   }
 `;
 
+// Progress bar animation
+const progressFill = keyframes`
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+`;
+
 // Educational content inside book
 const EducationalContent = styled.div`
   display: flex;
@@ -2571,10 +2559,23 @@ const EducationalContent = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0;
+  padding: 2rem;
   height: 100%;
   min-height: 100%;
-  animation: ${fadeInUp} 0.5s ease-out;
+  background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+  position: relative;
+  
+  /* Progress indicator at bottom */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #ff9800;
+    animation: ${progressFill} 4s linear forwards;
+    border-radius: 0 4px 4px 0;
+  }
 `;
 
 const MessageIcon = styled.div`
@@ -2609,98 +2610,73 @@ const MessageTitle = styled.h3`
 `;
 
 const MessageText = styled.p`
-  font-size: 2.2rem;
-  font-weight: 600;
-  line-height: 3rem;
-  margin: 0 0 3rem 0;
+  font-size: 1.9rem;
+  font-weight: 500;
+  line-height: 2.8rem;
+  margin: 0 0 2.5rem 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   max-width: 100%;
   padding: 0 2rem;
-  animation: ${fadeInUp} 0.8s ease-out 0.3s both;
-  color: #1f2937;
+  color: #374151;
   position: relative;
+  opacity: 0;
+  animation: ${fadeInUp} 0.6s ease-out forwards;
   
-  /* First message - gradient text */
+  /* First message styling */
   &:first-of-type {
-    background: linear-gradient(
-      90deg,
-      #ff9800 0%,
-      #f57c00 25%,
-      #ff9800 50%,
-      #f57c00 75%,
-      #ff9800 100%
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: 
-      ${fadeInUp} 0.8s ease-out 0.3s both,
-      ${gradientShift} 3s linear infinite,
-      ${glowPulse} 2s ease-in-out infinite;
-    font-size: 2.4rem;
-    font-weight: 700;
-    filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
+    font-size: 2.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 3rem;
+    animation-delay: 0.2s;
   }
   
-  /* Second message - emphasis styling */
+  /* Second message styling */
   &:last-of-type {
     margin-bottom: 0;
-    animation-delay: 0.6s;
-    font-size: 2rem;
-    color: #374151;
-    
-    /* Style the numbers */
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #ff9800, transparent);
-      animation: ${fadeInUp} 0.8s ease-out 1s both;
-    }
+    animation-delay: 0.5s;
+    background: #fff8e1;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    border-left: 4px solid #ff9800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
   
-  /* Highlight the "10-30" part */
+  /* Highlight numbers */
   strong {
     color: #ff9800;
-    font-weight: 800;
-    font-size: 1.1em;
-    text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
-    display: inline-block;
-    animation: ${pulse} 2s ease-in-out infinite;
-    animation-delay: 1.5s;
+    font-weight: 700;
+    font-size: 1.05em;
   }
   
   ${media('<=tablet')} {
-    font-size: 1.8rem;
-    line-height: 2.6rem;
-    padding: 0 1rem;
-    margin-bottom: 2rem;
+    font-size: 1.7rem;
+    line-height: 2.5rem;
+    padding: 0 1.5rem;
     
     &:first-of-type {
-      font-size: 2rem;
+      font-size: 1.9rem;
+      margin-bottom: 2.5rem;
     }
     
     &:last-of-type {
-      font-size: 1.6rem;
+      padding: 1.2rem 1.5rem;
     }
   }
   
   ${media('<=phone')} {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     line-height: 2.2rem;
-    padding: 0 0.5rem;
+    padding: 0 1rem;
     
     &:first-of-type {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
+      margin-bottom: 2rem;
     }
     
     &:last-of-type {
-      font-size: 1.3rem;
+      padding: 1rem;
+      font-size: 1.4rem;
     }
   }
 `;
@@ -2725,6 +2701,30 @@ const ScientificNote = styled.p`
     font-size: 1rem;
     margin-top: 1.2rem;
     padding-top: 1rem;
+  }
+`;
+
+// Auto-advance indicator
+const AutoAdvanceNote = styled.p`
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0;
+  opacity: 0;
+  animation: ${fadeInUp} 0.5s ease-out 1s forwards;
+  
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
+    bottom: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+    bottom: 1rem;
   }
 `;
 
@@ -2844,5 +2844,6 @@ export {
   MessageIcon,
   MessageTitle,
   MessageText,
-  ScientificNote
+  ScientificNote,
+  AutoAdvanceNote
 };

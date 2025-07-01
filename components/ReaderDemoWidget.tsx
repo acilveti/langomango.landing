@@ -8,6 +8,7 @@ import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import {
   ArrowIcon,
   ArrowIndicator,
+  AutoAdvanceNote,
   BackButton,
   BookAnimationOverlay,
   BookAnimationWrapper,
@@ -567,7 +568,7 @@ export default function ReaderDemoWidget({
         setShowEducationalMessage(true);
         lockScroll();
         
-        // After 5 seconds, hide message and continue with word counting
+        // After 4 seconds, hide message and continue with word counting
         setTimeout(() => {
           setShowEducationalMessage(false);
           // Hide word counts temporarily
@@ -596,7 +597,7 @@ export default function ReaderDemoWidget({
               }, 1000);
             }, 100); // Small delay after loading completes
           }, 2900); // Stop just before 3 seconds
-        }, 5000); // Extended to 5 seconds
+        }, 4000); // 4 seconds to read the message
       }
     }
   }, [currentPage, totalPages, handleInteraction, hasClicked, calculatePageWords]);
@@ -1079,6 +1080,9 @@ export default function ReaderDemoWidget({
                 <MessageText>
                   Did you know that there are required <strong>10-30</strong> exposures to a word to learn it?
                 </MessageText>
+                <AutoAdvanceNote>
+                  Continuing in a moment...
+                </AutoAdvanceNote>
               </EducationalContent>
             </ContentArea>
           ) : (
