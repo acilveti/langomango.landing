@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
@@ -12,9 +12,10 @@ interface LanguageSelectorModalProps {
   onClose: () => void;
   languages: Language[];
   selectedLanguage: Language | null;
-  onLanguageSelect: (language: Language) => void;
+  onLanguageSelect: (language: Language, level?: string) => void;
   isDark?: boolean;
   hasUserSelected?: boolean;
+  requireLevel?: boolean;
 }
 
 export default function LanguageSelectorModal({
@@ -24,15 +25,44 @@ export default function LanguageSelectorModal({
   selectedLanguage,
   onLanguageSelect,
   isDark = false,
-  hasUserSelected = false
+  hasUserSelected = false,
+  requireLevel = false
 }: LanguageSelectorModalProps) {
+  const [showLevelSelection, setShowLevelSelection] = useState(false);
+  const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<string>('');
   
   useEscClose({ onClose: isOpen ? onClose : () => {} });
 
   const handleLanguageSelect = useCallback((language: Language) => {
-    onLanguageSelect(language);
-    onClose();
-  }, [onLanguageSelect, onClose]);
+    console.log('[LanguageSelectorModal] Language selected:', language.name, 'requireLevel:', requireLevel);
+    if (requireLevel) {
+      setTempSelectedLanguage(language);
+      setShowLevelSelection(true);
+    } else {
+      onLanguageSelect(language);
+      onClose();
+    }
+  }, [onLanguageSelect, onClose, requireLevel]);
+
+  const handleLevelSelect = useCallback((level: string) => {
+    console.log('[LanguageSelectorModal] Level selected:', level, 'for language:', tempSelectedLanguage?.name);
+    if (tempSelectedLanguage) {
+      setSelectedLevel(level);
+      onLanguageSelect(tempSelectedLanguage, level);
+      onClose();
+      // Reset state
+      setShowLevelSelection(false);
+      setTempSelectedLanguage(null);
+      setSelectedLevel('');
+    }
+  }, [tempSelectedLanguage, onLanguageSelect, onClose]);
+
+  const handleBack = useCallback(() => {
+    setShowLevelSelection(false);
+    setTempSelectedLanguage(null);
+    setSelectedLevel('');
+  }, []);
 
   if (!isOpen) return null;
 
@@ -46,11 +76,84 @@ export default function LanguageSelectorModal({
           </CloseIconContainer>
           
           <ModalHeader>
-            <ModalTitle isDark={isDark}>Select Your Language</ModalTitle>
-            <ModalSubtitle isDark={isDark}>Choose the language you want to learn</ModalSubtitle>
+            <ModalTitle isDark={isDark}>
+              {showLevelSelection ? `Select Your ${tempSelectedLanguage?.name} Level` : 'Select Your Language'}
+            </ModalTitle>
+            <ModalSubtitle isDark={isDark}>
+              {showLevelSelection ? 'Choose your proficiency level' : 'Choose the language you want to learn'}
+            </ModalSubtitle>
           </ModalHeader>
           
-          <LanguageGrid>
+          {showLevelSelection && (
+            <BackButton onClick={handleBack} isDark={isDark}>
+              ← Back to languages
+            </BackButton>
+          )}
+          
+          {showLevelSelection ? (
+            <LevelGrid>
+              <LevelOption
+                onClick={() => handleLevelSelect('A1')}
+                isSelected={selectedLevel === 'A1'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🌱</LevelEmoji>
+                <LevelName isDark={isDark}>A1</LevelName>
+                <LevelDesc isDark={isDark}>Beginner</LevelDesc>
+              </LevelOption>
+              
+              <LevelOption
+                onClick={() => handleLevelSelect('A2')}
+                isSelected={selectedLevel === 'A2'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🌿</LevelEmoji>
+                <LevelName isDark={isDark}>A2</LevelName>
+                <LevelDesc isDark={isDark}>Elementary</LevelDesc>
+              </LevelOption>
+              
+              <LevelOption
+                onClick={() => handleLevelSelect('B1')}
+                isSelected={selectedLevel === 'B1'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🍀</LevelEmoji>
+                <LevelName isDark={isDark}>B1</LevelName>
+                <LevelDesc isDark={isDark}>Intermediate</LevelDesc>
+              </LevelOption>
+              
+              <LevelOption
+                onClick={() => handleLevelSelect('B2')}
+                isSelected={selectedLevel === 'B2'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🌳</LevelEmoji>
+                <LevelName isDark={isDark}>B2</LevelName>
+                <LevelDesc isDark={isDark}>Upper Intermediate</LevelDesc>
+              </LevelOption>
+              
+              <LevelOption
+                onClick={() => handleLevelSelect('C1')}
+                isSelected={selectedLevel === 'C1'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🌲</LevelEmoji>
+                <LevelName isDark={isDark}>C1</LevelName>
+                <LevelDesc isDark={isDark}>Advanced</LevelDesc>
+              </LevelOption>
+              
+              <LevelOption
+                onClick={() => handleLevelSelect('C2')}
+                isSelected={selectedLevel === 'C2'}
+                isDark={isDark}
+              >
+                <LevelEmoji>🎯</LevelEmoji>
+                <LevelName isDark={isDark}>C2</LevelName>
+                <LevelDesc isDark={isDark}>Mastery</LevelDesc>
+              </LevelOption>
+            </LevelGrid>
+          ) : (
+            <LanguageGrid>
             {languages.map((language) => (
               <LanguageOption
                 key={language.code}
@@ -65,7 +168,8 @@ export default function LanguageSelectorModal({
                 )}
               </LanguageOption>
             ))}
-          </LanguageGrid>
+            </LanguageGrid>
+          )}
         </ModalCard>
       </ModalContainer>
     </Portal>
@@ -294,5 +398,113 @@ const SelectedBadge = styled.span<{ isDark?: boolean }>`
     padding: 0.1rem 0.4rem;
     top: 0.3rem;
     right: 0.3rem;
+  }
+`;
+
+const BackButton = styled.button<{ isDark?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0 2rem 1rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: ${props => props.isDark ? 'white' : '#374151'};
+  }
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+    padding: 0 1.5rem 0.8rem;
+  }
+`;
+
+const LevelGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  
+  ${media('<=tablet')} {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  
+  ${media('<=phone')} {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+`;
+
+const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: ${(props) => {
+    if (props.isSelected) {
+      return props.isDark ? 'rgba(255,152,0,0.2)' : 'rgba(255,152,0,0.1)';
+    }
+    return props.isDark ? 'rgba(255, 255, 255, 0.05)' : '#f9fafb';
+  }};
+  border-radius: 1.2rem;
+  border: 2px solid ${props => {
+    if (props.isSelected) {
+      return props.isDark ? 'rgba(255,152,0,0.5)' : 'rgba(255,152,0,0.3)';
+    }
+    return props.isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent';
+  }};
+  text-align: center;
+  position: relative;
+
+  &:hover {
+    background: ${props => props.isDark ? 'rgba(255, 152, 0, 0.15)' : 'rgba(255, 152, 0, 0.08)'};
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border-color: ${props => props.isDark ? 'rgba(255, 152, 0, 0.5)' : 'rgba(255, 152, 0, 0.4)'};
+  }
+  
+  ${media('<=tablet')} {
+    padding: 1.5rem 1rem;
+  }
+`;
+
+const LevelEmoji = styled.span`
+  font-size: 3rem;
+  line-height: 1;
+  
+  ${media('<=tablet')} {
+    font-size: 2.5rem;
+  }
+`;
+
+const LevelName = styled.span<{ isDark?: boolean }>`
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: ${props => props.isDark ? 'white' : '#1f2937'};
+  
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+  }
+`;
+
+const LevelDesc = styled.span<{ isDark?: boolean }>`
+  font-size: 1.2rem;
+  color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
+  
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
   }
 `;

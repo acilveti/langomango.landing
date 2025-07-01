@@ -8,8 +8,8 @@ type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 
 interface LanguageSelectorProps {
   languages?: Language[];
-  onLanguageSelect: (language: Language) => void;
-  onProcessingComplete?: (language: Language) => void;
+  onLanguageSelect: (language: Language, level?: string) => void;
+  onProcessingComplete?: (language: Language, level?: string) => void;
   placeholder?: string;
   processingDuration?: number;
   confirmationDuration?: number;
@@ -19,6 +19,7 @@ interface LanguageSelectorProps {
   maxWidth?: string;
   autoOpenModal?: boolean;
   isDark?: boolean;
+  requireLevel?: boolean;
 }
 
 interface LanguageSelectorRef {
@@ -39,10 +40,12 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   className,
   maxWidth = "300px",
   autoOpenModal = false,
-  isDark = false
+  isDark = false,
+  requireLevel = false
 }, ref) => {
   const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
+  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -52,14 +55,16 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setSelectedLanguage(contextLanguage);
   }, [contextLanguage]);
 
-  function handleLanguageSelect(language: Language) {
+  function handleLanguageSelect(language: Language, level?: string) {
+    console.log('[LanguageSelector] handleLanguageSelect called with:', language.name, 'level:', level);
     setSelectedLanguage(language);
+    setSelectedLevel(level);
     setContextLanguage(language); // Update context
     setHasSelectedLanguage(true); // Mark that user has selected a language
     setIsModalOpen(false);
     
     // Call the immediate callback
-    onLanguageSelect(language);
+    onLanguageSelect(language, level);
     
     // Start processing
     setIsProcessing(true);
@@ -73,7 +78,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       // After showing confirmation, call the completion callback
       setTimeout(() => {
         if (onProcessingComplete) {
-          onProcessingComplete(language);
+          onProcessingComplete(language, level);
         }
       }, confirmationDuration);
     }, processingDuration);
@@ -84,6 +89,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setShowConfirmation(false);
     setIsProcessing(false);
     setSelectedLanguage(null);
+    setSelectedLevel(undefined);
     setIsModalOpen(false);
   };
 
@@ -126,6 +132,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         onLanguageSelect={handleLanguageSelect}
         isDark={isDark}
         hasUserSelected={hasSelectedLanguage}
+        requireLevel={requireLevel}
       />
 
       {/* Processing Message */}
@@ -133,7 +140,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         <ProcessingMessage>
           <ProcessingIcon>⏳</ProcessingIcon>
           <ProcessingText>
-            Verification of <strong>{selectedLanguage.name}</strong> availability for you...
+            Verification of <strong>{selectedLanguage.name}</strong>{selectedLevel ? ` (${selectedLevel})` : ''} availability for you...
           </ProcessingText>
         </ProcessingMessage>
       )}
@@ -143,7 +150,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         <ConfirmationMessage>
           <ConfirmationIcon>🎉</ConfirmationIcon>
           <ConfirmationText>
-            Great choice! <strong>{selectedLanguage.name}</strong> is available for your learning journey.
+            Great choice! <strong>{selectedLanguage.name}</strong>{selectedLevel ? ` (${selectedLevel})` : ''} is available for your learning journey.
           </ConfirmationText>
         </ConfirmationMessage>
       )}

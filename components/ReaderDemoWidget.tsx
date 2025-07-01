@@ -164,6 +164,8 @@ export default function ReaderDemoWidget({
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [showLevelDropdown, setShowLevelDropdown] = useState(false);
+  const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('');
   const [showExpandedForm, setShowExpandedForm] = useState(true);
   const [isEditingNative, setIsEditingNative] = useState(false);
@@ -347,34 +349,51 @@ export default function ReaderDemoWidget({
 
   // Handle language selection
   const handleLanguageSelect = (language: Language) => {
-    // Update context language
-    setContextLanguage(language);
+    // Store the selected language temporarily
+    setTempSelectedLanguage(language);
+    // Show level selection dropdown
+    setShowLevelDropdown(true);
     setIsLanguageDropdownOpen(false);
-    setHasSelectedLanguage(true);
-    
-    // Reset ALL word counting related states
-    setWordsRead(0);
-    setShowWordCounts(false);
-    setHasClicked(false);
-    setJustUpdated(false);
-    setShouldAnimateButton(true); // Reset button animation state
-    
-    // Clear any running timers
-    if (wordsTimerRef.current) {
-      clearTimeout(wordsTimerRef.current);
-      wordsTimerRef.current = null;
-    }
-    if (visibilityTimerRef.current) {
-      clearTimeout(visibilityTimerRef.current);
-      visibilityTimerRef.current = null;
-    }
-    
-    // Reset the visibility tracking
-    hasStartedTimerRef.current = false;
-    
-    // Call parent callback if provided
-    if (onLanguageChange) {
-      onLanguageChange(language);
+  };
+  
+  // Handle level selection
+  const handleLevelSelectInDropdown = (level: string) => {
+    if (tempSelectedLanguage) {
+      // Update context language
+      setContextLanguage(tempSelectedLanguage);
+      setHasSelectedLanguage(true);
+      
+      // Store the selected level
+      setSelectedLevel(level);
+      sessionStorage.setItem('selectedLevel', level);
+      
+      // Close dropdowns
+      setShowLevelDropdown(false);
+      
+      // Reset ALL word counting related states
+      setWordsRead(0);
+      setShowWordCounts(false);
+      setHasClicked(false);
+      setJustUpdated(false);
+      setShouldAnimateButton(true); // Reset button animation state
+      
+      // Clear any running timers
+      if (wordsTimerRef.current) {
+        clearTimeout(wordsTimerRef.current);
+        wordsTimerRef.current = null;
+      }
+      if (visibilityTimerRef.current) {
+        clearTimeout(visibilityTimerRef.current);
+        visibilityTimerRef.current = null;
+      }
+      
+      // Reset the visibility tracking
+      hasStartedTimerRef.current = false;
+      
+      // Call parent callback if provided
+      if (onLanguageChange) {
+        onLanguageChange(tempSelectedLanguage);
+      }
     }
   };
 
@@ -943,6 +962,11 @@ export default function ReaderDemoWidget({
       if (!target.closest('.language-selector-container') && isLanguageDropdownOpen) {
         setIsLanguageDropdownOpen(false);
       }
+      
+      // Close level dropdown if clicking outside
+      if (!target.closest('.language-selector-container') && showLevelDropdown) {
+        setShowLevelDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleGlobalClick);
@@ -952,7 +976,7 @@ export default function ReaderDemoWidget({
       document.removeEventListener('mousedown', handleGlobalClick);
       document.removeEventListener('touchstart', handleGlobalClick);
     };
-  }, [popup.visible, hidePopup, isLanguageDropdownOpen]);
+  }, [popup.visible, hidePopup, isLanguageDropdownOpen, showLevelDropdown]);
 
   const calculatePageWordsRef = useRef<typeof calculatePageWords | undefined>();
   calculatePageWordsRef.current = calculatePageWords;
@@ -1240,30 +1264,92 @@ export default function ReaderDemoWidget({
         </NavButtonRight>
         {/* Language selector dropdown */}
         <LanguageSelectorContainer className="language-selector-container">
-          <LanguageDropdown
-            onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-            $isOpen={isLanguageDropdownOpen}
-          >
-            <SelectedLanguage>
-              <LanguageFlag>{currentLanguage.flag}</LanguageFlag>
-              <LanguageName>{currentLanguage.name}</LanguageName>
-              <ChevronIcon $isOpen={isLanguageDropdownOpen}>▼</ChevronIcon>
-            </SelectedLanguage>
-          </LanguageDropdown>
-          
-          {isLanguageDropdownOpen && (
-            <LanguageList>
-              {DEFAULT_LANGUAGES.map((language) => (
+          {!showLevelDropdown ? (
+            <>
+              <LanguageDropdown
+                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                $isOpen={isLanguageDropdownOpen}
+              >
+                <SelectedLanguage>
+                  <LanguageFlag>{currentLanguage.flag}</LanguageFlag>
+                  <LanguageName>{currentLanguage.name}</LanguageName>
+                  <ChevronIcon $isOpen={isLanguageDropdownOpen}>▼</ChevronIcon>
+                </SelectedLanguage>
+              </LanguageDropdown>
+              
+              {isLanguageDropdownOpen && (
+                <LanguageList>
+                  {DEFAULT_LANGUAGES.map((language) => (
+                    <LanguageOption
+                      key={language.code}
+                      $isSelected={currentLanguage.code === language.code}
+                      onClick={() => handleLanguageSelect(language)}
+                    >
+                      <LanguageFlag>{language.flag}</LanguageFlag>
+                      <LanguageName>{language.name}</LanguageName>
+                    </LanguageOption>
+                  ))}
+                </LanguageList>
+              )}
+            </>
+          ) : (
+            <>
+              <LanguageDropdown
+                onClick={() => setShowLevelDropdown(false)}
+                $isOpen={true}
+              >
+                <SelectedLanguage>
+                  <LanguageFlag>{tempSelectedLanguage?.flag}</LanguageFlag>
+                  <LanguageName>Select {tempSelectedLanguage?.name} Level</LanguageName>
+                  <ChevronIcon $isOpen={true}>▼</ChevronIcon>
+                </SelectedLanguage>
+              </LanguageDropdown>
+              
+              <LanguageList>
                 <LanguageOption
-                  key={language.code}
-                  $isSelected={currentLanguage.code === language.code}
-                  onClick={() => handleLanguageSelect(language)}
+                  onClick={() => handleLevelSelectInDropdown('A1')}
+                  $isSelected={false}
                 >
-                  <LanguageFlag>{language.flag}</LanguageFlag>
-                  <LanguageName>{language.name}</LanguageName>
+                  <span style={{ fontSize: '1.5rem' }}>🌱</span>
+                  <LanguageName>A1 - Beginner</LanguageName>
                 </LanguageOption>
-              ))}
-            </LanguageList>
+                <LanguageOption
+                  onClick={() => handleLevelSelectInDropdown('A2')}
+                  $isSelected={false}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>🌿</span>
+                  <LanguageName>A2 - Elementary</LanguageName>
+                </LanguageOption>
+                <LanguageOption
+                  onClick={() => handleLevelSelectInDropdown('B1')}
+                  $isSelected={false}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>🍀</span>
+                  <LanguageName>B1 - Intermediate</LanguageName>
+                </LanguageOption>
+                <LanguageOption
+                  onClick={() => handleLevelSelectInDropdown('B2')}
+                  $isSelected={false}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>🌳</span>
+                  <LanguageName>B2 - Upper Int.</LanguageName>
+                </LanguageOption>
+                <LanguageOption
+                  onClick={() => handleLevelSelectInDropdown('C1')}
+                  $isSelected={false}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>🌲</span>
+                  <LanguageName>C1 - Advanced</LanguageName>
+                </LanguageOption>
+                <LanguageOption
+                  onClick={() => handleLevelSelectInDropdown('C2')}
+                  $isSelected={false}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>🎯</span>
+                  <LanguageName>C2 - Mastery</LanguageName>
+                </LanguageOption>
+              </LanguageList>
+            </>
           )}
         </LanguageSelectorContainer>
 
