@@ -1386,7 +1386,7 @@ export default function ReaderDemoWidget({
                   </div>
                 </div>
                 <AutoAdvanceNote>
-                  Let's continue reading...
+                  Let&apos;s continue reading...
                 </AutoAdvanceNote>
               </EducationalContent>
             </ContentArea>
