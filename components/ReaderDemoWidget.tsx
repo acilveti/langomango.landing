@@ -155,7 +155,6 @@ export default function ReaderDemoWidget({
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
-  const [pageChangeCount, setPageChangeCount] = useState(0);
   const [showSignupExpanded, setShowSignupExpanded] = useState(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -182,6 +181,9 @@ export default function ReaderDemoWidget({
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
   const [showEducationalMessage, setShowEducationalMessage] = useState(false);
+  const [showSecondEducationalMessage, setShowSecondEducationalMessage] = useState(false);
+  const [showThirdEducationalMessage, setShowThirdEducationalMessage] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
   const scrollLockCleanupRef = useRef<(() => void) | null>(null);
   
   // Handle opening signup directly if prop is set OR if returning from OAuth
@@ -399,7 +401,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'I had been working for hours, my lungs burning with each dive. The coral had grown thick around the anchor over the years.'
+              text: 'I had been working',
+              translationKey: 'I had been working',
+              showTranslation: true
+            },
+            {
+              text: ' for hours, my lungs burning with each dive. The coral had grown thick around the anchor over the years.'
             }
           ],
           indent: true
@@ -489,6 +496,120 @@ export default function ReaderDemoWidget({
           indent: true
         }
       ]
+    },
+    10: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'Lightning split the sky',
+              translationKey: 'Lightning split the sky',
+              showTranslation: true
+            },
+            {
+              text: ', illuminating the mountainous waves that surrounded them. Each flash revealed the true danger of their situation.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'The captain appeared on deck',
+              translationKey: 'The captain appeared on deck',
+              showTranslation: true
+            },
+            {
+              text: ', his weathered face grim but determined. He began barking orders that were barely audible over the howling wind.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: '"All hands on deck!" he roared, and even the most exhausted sailors found new strength in his commanding presence.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    },
+    11: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'Joan grabbed a rope',
+              translationKey: 'Joan grabbed a rope',
+              showTranslation: true
+            },
+            {
+              text: ' and joined the others in securing the cargo. The wet hemp burned his palms, but he held on with desperate determination.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'A massive wave crashed over the bow',
+              translationKey: 'A massive wave crashed over the bow',
+              showTranslation: true
+            },
+            {
+              text: ', sending torrents of seawater across the deck. Several men were swept off their feet, sliding dangerously toward the rails.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'Time seemed to slow as Joan watched a young sailor lose his grip and begin sliding toward certain death in the churning sea below.'
+            }
+          ],
+          indent: true
+        }
+      ]
+    },
+    12: {
+      paragraphs: [
+        {
+          segments: [
+            {
+              text: 'Without thinking, Joan released his rope',
+              translationKey: 'Without thinking, Joan released his rope',
+              showTranslation: true
+            },
+            {
+              text: ' and dove across the slippery deck. His fingers caught the boy\'s collar just as he reached the edge.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: 'They slid together',
+              translationKey: 'They slid together',
+              showTranslation: true
+            },
+            {
+              text: ' until Joan\'s boot caught against a cleat, stopping their deadly momentum. The young sailor\'s eyes were wide with terror and gratitude.'
+            }
+          ],
+          indent: true
+        },
+        {
+          segments: [
+            {
+              text: '"Hold on, lad," Joan gasped, pulling them both back to safety as another wave threatened to claim them both.'
+            }
+          ],
+          indent: true
+        }
+      ]
     }
   };
 
@@ -497,28 +618,10 @@ export default function ReaderDemoWidget({
     if (onInteraction) {
       // If parent component provides interaction handler, use it
       onInteraction();
-    } else if (useInlineSignup) {
-      // Use inline signup (sliding from bottom)
-      const newCount = pageChangeCount + 1;
-      setPageChangeCount(newCount);
-      
-      if (newCount >= 2 && !showSignupExpanded) {
-        setShowSignupExpanded(true);
-        if (onSignupVisibilityChange) {
-          onSignupVisibilityChange(true);
-        }
-      }
-    } else {
-      // Default behavior: open newsletter modal after 2 interactions
-      const newCount = pageChangeCount + 1;
-      setPageChangeCount(newCount);
-      
-      if (newCount >= 2) {
-        setIsModalOpened(true);
-        setPageChangeCount(0);
-      }
     }
-  }, [pageChangeCount, setIsModalOpened, onInteraction, useInlineSignup, showSignupExpanded, onSignupVisibilityChange]);
+    // Note: Signup is now triggered after the third educational message
+    // See handleNextPage function for the logic
+  }, [onInteraction]);
 
   // Calculate total words for current page translations
   const calculatePageWords = useCallback((pageNumber: number) => {
@@ -561,10 +664,13 @@ export default function ReaderDemoWidget({
       hidePopup();
       handleInteraction();
       
-      // Update words read on first click
-      if (!hasClicked) {
+      // Increment click count
+      const newClickCount = clickCount + 1;
+      setClickCount(newClickCount);
+      
+      // Show first educational message on first click
+      if (newClickCount === 1) {
         setHasClicked(true);
-        // Show educational message in place of content
         setShowEducationalMessage(true);
         lockScroll();
         
@@ -584,10 +690,12 @@ export default function ReaderDemoWidget({
               setShowWordCounts(true);
               // Update global counter 1 second after word counts appear
               setTimeout(() => {
-                // Calculate total words from both pages
-                const page8Words = calculatePageWords(8);
-                const page9Words = calculatePageWords(9);
-                setWordsRead(page8Words + page9Words);
+                // Calculate total words from all pages up to current
+                let totalWords = 0;
+                for (let i = 1; i <= currentPage + 1; i++) {
+                  totalWords += calculatePageWords(i);
+                }
+                setWordsRead(totalWords);
                 setJustUpdated(true);
                 setTimeout(() => {
                   setJustUpdated(false);
@@ -598,9 +706,85 @@ export default function ReaderDemoWidget({
             }, 100); // Small delay after loading completes
           }, 2900); // Stop just before 3 seconds
         }, 4000); // 4 seconds to read the message
+      } else if (newClickCount === 2) {
+        // Show second educational message on second click
+        setShowSecondEducationalMessage(true);
+        lockScroll();
+        
+        // Hide after 6 seconds (more content to read)
+        setTimeout(() => {
+          setShowSecondEducationalMessage(false);
+          unlockScroll();
+          
+          // Update word count after second message
+          setTimeout(() => {
+            let totalWords = 0;
+            for (let i = 1; i <= currentPage + 1; i++) {
+              totalWords += calculatePageWords(i);
+            }
+            setWordsRead(totalWords);
+            setJustUpdated(true);
+            setTimeout(() => {
+              setJustUpdated(false);
+            }, 1000);
+          }, 500);
+        }, 6000);
+      } else if (newClickCount === 3) {
+        // Show third educational message on third click
+        setShowThirdEducationalMessage(true);
+        lockScroll();
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+          setShowThirdEducationalMessage(false);
+          unlockScroll();
+          
+          // Update word count after third message
+          setTimeout(() => {
+            let totalWords = 0;
+            for (let i = 1; i <= currentPage + 1; i++) {
+              totalWords += calculatePageWords(i);
+            }
+            setWordsRead(totalWords);
+            setJustUpdated(true);
+            setTimeout(() => {
+              setJustUpdated(false);
+            }, 1000);
+          }, 500);
+          
+          // Show signup after third educational message
+          if (!showSignupExpanded && useInlineSignup) {
+            setTimeout(() => {
+              setShowSignupExpanded(true);
+              if (onSignupVisibilityChange) {
+                onSignupVisibilityChange(true);
+              }
+            }, 1500); // Show signup 1.5 seconds after message disappears
+          } else if (!useInlineSignup) {
+            // For newsletter modal mode
+            setTimeout(() => {
+              setIsModalOpened(true);
+            }, 1500);
+          }
+        }, 5000);
+      } else {
+        // Regular page transitions - update word count
+        setTimeout(() => {
+          let totalWords = 0;
+          for (let i = 1; i <= currentPage + 1; i++) {
+            totalWords += calculatePageWords(i);
+          }
+          if (totalWords > wordsRead) {
+            setWordsRead(totalWords);
+            setJustUpdated(true);
+            setTimeout(() => {
+              setJustUpdated(false);
+            }, 1000);
+          }
+        }, 300);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, hasClicked, calculatePageWords]);
+  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
@@ -1027,9 +1211,9 @@ export default function ReaderDemoWidget({
         <NavButtonRight 
           key={`nav-right-${currentPage}`}
           onClick={handleNextPage} 
-          disabled={currentPage === totalPages}
+          disabled={currentPage >= 12} // Disable after page 12
           aria-label="Next page"
-          $shouldAnimate={shouldAnimateButton}
+          $shouldAnimate={shouldAnimateButton && currentPage < 12}
         >
           &#8250;
           <PulseRing />
@@ -1082,6 +1266,127 @@ export default function ReaderDemoWidget({
                 </MessageText>
                 <AutoAdvanceNote>
                   Continuing in a moment...
+                </AutoAdvanceNote>
+              </EducationalContent>
+            </ContentArea>
+          ) : showSecondEducationalMessage ? (
+            <ContentArea>
+              <EducationalContent style={{ '--duration': '6s' } as any}>
+                <MessageText style={{ fontSize: '1.6rem', marginBottom: '1.5rem' }}>
+                  Did you know that an average novel has <strong>100,000 words</strong>?
+                </MessageText>
+                <MessageText style={{ 
+                  fontSize: '1.5rem', 
+                  background: '#f0f9ff',
+                  padding: '1.2rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  borderLeft: '4px solid #3b82f6',
+                  marginBottom: '1rem'
+                }}>
+                  With LangoMango, we transform each novel into words read in your target language based on your level:
+                </MessageText>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '0.8rem',
+                  maxWidth: '400px',
+                  margin: '0 auto',
+                  fontSize: '1.3rem'
+                }}>
+                  <div style={{
+                    background: '#fee2e2',
+                    padding: '0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    color: '#dc2626'
+                  }}>A1 - 15,000 words</div>
+                  <div style={{
+                    background: '#ffedd5',
+                    padding: '0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    color: '#ea580c'
+                  }}>A2 - 30,000 words</div>
+                  <div style={{
+                    background: '#fef3c7',
+                    padding: '0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    color: '#d97706'
+                  }}>B1 - 50,000 words</div>
+                  <div style={{
+                    background: '#d1fae5',
+                    padding: '0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    color: '#059669'
+                  }}>B2 - 80,000 words</div>
+                </div>
+                <AutoAdvanceNote>
+                  Continuing your reading journey...
+                </AutoAdvanceNote>
+              </EducationalContent>
+            </ContentArea>
+          ) : showThirdEducationalMessage ? (
+            <ContentArea>
+              <EducationalContent style={{ '--duration': '5s' } as any}>
+                <MessageText style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>
+                  📚 Read anywhere, anytime!
+                </MessageText>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.2rem',
+                  maxWidth: '500px',
+                  margin: '0 auto',
+                  textAlign: 'left'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    background: '#f0f9ff',
+                    padding: '1.2rem',
+                    borderRadius: '12px',
+                    border: '2px solid #3b82f6'
+                  }}>
+                    <span style={{ fontSize: '2rem' }}>📱</span>
+                    <span style={{ fontSize: '1.4rem', color: '#1e40af', fontWeight: '500' }}>
+                      Enjoy your favorite books from your Kindle or smartphone
+                    </span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    background: '#f0fdf4',
+                    padding: '1.2rem',
+                    borderRadius: '12px',
+                    border: '2px solid #22c55e'
+                  }}>
+                    <span style={{ fontSize: '2rem' }}>📤</span>
+                    <span style={{ fontSize: '1.4rem', color: '#166534', fontWeight: '500' }}>
+                      Upload your own ebooks and start reading immediately
+                    </span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    background: '#fefce8',
+                    padding: '1.2rem',
+                    borderRadius: '12px',
+                    border: '2px solid #facc15'
+                  }}>
+                    <span style={{ fontSize: '2rem' }}>📖</span>
+                    <span style={{ fontSize: '1.4rem', color: '#713f12', fontWeight: '500' }}>
+                      Access our library of books ready in multiple languages
+                    </span>
+                  </div>
+                </div>
+                <AutoAdvanceNote>
+                  Let's continue reading...
                 </AutoAdvanceNote>
               </EducationalContent>
             </ContentArea>
