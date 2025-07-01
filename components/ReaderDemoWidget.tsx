@@ -512,7 +512,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ', illuminating the mountainous waves that surrounded them. Each blinding flash revealed the true danger of their desperate situation.'
+              text: ', illuminating the mountainous waves that surrounded them.'
             }
           ],
           indent: true
@@ -520,7 +520,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'The captain appeared on deck, his weathered face grim but determined. He began barking orders that were barely audible over the howling wind.'
+              text: 'The captain appeared on deck',
+              translationKey: 'The captain appeared on deck',
+              showTranslation: true
+            },
+            {
+              text: ', his weathered face grim but determined.'
             }
           ],
           indent: true
@@ -533,7 +538,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ', and even the most exhausted sailors found new strength in his commanding presence.'
+              text: ', and even the most exhausted sailors found new strength.'
             }
           ],
           indent: true
@@ -550,7 +555,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ' and joined the others in securing the cargo. The wet hemp burned his palms, but he held on with desperate determination.'
+              text: ' and joined the others in securing the cargo.'
             }
           ],
           indent: true
@@ -558,7 +563,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'A massive wave crashed over the bow, sending torrents of seawater across the deck. Several men were swept off their feet.'
+              text: 'A massive wave crashed over the bow',
+              translationKey: 'A massive wave crashed over the bow',
+              showTranslation: true
+            },
+            {
+              text: ', sending torrents of seawater across the deck.'
             }
           ],
           indent: true
@@ -571,7 +581,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ' as Joan watched a young sailor lose his grip and begin sliding toward certain death in the churning sea below.'
+              text: ' as Joan watched a young sailor lose his grip and begin sliding toward the rails.'
             }
           ],
           indent: true
@@ -588,7 +598,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ' and dove across the slippery deck. His fingers caught the boy\'s collar just as he reached the edge.'
+              text: ' and dove across the slippery deck.'
             }
           ],
           indent: true
@@ -596,7 +606,12 @@ export default function ReaderDemoWidget({
         {
           segments: [
             {
-              text: 'They slid together until Joan\'s boot caught against a cleat, stopping their deadly momentum. The young sailor\'s eyes were wide with terror.'
+              text: 'His fingers caught the boy\'s collar',
+              translationKey: 'His fingers caught the boy\'s collar',
+              showTranslation: true
+            },
+            {
+              text: ' just as he reached the edge.'
             }
           ],
           indent: true
@@ -609,7 +624,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ', pulling them both back to safety as another massive wave threatened to claim them both.'
+              text: ', pulling them both back to safety.'
             }
           ],
           indent: true
