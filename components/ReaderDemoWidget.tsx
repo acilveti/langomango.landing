@@ -836,6 +836,9 @@ export default function ReaderDemoWidget({
         ([entry]) => {
           // Trigger when 10% is visible
           if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
+            // Lock scroll immediately before auto-scroll starts
+            lockScroll();
+            
             const rect = entry.target.getBoundingClientRect();
             const windowHeight = window.innerHeight;
             const readerCenter = rect.top + (rect.height / 2);
@@ -896,8 +899,7 @@ export default function ReaderDemoWidget({
           // If not already timing, start the 2-second visibility timer
           if (!visibilityTimerRef.current) {
             console.log('[checkVisibility] Setting 2-second visibility timer');
-            // Lock scroll immediately when starting the animation
-            lockScroll();
+            // Don't lock scroll here - it's already locked from auto-scroll
             setIsCalculatingWords(true); // Start loading animation
             setShouldAnimateButton(false); // Stop button animation during loading
             visibilityTimerRef.current = setTimeout(() => {
