@@ -1188,6 +1188,15 @@ export default function ReaderDemoWidget({
     };
   }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
+  const setBookContentRef = useCallback((el: HTMLDivElement | null) => {
+    if (pageRef.current !== el) {
+      (pageRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+    }
+    if (bookContentRef.current !== el) {
+      (bookContentRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+    }
+  }, []);
+
   // Measure and fix the height once content is mounted
   useEffect(() => {
     if (bookContentRef.current && !fixedHeight) {
@@ -1289,10 +1298,7 @@ export default function ReaderDemoWidget({
 
         {/* Book Content */}
         <BookContent 
-          ref={(el) => {
-            pageRef.current = el;
-            bookContentRef.current = el;
-          }}
+          ref={setBookContentRef}
           style={fixedHeight ? { height: `${fixedHeight}px`, minHeight: `${fixedHeight}px`, maxHeight: `${fixedHeight}px` } : {}}
         >
           {showEducationalMessage ? (
