@@ -183,6 +183,9 @@ export default function ReaderDemoWidget({
   const [showEducationalMessage, setShowEducationalMessage] = useState(false);
   const [showSecondEducationalMessage, setShowSecondEducationalMessage] = useState(false);
   const [showThirdEducationalMessage, setShowThirdEducationalMessage] = useState(false);
+  const [isHidingEducationalMessage, setIsHidingEducationalMessage] = useState(false);
+  const [isHidingSecondEducationalMessage, setIsHidingSecondEducationalMessage] = useState(false);
+  const [isHidingThirdEducationalMessage, setIsHidingThirdEducationalMessage] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const scrollLockCleanupRef = useRef<(() => void) | null>(null);
   
@@ -674,9 +677,13 @@ export default function ReaderDemoWidget({
         setShowEducationalMessage(true);
         lockScroll();
         
-        // After 4 seconds, hide message and continue with word counting
+        // After 3.5 seconds, start hiding animation
         setTimeout(() => {
-          setShowEducationalMessage(false);
+          setIsHidingEducationalMessage(true);
+          // After fade-out animation completes, hide the message
+          setTimeout(() => {
+            setShowEducationalMessage(false);
+            setIsHidingEducationalMessage(false);
           // Hide word counts temporarily
           setShowWordCounts(false);
           setIsCalculatingWords(true); // Start loading animation
@@ -705,16 +712,21 @@ export default function ReaderDemoWidget({
               }, 1000);
             }, 100); // Small delay after loading completes
           }, 2900); // Stop just before 3 seconds
-        }, 4000); // 4 seconds to read the message
+          }, 500); // 0.5 seconds for fade-out
+        }, 3500); // 3.5 seconds to read the message
       } else if (newClickCount === 2) {
         // Show second educational message on second click
         setShowSecondEducationalMessage(true);
         lockScroll();
         
-        // Hide after 6 seconds (more content to read)
+        // Hide after 4.5 seconds
         setTimeout(() => {
-          setShowSecondEducationalMessage(false);
-          unlockScroll();
+          setIsHidingSecondEducationalMessage(true);
+          // After fade-out animation completes
+          setTimeout(() => {
+            setShowSecondEducationalMessage(false);
+            setIsHidingSecondEducationalMessage(false);
+            unlockScroll();
           
           // Update word count after second message
           setTimeout(() => {
@@ -728,16 +740,21 @@ export default function ReaderDemoWidget({
               setJustUpdated(false);
             }, 1000);
           }, 500);
-        }, 6000);
+          }, 500); // 0.5 seconds for fade-out
+        }, 4500); // 4.5 seconds to read
       } else if (newClickCount === 3) {
         // Show third educational message on third click
         setShowThirdEducationalMessage(true);
         lockScroll();
         
-        // Hide after 5 seconds
+        // Hide after 4.5 seconds
         setTimeout(() => {
-          setShowThirdEducationalMessage(false);
-          unlockScroll();
+          setIsHidingThirdEducationalMessage(true);
+          // After fade-out animation completes
+          setTimeout(() => {
+            setShowThirdEducationalMessage(false);
+            setIsHidingThirdEducationalMessage(false);
+            unlockScroll();
           
           // Update word count after third message
           setTimeout(() => {
@@ -766,7 +783,8 @@ export default function ReaderDemoWidget({
               setIsModalOpened(true);
             }, 1500);
           }
-        }, 5000);
+          }, 500); // 0.5 seconds for fade-out
+        }, 4500); // 4.5 seconds to read
       } else {
         // Regular page transitions - update word count
         setTimeout(() => {
@@ -1257,12 +1275,12 @@ export default function ReaderDemoWidget({
         <BookContent ref={pageRef}>
           {showEducationalMessage ? (
             <ContentArea>
-              <EducationalContent>
-                <MessageText>
-                  You will be exposed to your target language while you read.
+              <EducationalContent $isHiding={isHidingEducationalMessage} style={{ '--duration': '5s' } as any}>
+                <MessageText style={{ fontSize: '2rem' }}>
+                  Did you know? You need <strong>10-30 exposures</strong> to a word to learn it.
                 </MessageText>
-                <MessageText>
-                  Did you know that there are required <strong>10-30</strong> exposures to a word to learn it?
+                <MessageText style={{ fontSize: '2rem' }}>
+                  An average novel has 100.000 words.
                 </MessageText>
                 <AutoAdvanceNote>
                   Continuing in a moment...
@@ -1271,118 +1289,98 @@ export default function ReaderDemoWidget({
             </ContentArea>
           ) : showSecondEducationalMessage ? (
             <ContentArea>
-              <EducationalContent style={{ '--duration': '6s' } as any}>
-                <MessageText style={{ fontSize: '1.6rem', marginBottom: '1.5rem' }}>
-                  Did you know that an average novel has <strong>100,000 words</strong>?
-                </MessageText>
-                <MessageText style={{ 
-                  fontSize: '1.5rem', 
-                  background: '#f0f9ff',
-                  padding: '1.2rem',
-                  borderRadius: '12px',
-                  border: 'none',
-                  borderLeft: '4px solid #3b82f6',
-                  marginBottom: '1rem'
-                }}>
-                  With LangoMango, we transform each novel into words read in your target language based on your level:
+              <EducationalContent $isHiding={isHidingSecondEducationalMessage} style={{ '--duration': '5s' } as any}>
+                <MessageText style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>
+                  With this method, with an average novel (100.000 words) you will be exposed to:
                 </MessageText>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '0.8rem',
-                  maxWidth: '400px',
+                  gap: '1rem',
+                  maxWidth: '380px',
                   margin: '0 auto',
-                  fontSize: '1.3rem'
+                  fontSize: '1.4rem'
                 }}>
                   <div style={{
                     background: '#fee2e2',
-                    padding: '0.8rem',
+                    padding: '1rem',
                     borderRadius: '8px',
                     fontWeight: '600',
-                    color: '#dc2626'
-                  }}>A1 - 15,000 words</div>
+                    color: '#dc2626',
+                    textAlign: 'center'
+                  }}><strong>A1</strong> → 15,000 words</div>
                   <div style={{
                     background: '#ffedd5',
-                    padding: '0.8rem',
+                    padding: '1rem',
                     borderRadius: '8px',
                     fontWeight: '600',
-                    color: '#ea580c'
-                  }}>A2 - 30,000 words</div>
+                    color: '#ea580c',
+                    textAlign: 'center'
+                  }}><strong>A2</strong> → 30,000 words</div>
                   <div style={{
                     background: '#fef3c7',
-                    padding: '0.8rem',
+                    padding: '1rem',
                     borderRadius: '8px',
                     fontWeight: '600',
-                    color: '#d97706'
-                  }}>B1 - 50,000 words</div>
+                    color: '#d97706',
+                    textAlign: 'center'
+                  }}><strong>B1</strong> → 50,000 words</div>
                   <div style={{
                     background: '#d1fae5',
-                    padding: '0.8rem',
+                    padding: '1rem',
                     borderRadius: '8px',
                     fontWeight: '600',
-                    color: '#059669'
-                  }}>B2 - 80,000 words</div>
+                    color: '#059669',
+                    textAlign: 'center'
+                  }}><strong>B2</strong> → 80,000 words</div>
                 </div>
                 <AutoAdvanceNote>
-                  Continuing your reading journey...
+                  Continuing your journey...
                 </AutoAdvanceNote>
               </EducationalContent>
             </ContentArea>
           ) : showThirdEducationalMessage ? (
             <ContentArea>
-              <EducationalContent style={{ '--duration': '5s' } as any}>
-                <MessageText style={{ fontSize: '1.8rem', marginBottom: '2rem' }}>
-                  📚 Read anywhere, anytime!
+              <EducationalContent $isHiding={isHidingThirdEducationalMessage} style={{ '--duration': '5s' } as any}>
+                <MessageText style={{ fontSize: '2rem', marginBottom: '2.5rem' }}>
+                  📚 Read anywhere, anytime
                 </MessageText>
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '1.2rem',
-                  maxWidth: '500px',
-                  margin: '0 auto',
-                  textAlign: 'left'
+                  gap: '1.5rem',
+                  maxWidth: '450px',
+                  margin: '0 auto'
                 }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem',
-                    background: '#f0f9ff',
-                    padding: '1.2rem',
-                    borderRadius: '12px',
-                    border: '2px solid #3b82f6'
+                    fontSize: '1.5rem',
+                    color: '#374151'
                   }}>
                     <span style={{ fontSize: '2rem' }}>📱</span>
-                    <span style={{ fontSize: '1.4rem', color: '#1e40af', fontWeight: '500' }}>
-                      Enjoy your favorite books from your Kindle or smartphone
-                    </span>
+                    <span>Read on Kindle or smartphone</span>
                   </div>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem',
-                    background: '#f0fdf4',
-                    padding: '1.2rem',
-                    borderRadius: '12px',
-                    border: '2px solid #22c55e'
+                    fontSize: '1.5rem',
+                    color: '#374151'
                   }}>
                     <span style={{ fontSize: '2rem' }}>📤</span>
-                    <span style={{ fontSize: '1.4rem', color: '#166534', fontWeight: '500' }}>
-                      Upload your own ebooks and start reading immediately
-                    </span>
+                    <span>Upload your own ebooks</span>
                   </div>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem',
-                    background: '#fefce8',
-                    padding: '1.2rem',
-                    borderRadius: '12px',
-                    border: '2px solid #facc15'
+                    fontSize: '1.5rem',
+                    color: '#374151'
                   }}>
                     <span style={{ fontSize: '2rem' }}>📖</span>
-                    <span style={{ fontSize: '1.4rem', color: '#713f12', fontWeight: '500' }}>
-                      Access our library of books ready in multiple languages
-                    </span>
+                    <span>Access our book library</span>
                   </div>
                 </div>
                 <AutoAdvanceNote>

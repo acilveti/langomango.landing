@@ -2552,18 +2552,36 @@ const progressFill = keyframes`
   }
 `;
 
+// Fade out animation
+const fadeOut = keyframes`
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+`;
+
 // Educational content inside book
-const EducationalContent = styled.div`
+const EducationalContent = styled.div<{ $isHiding?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 2rem;
+  padding-bottom: 6rem; /* Add extra bottom padding for AutoAdvanceNote */
   height: 100%;
   min-height: 100%;
   background: linear-gradient(to bottom, #fafafa, #f5f5f5);
   position: relative;
+  
+  /* Apply fade-out animation when hiding */
+  ${props => props.$isHiding && css`
+    animation: ${fadeOut} 0.5s ease-out forwards;
+  `}
   
   /* Progress indicator at bottom */
   &::after {
@@ -2707,7 +2725,7 @@ const ScientificNote = styled.p`
 // Auto-advance indicator
 const AutoAdvanceNote = styled.p`
   position: absolute;
-  bottom: 1.5rem;
+  bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.2rem;
@@ -2719,12 +2737,12 @@ const AutoAdvanceNote = styled.p`
   
   ${media('<=tablet')} {
     font-size: 1.1rem;
-    bottom: 1.2rem;
+    bottom: 0.8rem;
   }
   
   ${media('<=phone')} {
     font-size: 1rem;
-    bottom: 1rem;
+    bottom: 0.6rem;
   }
 `;
 
