@@ -28,6 +28,7 @@ import SimpleCta from 'components/SimpleCta2';
 import { Language } from 'contexts/VisitorContext';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import { useVisitor } from 'contexts/VisitorContext';
+import { getAllPosts } from 'utils/postsFetcher';
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -637,7 +638,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
 
   return {
     props: {
-      posts: await getAllPosts(),
+      posts: await getAllPosts(), 
       ...translations,
     },
   };
