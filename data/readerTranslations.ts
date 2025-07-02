@@ -234,6 +234,7 @@ export const readerTranslations: Translations = {
   
   // Korean
   ko: {
+    // Sentences (B1+)
     'He opened his eyes': '그는 눈을 떴다',
     'storm': '폭풍',
     'Joan struggled to his feet': '조안은 일어서려고 애썼다',
@@ -245,11 +246,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"모두 갑판으로!"',
     'Joan grabbed a rope': '조안이 밧줄을 잡았다',
     'wave': '파도',
-    'Time seemed to slow': '시간이 느려진 것 같았다'
+    'Time seemed to slow': '시간이 느려진 것 같았다',
+    // Words (A1-A2)
+    'eyes': '눈',
+    'night': '밤',
+    'feet': '발',
+    'deck': '갑판',
+    'sail': '돛',
+    'wind': '바람',
+    'lightning': '번개',
+    'sky': '하늘',
+    'face': '얼굴',
+    'sailors': '선원들',
+    'rope': '밧줄',
+    'water': '물',
+    'time': '시간',
+    'sailor': '선원'
   },
   
   // Portuguese
   pt: {
+    // Sentences (B1+)
     'He opened his eyes': 'Ele abriu os olhos',
     'storm': 'tempestade',
     'Joan struggled to his feet': 'Joan lutou para se levantar',
@@ -261,11 +278,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Todos ao convés!"',
     'Joan grabbed a rope': 'Joan agarrou uma corda',
     'wave': 'onda',
-    'Time seemed to slow': 'O tempo pareceu desacelerar'
+    'Time seemed to slow': 'O tempo pareceu desacelerar',
+    // Words (A1-A2)
+    'eyes': 'olhos',
+    'night': 'noite',
+    'feet': 'pés',
+    'deck': 'convés',
+    'sail': 'vela',
+    'wind': 'vento',
+    'lightning': 'raio',
+    'sky': 'céu',
+    'face': 'rosto',
+    'sailors': 'marinheiros',
+    'rope': 'corda',
+    'water': 'água',
+    'time': 'tempo',
+    'sailor': 'marinheiro'
   },
   
   // Russian
   ru: {
+    // Sentences (B1+)
     'He opened his eyes': 'Он открыл глаза',
     'storm': 'шторм',
     'Joan struggled to his feet': 'Жоан с трудом поднялся на ноги',
@@ -277,11 +310,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Все наверх!"',
     'Joan grabbed a rope': 'Жоан схватил верёвку',
     'wave': 'волна',
-    'Time seemed to slow': 'Время словно замедлилось'
+    'Time seemed to slow': 'Время словно замедлилось',
+    // Words (A1-A2)
+    'eyes': 'глаза',
+    'night': 'ночь',
+    'feet': 'ноги',
+    'deck': 'палуба',
+    'sail': 'парус',
+    'wind': 'ветер',
+    'lightning': 'молния',
+    'sky': 'небо',
+    'face': 'лицо',
+    'sailors': 'моряки',
+    'rope': 'верёвка',
+    'water': 'вода',
+    'time': 'время',
+    'sailor': 'моряк'
   },
   
   // Arabic
   ar: {
+    // Sentences (B1+)
     'He opened his eyes': 'فتح عينيه',
     'storm': 'عاصفة',
     'Joan struggled to his feet': 'كافح جوان للوقوف على قدميه',
@@ -293,11 +342,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"الجميع على السطح!"',
     'Joan grabbed a rope': 'أمسك جوان بحبل',
     'wave': 'موجة',
-    'Time seemed to slow': 'بدا الوقت وكأنه يتباطأ'
+    'Time seemed to slow': 'بدا الوقت وكأنه يتباطأ',
+    // Words (A1-A2)
+    'eyes': 'عيون',
+    'night': 'ليل',
+    'feet': 'أقدام',
+    'deck': 'سطح',
+    'sail': 'شراع',
+    'wind': 'رياح',
+    'lightning': 'برق',
+    'sky': 'سماء',
+    'face': 'وجه',
+    'sailors': 'بحارة',
+    'rope': 'حبل',
+    'water': 'ماء',
+    'time': 'وقت',
+    'sailor': 'بحار'
   },
   
   // Hindi
   hi: {
+    // Sentences (B1+)
     'He opened his eyes': 'उसने अपनी आँखें खोलीं',
     'storm': 'तूफान',
     'Joan struggled to his feet': 'जोआन अपने पैरों पर खड़ा होने के लिए संघर्ष कर रहा था',
@@ -309,11 +374,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"सभी डेक पर!"',
     'Joan grabbed a rope': 'जोआन ने एक रस्सी पकड़ी',
     'wave': 'लहर',
-    'Time seemed to slow': 'समय धीमा होता दिखा'
+    'Time seemed to slow': 'समय धीमा होता दिखा',
+    // Words (A1-A2)
+    'eyes': 'आँखें',
+    'night': 'रात',
+    'feet': 'पैर',
+    'deck': 'डेक',
+    'sail': 'पाल',
+    'wind': 'हवा',
+    'lightning': 'बिजली',
+    'sky': 'आकाश',
+    'face': 'चेहरा',
+    'sailors': 'नाविक',
+    'rope': 'रस्सी',
+    'water': 'पानी',
+    'time': 'समय',
+    'sailor': 'नाविक'
   },
   
   // Dutch
   nl: {
+    // Sentences (B1+)
     'He opened his eyes': 'Hij opende zijn ogen',
     'storm': 'storm',
     'Joan struggled to his feet': 'Joan worstelde overeind',
@@ -325,11 +406,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Alle hens aan dek!"',
     'Joan grabbed a rope': 'Joan greep een touw',
     'wave': 'golf',
-    'Time seemed to slow': 'De tijd leek te vertragen'
+    'Time seemed to slow': 'De tijd leek te vertragen',
+    // Words (A1-A2)
+    'eyes': 'ogen',
+    'night': 'nacht',
+    'feet': 'voeten',
+    'deck': 'dek',
+    'sail': 'zeil',
+    'wind': 'wind',
+    'lightning': 'bliksem',
+    'sky': 'lucht',
+    'face': 'gezicht',
+    'sailors': 'zeelieden',
+    'rope': 'touw',
+    'water': 'water',
+    'time': 'tijd',
+    'sailor': 'zeeman'
   },
   
   // Polish
   pl: {
+    // Sentences (B1+)
     'He opened his eyes': 'Otworzył oczy',
     'storm': 'burza',
     'Joan struggled to his feet': 'Joan z trudem wstał',
@@ -341,11 +438,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Wszyscy na pokład!"',
     'Joan grabbed a rope': 'Joan chwycił linę',
     'wave': 'fala',
-    'Time seemed to slow': 'Czas zdawał się zwalniać'
+    'Time seemed to slow': 'Czas zdawał się zwalniać',
+    // Words (A1-A2)
+    'eyes': 'oczy',
+    'night': 'noc',
+    'feet': 'stopy',
+    'deck': 'pokład',
+    'sail': 'żagiel',
+    'wind': 'wiatr',
+    'lightning': 'błyskawica',
+    'sky': 'niebo',
+    'face': 'twarz',
+    'sailors': 'marynarze',
+    'rope': 'lina',
+    'water': 'woda',
+    'time': 'czas',
+    'sailor': 'marynarz'
   },
   
   // Turkish
   tr: {
+    // Sentences (B1+)
     'He opened his eyes': 'Gözlerini açtı',
     'storm': 'fırtına',
     'Joan struggled to his feet': 'Joan ayağa kalkmak için mücadele etti',
@@ -357,11 +470,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Herkes güverteye!"',
     'Joan grabbed a rope': 'Joan bir ip yakaladı',
     'wave': 'dalga',
-    'Time seemed to slow': 'Zaman yavaşlıyor gibiydi'
+    'Time seemed to slow': 'Zaman yavaşlıyor gibiydi',
+    // Words (A1-A2)
+    'eyes': 'gözler',
+    'night': 'gece',
+    'feet': 'ayaklar',
+    'deck': 'güverte',
+    'sail': 'yelken',
+    'wind': 'rüzgar',
+    'lightning': 'şimşek',
+    'sky': 'gökyüzü',
+    'face': 'yüz',
+    'sailors': 'denizciler',
+    'rope': 'ip',
+    'water': 'su',
+    'time': 'zaman',
+    'sailor': 'denizci'
   },
   
   // Swedish
   sv: {
+    // Sentences (B1+)
     'He opened his eyes': 'Han öppnade ögonen',
     'storm': 'storm',
     'Joan struggled to his feet': 'Joan kämpade sig upp på fötter',
@@ -373,11 +502,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Alla man på däck!"',
     'Joan grabbed a rope': 'Joan grep tag i ett rep',
     'wave': 'våg',
-    'Time seemed to slow': 'Tiden tycktes sakta ner'
+    'Time seemed to slow': 'Tiden tycktes sakta ner',
+    // Words (A1-A2)
+    'eyes': 'ögon',
+    'night': 'natt',
+    'feet': 'fötter',
+    'deck': 'däck',
+    'sail': 'segel',
+    'wind': 'vind',
+    'lightning': 'blixt',
+    'sky': 'himmel',
+    'face': 'ansikte',
+    'sailors': 'sjömän',
+    'rope': 'rep',
+    'water': 'vatten',
+    'time': 'tid',
+    'sailor': 'sjöman'
   },
   
   // Hebrew
   he: {
+    // Sentences (B1+)
     'He opened his eyes': 'הוא פתח את עיניו',
     'storm': 'סערה',
     'Joan struggled to his feet': 'ג׳ואן נאבק לקום על רגליו',
@@ -389,11 +534,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"כולם על הסיפון!"',
     'Joan grabbed a rope': 'ג׳ואן תפס חבל',
     'wave': 'גל',
-    'Time seemed to slow': 'הזמן נראה כאילו האט'
+    'Time seemed to slow': 'הזמן נראה כאילו האט',
+    // Words (A1-A2)
+    'eyes': 'עיניים',
+    'night': 'לילה',
+    'feet': 'רגליים',
+    'deck': 'סיפון',
+    'sail': 'מפרש',
+    'wind': 'רוח',
+    'lightning': 'ברק',
+    'sky': 'שמיים',
+    'face': 'פנים',
+    'sailors': 'מלחים',
+    'rope': 'חבל',
+    'water': 'מים',
+    'time': 'זמן',
+    'sailor': 'מלח'
   },
   
   // Norwegian
   no: {
+    // Sentences (B1+)
     'He opened his eyes': 'Han åpnet øynene',
     'storm': 'storm',
     'Joan struggled to his feet': 'Joan kjempet seg opp på beina',
@@ -405,11 +566,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Alle mann på dekk!"',
     'Joan grabbed a rope': 'Joan grep et tau',
     'wave': 'bølge',
-    'Time seemed to slow': 'Tiden syntes å sakne'
+    'Time seemed to slow': 'Tiden syntes å sakne',
+    // Words (A1-A2)
+    'eyes': 'øyne',
+    'night': 'natt',
+    'feet': 'føtter',
+    'deck': 'dekk',
+    'sail': 'seil',
+    'wind': 'vind',
+    'lightning': 'lyn',
+    'sky': 'himmel',
+    'face': 'ansikt',
+    'sailors': 'sjømenn',
+    'rope': 'tau',
+    'water': 'vann',
+    'time': 'tid',
+    'sailor': 'sjømann'
   },
   
   // Danish
   da: {
+    // Sentences (B1+)
     'He opened his eyes': 'Han åbnede øjnene',
     'storm': 'storm',
     'Joan struggled to his feet': 'Joan kæmpede sig op på benene',
@@ -421,11 +598,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Alle mand på dæk!"',
     'Joan grabbed a rope': 'Joan greb et reb',
     'wave': 'bølge',
-    'Time seemed to slow': 'Tiden syntes at gå langsommere'
+    'Time seemed to slow': 'Tiden syntes at gå langsommere',
+    // Words (A1-A2)
+    'eyes': 'øjne',
+    'night': 'nat',
+    'feet': 'fødder',
+    'deck': 'dæk',
+    'sail': 'sejl',
+    'wind': 'vind',
+    'lightning': 'lyn',
+    'sky': 'himmel',
+    'face': 'ansigt',
+    'sailors': 'sømænd',
+    'rope': 'reb',
+    'water': 'vand',
+    'time': 'tid',
+    'sailor': 'sømand'
   },
   
   // Greek
   el: {
+    // Sentences (B1+)
     'He opened his eyes': 'Άνοιξε τα μάτια του',
     'storm': 'καταιγίδα',
     'Joan struggled to his feet': 'Ο Τζόαν πάλεψε να σηκωθεί',
@@ -437,11 +630,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Όλοι στο κατάστρωμα!"',
     'Joan grabbed a rope': 'Ο Τζόαν άρπαξε ένα σχοινί',
     'wave': 'κύμα',
-    'Time seemed to slow': 'Ο χρόνος φάνηκε να επιβραδύνεται'
+    'Time seemed to slow': 'Ο χρόνος φάνηκε να επιβραδύνεται',
+    // Words (A1-A2)
+    'eyes': 'μάτια',
+    'night': 'νύχτα',
+    'feet': 'πόδια',
+    'deck': 'κατάστρωμα',
+    'sail': 'πανί',
+    'wind': 'άνεμος',
+    'lightning': 'κεραυνός',
+    'sky': 'ουρανός',
+    'face': 'πρόσωπο',
+    'sailors': 'ναύτες',
+    'rope': 'σχοινί',
+    'water': 'νερό',
+    'time': 'χρόνος',
+    'sailor': 'ναύτης'
   },
   
   // Vietnamese
   vi: {
+    // Sentences (B1+)
     'He opened his eyes': 'Anh mở mắt',
     'storm': 'bão',
     'Joan struggled to his feet': 'Joan vật lộn để đứng dậy',
@@ -453,11 +662,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Tất cả lên boong!"',
     'Joan grabbed a rope': 'Joan nắm lấy một sợi dây',
     'wave': 'sóng',
-    'Time seemed to slow': 'Thời gian dường như chậm lại'
+    'Time seemed to slow': 'Thời gian dường như chậm lại',
+    // Words (A1-A2)
+    'eyes': 'mắt',
+    'night': 'đêm',
+    'feet': 'chân',
+    'deck': 'boong',
+    'sail': 'buồm',
+    'wind': 'gió',
+    'lightning': 'sét',
+    'sky': 'trời',
+    'face': 'mặt',
+    'sailors': 'thủy thủ',
+    'rope': 'dây thừng',
+    'water': 'nước',
+    'time': 'thời gian',
+    'sailor': 'thủy thủ'
   },
   
   // Thai
   th: {
+    // Sentences (B1+)
     'He opened his eyes': 'เขาลืมตา',
     'storm': 'พายุ',
     'Joan struggled to his feet': 'โจนดิ้นรนลุกขึ้นยืน',
@@ -469,11 +694,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"ทุกคนขึ้นดาดฟ้า!"',
     'Joan grabbed a rope': 'โจนคว้าเชือก',
     'wave': 'คลื่น',
-    'Time seemed to slow': 'เวลาดูเหมือนช้าลง'
+    'Time seemed to slow': 'เวลาดูเหมือนช้าลง',
+    // Words (A1-A2)
+    'eyes': 'ตา',
+    'night': 'กลางคืน',
+    'feet': 'เท้า',
+    'deck': 'ดาดฟ้า',
+    'sail': 'ใบเรือ',
+    'wind': 'ลม',
+    'lightning': 'ฟ้าแลบ',
+    'sky': 'ท้องฟ้า',
+    'face': 'หน้า',
+    'sailors': 'ลูกเรือ',
+    'rope': 'เชือก',
+    'water': 'น้ำ',
+    'time': 'เวลา',
+    'sailor': 'ลูกเรือ'
   },
   
   // Indonesian
   id: {
+    // Sentences (B1+)
     'He opened his eyes': 'Dia membuka matanya',
     'storm': 'badai',
     'Joan struggled to his feet': 'Joan berjuang untuk berdiri',
@@ -485,11 +726,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Semua ke geladak!"',
     'Joan grabbed a rope': 'Joan meraih tali',
     'wave': 'gelombang',
-    'Time seemed to slow': 'Waktu seakan melambat'
+    'Time seemed to slow': 'Waktu seakan melambat',
+    // Words (A1-A2)
+    'eyes': 'mata',
+    'night': 'malam',
+    'feet': 'kaki',
+    'deck': 'geladak',
+    'sail': 'layar',
+    'wind': 'angin',
+    'lightning': 'petir',
+    'sky': 'langit',
+    'face': 'wajah',
+    'sailors': 'pelaut',
+    'rope': 'tali',
+    'water': 'air',
+    'time': 'waktu',
+    'sailor': 'pelaut'
   },
   
   // Finnish
   fi: {
+    // Sentences (B1+)
     'He opened his eyes': 'Hän avasi silmänsä',
     'storm': 'myrsky',
     'Joan struggled to his feet': 'Joan kamppaili jaloilleen',
@@ -501,11 +758,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Kaikki kannelle!"',
     'Joan grabbed a rope': 'Joan tarttui köyteen',
     'wave': 'aalto',
-    'Time seemed to slow': 'Aika näytti hidastuvan'
+    'Time seemed to slow': 'Aika näytti hidastuvan',
+    // Words (A1-A2)
+    'eyes': 'silmät',
+    'night': 'yö',
+    'feet': 'jalat',
+    'deck': 'kansi',
+    'sail': 'purje',
+    'wind': 'tuuli',
+    'lightning': 'salama',
+    'sky': 'taivas',
+    'face': 'kasvot',
+    'sailors': 'merimiehet',
+    'rope': 'köysi',
+    'water': 'vesi',
+    'time': 'aika',
+    'sailor': 'merimies'
   },
   
   // Romanian
   ro: {
+    // Sentences (B1+)
     'He opened his eyes': 'Și-a deschis ochii',
     'storm': 'furtună',
     'Joan struggled to his feet': 'Joan s-a chinuit să se ridice',
@@ -517,11 +790,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Toată lumea pe punte!"',
     'Joan grabbed a rope': 'Joan a apucat o frânghie',
     'wave': 'val',
-    'Time seemed to slow': 'Timpul părea să încetinească'
+    'Time seemed to slow': 'Timpul părea să încetinească',
+    // Words (A1-A2)
+    'eyes': 'ochi',
+    'night': 'noapte',
+    'feet': 'picioare',
+    'deck': 'punte',
+    'sail': 'pânză',
+    'wind': 'vânt',
+    'lightning': 'fulger',
+    'sky': 'cer',
+    'face': 'față',
+    'sailors': 'marinari',
+    'rope': 'frânghie',
+    'water': 'apă',
+    'time': 'timp',
+    'sailor': 'marinar'
   },
   
   // Hungarian
   hu: {
+    // Sentences (B1+)
     'He opened his eyes': 'Kinyitotta a szemét',
     'storm': 'vihar',
     'Joan struggled to his feet': 'Joan küszködve talpra állt',
@@ -533,11 +822,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Mindenki a fedélzetre!"',
     'Joan grabbed a rope': 'Joan megragadott egy kötelet',
     'wave': 'hullám',
-    'Time seemed to slow': 'Az idő mintha lelassult volna'
+    'Time seemed to slow': 'Az idő mintha lelassult volna',
+    // Words (A1-A2)
+    'eyes': 'szemek',
+    'night': 'éjszaka',
+    'feet': 'lábak',
+    'deck': 'fedélzet',
+    'sail': 'vitorla',
+    'wind': 'szél',
+    'lightning': 'villám',
+    'sky': 'ég',
+    'face': 'arc',
+    'sailors': 'tengerészek',
+    'rope': 'kötél',
+    'water': 'víz',
+    'time': 'idő',
+    'sailor': 'tengerész'
   },
   
   // Czech
   cs: {
+    // Sentences (B1+)
     'He opened his eyes': 'Otevřel oči',
     'storm': 'bouře',
     'Joan struggled to his feet': 'Joan se s námahou postavil',
@@ -549,11 +854,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Všichni na palubu!"',
     'Joan grabbed a rope': 'Joan popadl lano',
     'wave': 'vlna',
-    'Time seemed to slow': 'Čas jako by se zpomalil'
+    'Time seemed to slow': 'Čas jako by se zpomalil',
+    // Words (A1-A2)
+    'eyes': 'oči',
+    'night': 'noc',
+    'feet': 'nohy',
+    'deck': 'paluba',
+    'sail': 'plachta',
+    'wind': 'vítr',
+    'lightning': 'blesk',
+    'sky': 'obloha',
+    'face': 'tvář',
+    'sailors': 'námořníci',
+    'rope': 'lano',
+    'water': 'voda',
+    'time': 'čas',
+    'sailor': 'námořník'
   },
   
   // Ukrainian
   uk: {
+    // Sentences (B1+)
     'He opened his eyes': 'Він відкрив очі',
     'storm': 'шторм',
     'Joan struggled to his feet': 'Джоан з труднощами піднявся на ноги',
@@ -565,11 +886,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Всі на палубу!"',
     'Joan grabbed a rope': 'Джоан схопив мотузку',
     'wave': 'хвиля',
-    'Time seemed to slow': 'Час ніби сповільнився'
+    'Time seemed to slow': 'Час ніби сповільнився',
+    // Words (A1-A2)
+    'eyes': 'очі',
+    'night': 'ніч',
+    'feet': 'ноги',
+    'deck': 'палуба',
+    'sail': 'вітрило',
+    'wind': 'вітер',
+    'lightning': 'блискавка',
+    'sky': 'небо',
+    'face': 'обличчя',
+    'sailors': 'моряки',
+    'rope': 'мотузка',
+    'water': 'вода',
+    'time': 'час',
+    'sailor': 'моряк'
   },
   
   // Malay
   ms: {
+    // Sentences (B1+)
     'He opened his eyes': 'Dia membuka matanya',
     'storm': 'ribut',
     'Joan struggled to his feet': 'Joan bergelut untuk bangun',
@@ -581,11 +918,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Semua ke dek!"',
     'Joan grabbed a rope': 'Joan mencapai tali',
     'wave': 'gelombang',
-    'Time seemed to slow': 'Masa seolah-olah perlahan'
+    'Time seemed to slow': 'Masa seolah-olah perlahan',
+    // Words (A1-A2)
+    'eyes': 'mata',
+    'night': 'malam',
+    'feet': 'kaki',
+    'deck': 'dek',
+    'sail': 'layar',
+    'wind': 'angin',
+    'lightning': 'kilat',
+    'sky': 'langit',
+    'face': 'muka',
+    'sailors': 'kelasi',
+    'rope': 'tali',
+    'water': 'air',
+    'time': 'masa',
+    'sailor': 'kelasi'
   },
   
   // Persian/Farsi
   fa: {
+    // Sentences (B1+)
     'He opened his eyes': 'چشمانش را باز کرد',
     'storm': 'طوفان',
     'Joan struggled to his feet': 'ژوآن به سختی بلند شد',
@@ -597,11 +950,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"همه روی عرشه!"',
     'Joan grabbed a rope': 'ژوآن طنابی را گرفت',
     'wave': 'موج',
-    'Time seemed to slow': 'زمان به نظر کند شده بود'
+    'Time seemed to slow': 'زمان به نظر کند شده بود',
+    // Words (A1-A2)
+    'eyes': 'چشم‌ها',
+    'night': 'شب',
+    'feet': 'پاها',
+    'deck': 'عرشه',
+    'sail': 'بادبان',
+    'wind': 'باد',
+    'lightning': 'رعد و برق',
+    'sky': 'آسمان',
+    'face': 'صورت',
+    'sailors': 'ملوانان',
+    'rope': 'طناب',
+    'water': 'آب',
+    'time': 'زمان',
+    'sailor': 'ملوان'
   },
   
   // Bengali
   bn: {
+    // Sentences (B1+)
     'He opened his eyes': 'সে তার চোখ খুলল',
     'storm': 'ঝড়',
     'Joan struggled to his feet': 'জোয়ান পা দিয়ে দাঁড়াতে সংগ্রাম করল',
@@ -613,11 +982,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"সবাই ডেকে!"',
     'Joan grabbed a rope': 'জোয়ান একটি দড়ি ধরল',
     'wave': 'ঢেউ',
-    'Time seemed to slow': 'সময় ধীর হয়ে যাচ্ছে বলে মনে হল'
+    'Time seemed to slow': 'সময় ধীর হয়ে যাচ্ছে বলে মনে হল',
+    // Words (A1-A2)
+    'eyes': 'চোখ',
+    'night': 'রাত',
+    'feet': 'পা',
+    'deck': 'ডেক',
+    'sail': 'পাল',
+    'wind': 'বাতাস',
+    'lightning': 'বিদ্যুৎ',
+    'sky': 'আকাশ',
+    'face': 'মুখ',
+    'sailors': 'নাবিকরা',
+    'rope': 'দড়ি',
+    'water': 'পানি',
+    'time': 'সময়',
+    'sailor': 'নাবিক'
   },
   
   // Bulgarian
   bg: {
+    // Sentences (B1+)
     'He opened his eyes': 'Той отвори очи',
     'storm': 'буря',
     'Joan struggled to his feet': 'Жоан се бореше да се изправи',
@@ -629,11 +1014,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Всички на палубата!"',
     'Joan grabbed a rope': 'Жоан сграбчи въже',
     'wave': 'вълна',
-    'Time seemed to slow': 'Времето сякаш се забави'
+    'Time seemed to slow': 'Времето сякаш се забави',
+    // Words (A1-A2)
+    'eyes': 'очи',
+    'night': 'нощ',
+    'feet': 'крака',
+    'deck': 'палуба',
+    'sail': 'платно',
+    'wind': 'вятър',
+    'lightning': 'мълния',
+    'sky': 'небе',
+    'face': 'лице',
+    'sailors': 'моряци',
+    'rope': 'въже',
+    'water': 'вода',
+    'time': 'време',
+    'sailor': 'моряк'
   },
   
   // Croatian
   hr: {
+    // Sentences (B1+)
     'He opened his eyes': 'Otvorio je oči',
     'storm': 'oluja',
     'Joan struggled to his feet': 'Joan se s mukom digao na noge',
@@ -645,11 +1046,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Svi na palubu!"',
     'Joan grabbed a rope': 'Joan je zgrabio uže',
     'wave': 'val',
-    'Time seemed to slow': 'Činilo se da vrijeme usporava'
+    'Time seemed to slow': 'Činilo se da vrijeme usporava',
+    // Words (A1-A2)
+    'eyes': 'oči',
+    'night': 'noć',
+    'feet': 'stopala',
+    'deck': 'paluba',
+    'sail': 'jedro',
+    'wind': 'vjetar',
+    'lightning': 'munja',
+    'sky': 'nebo',
+    'face': 'lice',
+    'sailors': 'mornari',
+    'rope': 'uže',
+    'water': 'voda',
+    'time': 'vrijeme',
+    'sailor': 'mornar'
   },
   
   // Serbian
   sr: {
+    // Sentences (B1+)
     'He opened his eyes': 'Отворио је очи',
     'storm': 'олуја',
     'Joan struggled to his feet': 'Џоан се мучио да устане',
@@ -661,11 +1078,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Сви на палубу!"',
     'Joan grabbed a rope': 'Џоан је зграбио уже',
     'wave': 'талас',
-    'Time seemed to slow': 'Чинило се да време успорава'
+    'Time seemed to slow': 'Чинило се да време успорава',
+    // Words (A1-A2)
+    'eyes': 'очи',
+    'night': 'ноћ',
+    'feet': 'стопала',
+    'deck': 'палуба',
+    'sail': 'једро',
+    'wind': 'ветар',
+    'lightning': 'муња',
+    'sky': 'небо',
+    'face': 'лице',
+    'sailors': 'морнари',
+    'rope': 'уже',
+    'water': 'вода',
+    'time': 'време',
+    'sailor': 'морнар'
   },
   
   // Slovak
   sk: {
+    // Sentences (B1+)
     'He opened his eyes': 'Otvoril oči',
     'storm': 'búrka',
     'Joan struggled to his feet': 'Joan sa s námahou postavil',
@@ -677,11 +1110,27 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Všetci na palubu!"',
     'Joan grabbed a rope': 'Joan chytil lano',
     'wave': 'vlna',
-    'Time seemed to slow': 'Čas akoby spomalil'
+    'Time seemed to slow': 'Čas akoby spomalil',
+    // Words (A1-A2)
+    'eyes': 'oči',
+    'night': 'noc',
+    'feet': 'nohy',
+    'deck': 'paluba',
+    'sail': 'plachta',
+    'wind': 'vietor',
+    'lightning': 'blesk',
+    'sky': 'obloha',
+    'face': 'tvár',
+    'sailors': 'námorníci',
+    'rope': 'lano',
+    'water': 'voda',
+    'time': 'čas',
+    'sailor': 'námorník'
   },
   
   // Catalan
   ca: {
+    // Sentences (B1+)
     'He opened his eyes': 'Va obrir els ulls',
     'storm': 'tempesta',
     'Joan struggled to his feet': 'Joan va lluitar per posar-se dret',
@@ -693,7 +1142,22 @@ export const readerTranslations: Translations = {
     '"All hands on deck!"': '"Tothom a coberta!"',
     'Joan grabbed a rope': 'Joan va agafar una corda',
     'wave': 'onada',
-    'Time seemed to slow': 'El temps semblava alentir-se'
+    'Time seemed to slow': 'El temps semblava alentir-se',
+    // Words (A1-A2)
+    'eyes': 'ulls',
+    'night': 'nit',
+    'feet': 'peus',
+    'deck': 'coberta',
+    'sail': 'vela',
+    'wind': 'vent',
+    'lightning': 'llamp',
+    'sky': 'cel',
+    'face': 'cara',
+    'sailors': 'mariners',
+    'rope': 'corda',
+    'water': 'aigua',
+    'time': 'temps',
+    'sailor': 'mariner'
   }
 };
 
