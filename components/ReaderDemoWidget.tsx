@@ -6,6 +6,8 @@ import { apiService } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 import {
+  AlphabetLetter,
+  AlphabetProgressContainer,
   ArrowIcon,
   ArrowIndicator,
   AutoAdvanceNote,
@@ -86,6 +88,8 @@ import {
   PopupArrow,
   PopupText,
   PrimaryButton,
+  ProgressHint,
+  ProgressMessage,
   PromptIcon,
   PromptMessage,
   PromptText,
@@ -120,11 +124,7 @@ import {
   WordCountBadge,
   WordsLabel,
   WordsNumber,
-  WordsReadCounter,
-  AlphabetProgressContainer,
-  AlphabetLetter,
-  ProgressHint,
-  ProgressMessage
+  WordsReadCounter
 } from './ReaderDemoWidget.styles';
 
 // Type definitions
@@ -1889,11 +1889,11 @@ export default function ReaderDemoWidget({
             {alphabetStage === 0 && "Your alphabet journey begins!"}
             {alphabetStage === 1 && "Keep going! More letters await..."}
             {alphabetStage === 2 && "Almost there! Just one more page..."}
-            {alphabetStage === 3 && "Amazing! You've collected the entire alphabet!"}
+            {alphabetStage === 3 && "Amazing! You&apos;ve collected the entire alphabet!"}
           </ProgressHint>
           {showCompletionMessage && (
             <ProgressMessage>
-              🎉 Alphabet Complete! You've unlocked all {currentLanguage.name} letters!
+              🎉 Alphabet Complete! You&apos;ve unlocked all {currentLanguage.name} letters!
             </ProgressMessage>
           )}
           {alphabetArray.map((letter, index) => {
