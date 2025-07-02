@@ -120,7 +120,11 @@ import {
   WordCountBadge,
   WordsLabel,
   WordsNumber,
-  WordsReadCounter
+  WordsReadCounter,
+  AlphabetProgressContainer,
+  AlphabetLetter,
+  ProgressHint,
+  ProgressMessage
 } from './ReaderDemoWidget.styles';
 
 // Type definitions
@@ -193,6 +197,10 @@ export default function ReaderDemoWidget({
   const scrollLockCleanupRef = useRef<(() => void) | null>(null);
   const [fixedHeight, setFixedHeight] = useState<number | null>(null);
   const bookContentRef = useRef<HTMLDivElement>(null);
+  const [showAlphabetProgress, setShowAlphabetProgress] = useState(false);
+  const [activeLetters, setActiveLetters] = useState<string[]>([]);
+  const [showCompletionMessage, setShowCompletionMessage] = useState(false);
+  const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   
   // Get level from sessionStorage on mount
   useEffect(() => {
@@ -430,6 +438,20 @@ export default function ReaderDemoWidget({
   // Determine if we should show words only or sentences based on level
   const showWordsOnly = !demoLevel || demoLevel === 'A1' || demoLevel === 'A2';
   
+  // Function to get random letters that haven't been added yet
+  const getRandomLetters = (count: number, existing: string[]): string[] => {
+    const availableLetters = alphabetArray.filter(letter => !existing.includes(letter));
+    const selected: string[] = [];
+    
+    for (let i = 0; i < count && availableLetters.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * availableLetters.length);
+      selected.push(availableLetters[randomIndex]);
+      availableLetters.splice(randomIndex, 1);
+    }
+    
+    return selected;
+  };
+
   // Book content for WORDS ONLY (A1, A2, or unset)
   const bookContentWords: BookContent = {
     8: {
@@ -882,9 +904,16 @@ export default function ReaderDemoWidget({
       const newClickCount = clickCount + 1;
       setClickCount(newClickCount);
       
-      // Show first educational message on first click
+      // Show alphabet progress on first click
       if (newClickCount === 1) {
         setHasClicked(true);
+        setShowAlphabetProgress(true);
+        
+        // Add 3 random letters on first click
+        const firstLetters = getRandomLetters(3, []);
+        setActiveLetters(firstLetters);
+        
+        // Continue with educational message flow
         setShowEducationalMessage(true);
         lockScroll();
         
@@ -926,6 +955,10 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 3500); // 3.5 seconds to read the message
       } else if (newClickCount === 2) {
+        // Add 4 more random letters on second click
+        const newLetters = getRandomLetters(4, activeLetters);
+        setActiveLetters(prev => [...prev, ...newLetters]);
+        
         // Show second educational message on second click
         setShowSecondEducationalMessage(true);
         lockScroll();
@@ -954,6 +987,10 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 4500); // 4.5 seconds to read
       } else if (newClickCount === 3) {
+        // Add 5 more random letters on third click
+        const newLetters = getRandomLetters(5, activeLetters);
+        setActiveLetters(prev => [...prev, ...newLetters]);
+        
         // Show third educational message on third click
         setShowThirdEducationalMessage(true);
         lockScroll();
@@ -997,6 +1034,27 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 4500); // 4.5 seconds to read
       } else {
+        // Continue adding random letters with each click
+        const remainingCount = 26 - activeLetters.length;
+        
+        if (remainingCount > 0) {
+          // Add 3-5 letters per click, proportionally more as we near completion
+          const baseAdd = 3;
+          const bonusAdd = Math.floor((26 - remainingCount) / 5); // Add more letters as we progress
+          const lettersToAdd = Math.min(baseAdd + bonusAdd, remainingCount);
+          
+          const newLetters = getRandomLetters(lettersToAdd, activeLetters);
+          setActiveLetters(prev => [...prev, ...newLetters]);
+          
+          // Check if alphabet is complete
+          if (activeLetters.length + newLetters.length === 26 && !showCompletionMessage) {
+            setShowCompletionMessage(true);
+            setTimeout(() => {
+              setShowCompletionMessage(false);
+            }, 3000);
+          }
+        }
+        
         // Regular page transitions - update word count
         setTimeout(() => {
           let totalWords = 0;
@@ -1825,6 +1883,35 @@ export default function ReaderDemoWidget({
           )}
         </BookContent>
       </ReaderContainer>
+
+      {/* Alphabet Progress */}
+      {showAlphabetProgress && (
+        <AlphabetProgressContainer>
+          <ProgressHint>
+            Keep reading to unlock all letters!
+          </ProgressHint>
+          {showCompletionMessage && (
+            <ProgressMessage>
+              🎉 Alphabet Complete! You've unlocked all {currentLanguage.name} letters!
+            </ProgressMessage>
+          )}
+          {alphabetArray.map((letter, index) => {
+            const isActive = activeLetters.includes(letter);
+            const activeIndex = activeLetters.indexOf(letter);
+            const animationDelay = isActive ? activeIndex * 0.1 : 0;
+            
+            return (
+              <AlphabetLetter
+                key={letter}
+                $isActive={isActive}
+                $animationDelay={animationDelay}
+              >
+                {letter}
+              </AlphabetLetter>
+            );
+          })}
+        </AlphabetProgressContainer>
+      )}
 
       {/* Bottom Navigation Bar */}
       <BottomBar $inModal={signupMode === 'fullscreen'} $isLoading={isCalculatingWords}>

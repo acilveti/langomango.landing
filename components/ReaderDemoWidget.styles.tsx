@@ -2752,6 +2752,147 @@ const AutoAdvanceNote = styled.p`
   }
 `;
 
+// Alphabet Progress Styles
+const AlphabetProgressContainer = styled.div`
+  position: absolute;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 25;
+  max-width: 95%;
+  overflow: hidden;
+  position: relative;
+  
+  ${media('<=tablet')} {
+    bottom: 5rem;
+    gap: 0.1rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  ${media('<=phone')} {
+    bottom: 4.5rem;
+    gap: 0.08rem;
+    padding: 0.6rem 1rem;
+    max-width: 98%;
+    font-size: 0.8rem;
+  }
+`;
+
+// Animation for letters rolling in from left
+const rollInFromLeft = keyframes`
+  0% {
+    transform: translateX(-100px) rotateY(-90deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0) rotateY(-45deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(0) rotateY(0deg);
+    opacity: 1;
+  }
+`;
+
+const AlphabetLetter = styled.div<{ $isActive: boolean; $animationDelay?: number }>`
+  position: relative;
+  width: 1.8rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-family: 'Georgia', serif;
+  transition: all 0.3s ease;
+  
+  /* Base state - empty placeholder */
+  color: ${props => props.$isActive ? '#1f2937' : '#e5e7eb'};
+  border-bottom: 2px solid ${props => props.$isActive ? '#ff9800' : 'transparent'};
+  
+  /* Active letters animation */
+  ${props => props.$isActive && css`
+    animation: ${rollInFromLeft} 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: ${props.$animationDelay || 0}s;
+    opacity: 0;
+  `}
+  
+  ${media('<=tablet')} {
+    width: 1.5rem;
+    height: 1.9rem;
+    font-size: 1.1rem;
+  }
+  
+  ${media('<=phone')} {
+    width: 1.2rem;
+    height: 1.6rem;
+    font-size: 0.9rem;
+  }
+`;
+
+// Progress hint message
+const ProgressHint = styled.div`
+  position: absolute;
+  top: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0.8;
+  
+  ${media('<=tablet')} {
+    font-size: 1rem;
+    top: -2.5rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 0.9rem;
+    top: -2.2rem;
+  }
+`;
+
+const ProgressMessage = styled.div`
+  position: absolute;
+  top: -5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
+  white-space: nowrap;
+  animation: ${bounceIn} 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.6rem;
+    top: -4rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1.1rem;
+    padding: 0.7rem 1.4rem;
+    top: -3.5rem;
+    max-width: 90%;
+    text-align: center;
+    white-space: normal;
+  }
+`;
+
 // Export all styled components
 export {
   WidgetWrapper,
@@ -2869,5 +3010,9 @@ export {
   MessageTitle,
   MessageText,
   ScientificNote,
-  AutoAdvanceNote
+  AutoAdvanceNote,
+  AlphabetProgressContainer,
+  AlphabetLetter,
+  ProgressHint,
+  ProgressMessage
 };
