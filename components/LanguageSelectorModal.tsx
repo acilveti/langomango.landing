@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
