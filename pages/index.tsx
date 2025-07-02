@@ -3,16 +3,9 @@ import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
 import styled from 'styled-components';
-import BasicSection, { BasicSection1 } from 'components/BasicSection';
-import Link from 'components/Link';
-import { EnvVars } from 'env.production';
-import { getAllPosts } from 'utils/postsFetcher';
 import Cta from 'views/HomePage/Cta';
-import Features from 'views/HomePage/Features';
 import FeaturesGallery from 'views/HomePage/FeaturesGallery';
 import Hero from 'views/HomePage/Hero';
-import Partners from 'views/HomePage/Partners';
-import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -21,9 +14,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
 import AutofitGrid from 'components/AutofitGrid';
-import BasicCard from 'components/BasicCard';
-import Page from 'components/Page';
-import SectionTitle from 'components/SectionTitle';
 import OverTitle from 'components/OverTitle';
 import Container from 'components/Container';
 import YoutubeVideo from 'components/YoutubeVideo';
@@ -35,10 +25,8 @@ import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackP
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
 import SimpleCta from 'components/SimpleCta2';
-import LanguageSelector from 'components/LanguageSelector';
-import { Language, DEFAULT_LANGUAGES } from 'contexts/VisitorContext';
+import { Language } from 'contexts/VisitorContext';
 import ReaderDemoModal from 'components/ReaderDemoModal';
-import ReaderDemoWidget from 'components/ReaderDemoWidget';
 import { useVisitor } from 'contexts/VisitorContext';
 
 // Reddit Pixel ID
