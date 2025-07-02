@@ -2079,65 +2079,88 @@ export default function ReaderDemoWidget({
                 
                 {/* Registration section - shown AFTER level selection */}
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}>
-                    <EmailRegistrationInputCompact
-                      type="email"
-                      placeholder="Email"
-                      value={registrationEmail}
-                      onChange={(e) => setRegistrationEmail(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail)) {
-                          setHasRegistered(true);
-                          // Now trigger the actual signup with the selected level
-                          if (selectedLevel) {
-                            handleLevelSelect(selectedLevel);
+                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered} style={{ flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
+                      <EmailRegistrationInputCompact
+                        type="email"
+                        placeholder="Email"
+                        value={registrationEmail}
+                        onChange={(e) => setRegistrationEmail(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail)) {
+                            setHasRegistered(true);
+                            // Now trigger the actual signup with the selected level
+                            if (selectedLevel) {
+                              handleLevelSelect(selectedLevel);
+                            }
                           }
-                        }
-                      }}
-                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
-                      $isValid={showValidEmailIndicator}
-                    />
-                    <OrDividerCompact>or</OrDividerCompact>
+                        }}
+                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                        $isValid={showValidEmailIndicator}
+                        style={{ flex: 1 }}
+                      />
+                      <SignupButtonCompact
+                        onClick={() => {
+                          if (registrationEmail && validateEmail(registrationEmail)) {
+                            setHasRegistered(true);
+                            // Now trigger the actual signup with the selected level
+                            if (selectedLevel) {
+                              handleLevelSelect(selectedLevel);
+                            }
+                          }
+                        }}
+                        disabled={!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel}
+                        style={{ 
+                          padding: '8px 16px',
+                          opacity: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel) ? 0.5 : 1,
+                          cursor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel) ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        →
+                      </SignupButtonCompact>
+                    </div>
+                    <OrDividerCompact style={{ margin: '16px 0 12px', width: '100%', textAlign: 'center', display: 'block' }}>or</OrDividerCompact>
                     <GoogleSignupButtonCompact 
-                      onClick={() => {
-                        // Language preferences are already being persisted to localStorage by VisitorContext
-                        // Just ensure they're up to date
-                        if (tempTargetLanguage) {
-                          setContextLanguage(tempTargetLanguage);
-                        }
-                        
-                        // Store the selected level if any
-                        if (selectedLevel) {
-                          sessionStorage.setItem('selectedLevel', selectedLevel);
-                        }
-                        
-                        // Mark that we're in the registration flow and need to return
-                        sessionStorage.setItem('registrationFlow', 'google');
-                        sessionStorage.setItem('returnToWidget', 'true');
-                        
-                        // Get current page URL and add state parameter
-                        const currentUrl = new URL(window.location.href);
-                        // Add state to indicate we should open signup modal on return
-                        currentUrl.searchParams.set('state', 'oauth_signup_return');
-                        
-                        // Build the Google OAuth URL
-                        const baseUrl = 'https://staging.langomango.com';
-                        // Don't include /landing-callback in returnUrl, just use root
-                        const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${encodeURIComponent('/')}&frontendRedirectUrl=${encodeURIComponent(currentUrl.toString())}`;
-                        
-                        console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
-                        window.location.href = googleAuthUrl;
-                      }}
-                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
-                    >
-                      <svg viewBox="0 0 24 24" width="16" height="16">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                      <span>Google</span>
-                    </GoogleSignupButtonCompact>
+                        onClick={() => {
+                          // Language preferences are already being persisted to localStorage by VisitorContext
+                          // Just ensure they're up to date
+                          if (tempTargetLanguage) {
+                            setContextLanguage(tempTargetLanguage);
+                          }
+                          
+                          // Store the selected level if any
+                          if (selectedLevel) {
+                            sessionStorage.setItem('selectedLevel', selectedLevel);
+                          }
+                          
+                          // Mark that we're in the registration flow and need to return
+                          sessionStorage.setItem('registrationFlow', 'google');
+                          sessionStorage.setItem('returnToWidget', 'true');
+                          
+                          // Get current page URL and add state parameter
+                          const currentUrl = new URL(window.location.href);
+                          // Add state to indicate we should open signup modal on return
+                          currentUrl.searchParams.set('state', 'oauth_signup_return');
+                          
+                          // Build the Google OAuth URL
+                          const baseUrl = 'https://staging.langomango.com';
+                          // Don't include /landing-callback in returnUrl, just use root
+                          const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${encodeURIComponent('/')}&frontendRedirectUrl=${encodeURIComponent(currentUrl.toString())}`;
+                          
+                          console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
+                          window.location.href = googleAuthUrl;
+                        }}
+                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                        style={{ width: '100%' }}
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span>Google</span>
+                      </GoogleSignupButtonCompact>
                   </CompactRegistrationSection>
                 )}
                 
