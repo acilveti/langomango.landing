@@ -73,6 +73,31 @@ export interface UpdateDemoProfileResponse {
   message: string;
 }
 
+export interface SignupWithEmailRequest {
+  email: string;
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+}
+
+export interface SignupWithEmailResponse {
+  success: boolean;
+  token: string;
+  user: DemoUserInfo;
+  redirectUrl: string;
+}
+
+export interface UpdateUserProfileRequest {
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+}
+
+export interface UpdateUserProfileResponse {
+  success: boolean;
+  redirectUrl: string;
+}
+
 // API service class
 class ApiService {
   private baseUrl: string;
@@ -141,6 +166,25 @@ class ApiService {
   // Update demo profile endpoint for authenticated users
   async updateDemoProfile(data: UpdateDemoProfileRequest, token: string): Promise<UpdateDemoProfileResponse> {
     return this.request<UpdateDemoProfileResponse>('/auth/update-demo-profile', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
+  // Full signup with email endpoint
+  async signupWithEmail(data: SignupWithEmailRequest): Promise<SignupWithEmailResponse> {
+    return this.request<SignupWithEmailResponse>('/auth/signup-email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Update user profile endpoint for authenticated users
+  async updateUserProfile(data: UpdateUserProfileRequest, token: string): Promise<UpdateUserProfileResponse> {
+    return this.request<UpdateUserProfileResponse>('/auth/update-profile', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {

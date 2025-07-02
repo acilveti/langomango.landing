@@ -1064,6 +1064,11 @@ export default function ReaderDemoWidget({
   const handleLevelSelect = useCallback(async (level: string) => {
     if (!hasSelectedTarget || isEditingTarget) return;
     
+    // For full register mode, ensure user has registered first
+    if (isFullRegister && !hasRegistered && !hasValidEmail) {
+      return;
+    }
+    
     setSelectedLevel(level);
     setDemoLevel(level); // Update demo level for content display
     sessionStorage.setItem('selectedLevel', level);
@@ -1072,37 +1077,93 @@ export default function ReaderDemoWidget({
     setShowBookAnimation(true);
     
     try {
-      // Track Reddit pixel signup event
-      trackRedditConversion(RedditEventTypes.SIGNUP, {
-        signup_type: 'demo',
-        native_language: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-        target_language: tempTargetLanguage.code,
-        level: level,
-        source: 'reader_widget'
-      });
-      
-      const response = await apiService.demoSignup({
-        nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-        targetLanguage: tempTargetLanguage.code,
-        level: level
-      });
-      
-      if (response.success && response.redirectUrl) {
-        // Wait a bit for animation before redirecting
-        setTimeout(() => {
-          window.location.href = response.redirectUrl;
-        }, 1500);
+      // Full registration flow - user has email or Google auth
+      if (isFullRegister && (hasRegistered || hasValidEmail)) {
+        // Track Reddit pixel signup event for full registration
+        trackRedditConversion(RedditEventTypes.SIGNUP, {
+          signup_type: 'full',
+          native_language: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+          target_language: tempTargetLanguage.code,
+          level: level,
+          source: 'reader_widget'
+        });
+        
+        if (hasValidEmail && registrationEmail) {
+          // Email registration flow
+          const response = await apiService.signupWithEmail({
+            email: registrationEmail,
+            nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+            targetLanguage: tempTargetLanguage.code,
+            level: level
+          });
+          
+          if (response.success && response.token) {
+            // Store token
+            localStorage.setItem('token', response.token);
+            
+            // Redirect to app
+            setTimeout(() => {
+              window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
+            }, 1500);
+          } else {
+            throw new Error('Failed to create account');
+          }
+        } else if (hasRegistered) {
+          // Google OAuth flow - update existing user profile
+          const token = localStorage.getItem('token');
+          
+          if (token) {
+            const response = await apiService.updateUserProfile({
+              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+              targetLanguage: tempTargetLanguage.code,
+              level: level
+            }, token);
+            
+            if (response.success) {
+              setTimeout(() => {
+                window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
+              }, 1500);
+            } else {
+              throw new Error('Failed to update profile');
+            }
+          } else {
+            throw new Error('No authentication token found');
+          }
+        }
       } else {
-        throw new Error('Invalid response from server');
+        // Demo flow (when isFullRegister is false)
+        // Track Reddit pixel signup event for demo
+        trackRedditConversion(RedditEventTypes.SIGNUP, {
+          signup_type: 'demo',
+          native_language: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+          target_language: tempTargetLanguage.code,
+          level: level,
+          source: 'reader_widget'
+        });
+        
+        const response = await apiService.demoSignup({
+          nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+          targetLanguage: tempTargetLanguage.code,
+          level: level
+        });
+        
+        if (response.success && response.redirectUrl) {
+          // Wait a bit for animation before redirecting
+          setTimeout(() => {
+            window.location.href = response.redirectUrl;
+          }, 1500);
+        } else {
+          throw new Error('Invalid response from server');
+        }
       }
     } catch (error) {
-      console.error('Demo signup error:', error);
-      setSignupError(error instanceof Error ? error.message : 'Failed to create demo account. Please try again.');
+      console.error('Signup error:', error);
+      setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
       setShowBookAnimation(false);
       setIsLoadingSignup(false);
       setSelectedLevel('');
     }
-  }, [hasSelectedTarget, isEditingTarget, tempNativeLanguage, nativeLanguage, tempTargetLanguage]);
+  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage, registrationEmail]);
 
   const hidePopup = useCallback(() => {
     setPopup(prev => ({ ...prev, visible: false }));
@@ -1871,73 +1932,261 @@ export default function ReaderDemoWidget({
                   </LanguagePickerContainer>
                 )}
                 
-
-                
+                {/* Level selector - comes AFTER language selection and BEFORE registration */}
                 <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
                   <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
-                  <LevelButtons>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'A1'}
-                      onClick={() => handleLevelSelect('A1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🌱</LevelEmoji>
-                      <LevelName>A1</LevelName>
-                      <LevelDesc>Beginner</LevelDesc>
-                    </LevelButton>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'A2'}
-                      onClick={() => handleLevelSelect('A2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🌿</LevelEmoji>
-                      <LevelName>A2</LevelName>
-                      <LevelDesc>Elementary</LevelDesc>
-                    </LevelButton>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'B1'}
-                      onClick={() => handleLevelSelect('B1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🍀</LevelEmoji>
-                      <LevelName>B1</LevelName>
-                      <LevelDesc>Intermediate</LevelDesc>
-                    </LevelButton>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'B2'}
-                      onClick={() => handleLevelSelect('B2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🌳</LevelEmoji>
-                      <LevelName>B2</LevelName>
-                      <LevelDesc>Upper Int.</LevelDesc>
-                    </LevelButton>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'C1'}
-                      onClick={() => handleLevelSelect('C1')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🌲</LevelEmoji>
-                      <LevelName>C1</LevelName>
-                      <LevelDesc>Advanced</LevelDesc>
-                    </LevelButton>
-                    <LevelButton 
-                      $isActive={selectedLevel === 'C2'}
-                      onClick={() => handleLevelSelect('C2')}
-                      $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                      $needsSelection={hasSelectedTarget && !selectedLevel}
-                    >
-                      <LevelEmoji>🎯</LevelEmoji>
-                      <LevelName>C2</LevelName>
-                      <LevelDesc>Mastery</LevelDesc>
-                    </LevelButton>
-                  </LevelButtons>
+                  {/* If level is already selected (from demo), show only that level */}
+                  {demoLevel ? (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      marginTop: '1.5rem'
+                    }}>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            // Don't do anything yet, just visual selection
+                            setSelectedLevel(demoLevel);
+                          } else {
+                            handleLevelSelect(demoLevel);
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        style={{ width: '120px' }}
+                      >
+                        <LevelEmoji>
+                          {demoLevel === 'A1' && '🌱'}
+                          {demoLevel === 'A2' && '🌿'}
+                          {demoLevel === 'B1' && '🍀'}
+                          {demoLevel === 'B2' && '🌳'}
+                          {demoLevel === 'C1' && '🌲'}
+                          {demoLevel === 'C2' && '🎯'}
+                        </LevelEmoji>
+                        <LevelName>{demoLevel}</LevelName>
+                        <LevelDesc>
+                          {demoLevel === 'A1' && 'Beginner'}
+                          {demoLevel === 'A2' && 'Elementary'}
+                          {demoLevel === 'B1' && 'Intermediate'}
+                          {demoLevel === 'B2' && 'Upper Int.'}
+                          {demoLevel === 'C1' && 'Advanced'}
+                          {demoLevel === 'C2' && 'Mastery'}
+                        </LevelDesc>
+                      </LevelButton>
+                    </div>
+                  ) : (
+                    /* Show full grid if no level is selected */
+                    <LevelButtons>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('A1');
+                          } else {
+                            handleLevelSelect('A1');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🌱</LevelEmoji>
+                        <LevelName>A1</LevelName>
+                        <LevelDesc>Beginner</LevelDesc>
+                      </LevelButton>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('A2');
+                          } else {
+                            handleLevelSelect('A2');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🌿</LevelEmoji>
+                        <LevelName>A2</LevelName>
+                        <LevelDesc>Elementary</LevelDesc>
+                      </LevelButton>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('B1');
+                          } else {
+                            handleLevelSelect('B1');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🍀</LevelEmoji>
+                        <LevelName>B1</LevelName>
+                        <LevelDesc>Intermediate</LevelDesc>
+                      </LevelButton>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('B2');
+                          } else {
+                            handleLevelSelect('B2');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🌳</LevelEmoji>
+                        <LevelName>B2</LevelName>
+                        <LevelDesc>Upper Int.</LevelDesc>
+                      </LevelButton>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('C1');
+                          } else {
+                            handleLevelSelect('C1');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🌲</LevelEmoji>
+                        <LevelName>C1</LevelName>
+                        <LevelDesc>Advanced</LevelDesc>
+                      </LevelButton>
+                      <LevelButton 
+                        $isActive={false}
+                        onClick={() => {
+                          if (isFullRegister) {
+                            setSelectedLevel('C2');
+                          } else {
+                            handleLevelSelect('C2');
+                          }
+                        }}
+                        $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
+                        $needsSelection={hasSelectedTarget && !selectedLevel}
+                      >
+                        <LevelEmoji>🎯</LevelEmoji>
+                        <LevelName>C2</LevelName>
+                        <LevelDesc>Mastery</LevelDesc>
+                      </LevelButton>
+                    </LevelButtons>
+                  )}
                 </LevelSelectorContainer>
+                
+                {/* Registration section - shown AFTER level selection */}
+                {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
+                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}>
+                    <EmailRegistrationInputCompact
+                      type="email"
+                      placeholder="Email"
+                      value={registrationEmail}
+                      onChange={(e) => setRegistrationEmail(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail)) {
+                          setHasRegistered(true);
+                          // Now trigger the actual signup with the selected level
+                          if (selectedLevel) {
+                            handleLevelSelect(selectedLevel);
+                          }
+                        }
+                      }}
+                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                      $isValid={showValidEmailIndicator}
+                    />
+                    <OrDividerCompact>or</OrDividerCompact>
+                    <GoogleSignupButtonCompact 
+                      onClick={() => {
+                        // Language preferences are already being persisted to localStorage by VisitorContext
+                        // Just ensure they're up to date
+                        if (tempTargetLanguage) {
+                          setContextLanguage(tempTargetLanguage);
+                        }
+                        
+                        // Store the selected level if any
+                        if (selectedLevel) {
+                          sessionStorage.setItem('selectedLevel', selectedLevel);
+                        }
+                        
+                        // Mark that we're in the registration flow and need to return
+                        sessionStorage.setItem('registrationFlow', 'google');
+                        sessionStorage.setItem('returnToWidget', 'true');
+                        
+                        // Get current page URL and add state parameter
+                        const currentUrl = new URL(window.location.href);
+                        // Add state to indicate we should open signup modal on return
+                        currentUrl.searchParams.set('state', 'oauth_signup_return');
+                        
+                        // Build the Google OAuth URL
+                        const baseUrl = 'https://staging.langomango.com';
+                        // Don't include /landing-callback in returnUrl, just use root
+                        const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${encodeURIComponent('/')}&frontendRedirectUrl=${encodeURIComponent(currentUrl.toString())}`;
+                        
+                        console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
+                        window.location.href = googleAuthUrl;
+                      }}
+                      $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      <span>Google</span>
+                    </GoogleSignupButtonCompact>
+                  </CompactRegistrationSection>
+                )}
+                
+                {isFullRegister && hasSelectedTarget && !isEditingTarget && hasRegistered && (
+                  <CompactRegistrationSection $isCompleted={true}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#22c55e',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Signed in with Google</span>
+                    </div>
+                  </CompactRegistrationSection>
+                )}
+                
+                {!isFullRegister && (
+                  <SecondarySection>
+                    <SecondaryDivider>
+                      <DividerLine />
+                      <DividerText>or jump straight to the app</DividerText>
+                      <DividerLine />
+                    </SecondaryDivider>
+                    
+                    <SecondaryButtons>
+                      <SecondaryButton onClick={() => setShowExpandedForm(false)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                          <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Sign up with Email
+                      </SecondaryButton>
+                      <SecondaryButton onClick={handleGoogleSignup}>
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                      </SecondaryButton>
+                    </SecondaryButtons>
+                  </SecondarySection>
+                )}
                 
                 {showBookAnimation && (
                   <BookAnimationWrapper>
@@ -1955,11 +2204,16 @@ export default function ReaderDemoWidget({
               Please select your target language to continue
               </PromptMessage>
               ) : (!selectedLevel && hasSelectedTarget) ? (
-                  <PromptMessage>
-                    <PromptIcon>🎯</PromptIcon>
-                    Now select your level to start reading
-                  </PromptMessage>
-                ) : null}
+              <PromptMessage>
+              <PromptIcon>🎯</PromptIcon>
+              Now select your level
+              </PromptMessage>
+              ) : (isFullRegister && !hasRegistered && !hasValidEmail && selectedLevel) ? (
+              <PromptMessage>
+              <PromptIcon>📧</PromptIcon>
+              Please enter your email or sign in with Google
+              </PromptMessage>
+              ) : null}
               
               {signupError && (
                 <ErrorMessage>
@@ -1968,32 +2222,7 @@ export default function ReaderDemoWidget({
                 </ErrorMessage>
               )}
               
-              <SecondarySection>
-                <SecondaryDivider>
-                  <DividerLine />
-                  <DividerText>or jump straight to the app</DividerText>
-                  <DividerLine />
-                </SecondaryDivider>
-                
-                <SecondaryButtons>
-                  <SecondaryButton onClick={() => setShowExpandedForm(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                      <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    Sign up with Email
-                  </SecondaryButton>
-                  <SecondaryButton onClick={handleGoogleSignup}>
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Continue with Google
-                  </SecondaryButton>
-                </SecondaryButtons>
-              </SecondarySection>
+              
             </SignupExpanded>
             </SignupExpandedWrapper>
           ) : (
