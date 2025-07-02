@@ -201,6 +201,7 @@ export default function ReaderDemoWidget({
   const [activeLetters, setActiveLetters] = useState<string[]>([]);
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   
   // Get level from sessionStorage on mount
   useEffect(() => {
@@ -904,14 +905,14 @@ export default function ReaderDemoWidget({
       const newClickCount = clickCount + 1;
       setClickCount(newClickCount);
       
-      // Show alphabet progress on first click
+      // First click - add more letters (total: 7 + 6 = 13)
       if (newClickCount === 1) {
         setHasClicked(true);
-        setShowAlphabetProgress(true);
+        setAlphabetStage(1);
         
-        // Add 3 random letters on first click
-        const firstLetters = getRandomLetters(3, []);
-        setActiveLetters(firstLetters);
+        // Add 6 more random letters on first click
+        const newLetters = getRandomLetters(6, activeLetters);
+        setActiveLetters(prev => [...prev, ...newLetters]);
         
         // Continue with educational message flow
         setShowEducationalMessage(true);
@@ -955,8 +956,9 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 3500); // 3.5 seconds to read the message
       } else if (newClickCount === 2) {
-        // Add 4 more random letters on second click
-        const newLetters = getRandomLetters(4, activeLetters);
+        // Second click - add more letters (total: 13 + 7 = 20)
+        setAlphabetStage(2);
+        const newLetters = getRandomLetters(7, activeLetters);
         setActiveLetters(prev => [...prev, ...newLetters]);
         
         // Show second educational message on second click
@@ -987,9 +989,18 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 4500); // 4.5 seconds to read
       } else if (newClickCount === 3) {
-        // Add 5 more random letters on third click
-        const newLetters = getRandomLetters(5, activeLetters);
-        setActiveLetters(prev => [...prev, ...newLetters]);
+        // Third click - complete the alphabet (total: 20 + 6 = 26)
+        setAlphabetStage(3);
+        const remainingLetters = getRandomLetters(6, activeLetters);
+        setActiveLetters(prev => [...prev, ...remainingLetters]);
+        
+        // Show completion message
+        setTimeout(() => {
+          setShowCompletionMessage(true);
+          setTimeout(() => {
+            setShowCompletionMessage(false);
+          }, 3000);
+        }, 600); // Show after letters animate in
         
         // Show third educational message on third click
         setShowThirdEducationalMessage(true);
@@ -1034,28 +1045,8 @@ export default function ReaderDemoWidget({
           }, 500); // 0.5 seconds for fade-out
         }, 4500); // 4.5 seconds to read
       } else {
-        // Continue adding random letters with each click
-        const remainingCount = 26 - activeLetters.length;
-        
-        if (remainingCount > 0) {
-          // Add 3-5 letters per click, proportionally more as we near completion
-          const baseAdd = 3;
-          const bonusAdd = Math.floor((26 - remainingCount) / 5); // Add more letters as we progress
-          const lettersToAdd = Math.min(baseAdd + bonusAdd, remainingCount);
-          
-          const newLetters = getRandomLetters(lettersToAdd, activeLetters);
-          setActiveLetters(prev => [...prev, ...newLetters]);
-          
-          // Check if alphabet is complete
-          if (activeLetters.length + newLetters.length === 26 && !showCompletionMessage) {
-            setShowCompletionMessage(true);
-            setTimeout(() => {
-              setShowCompletionMessage(false);
-            }, 3000);
-          }
-        }
-        
-        // Regular page transitions - update word count
+        // After 3 clicks, alphabet is already complete
+        // Just update word count
         setTimeout(() => {
           let totalWords = 0;
           for (let i = 1; i <= currentPage + 1; i++) {
@@ -1463,6 +1454,13 @@ export default function ReaderDemoWidget({
               setTimeout(() => {
                 setShowWordCounts(true);
                 console.log('[visibilityTimer] Word count badges shown');
+                
+                // Show alphabet progress with initial letters (25% of alphabet = 6-7 letters)
+                setShowAlphabetProgress(true);
+                const initialLetters = getRandomLetters(7, []);
+                setActiveLetters(initialLetters);
+                setAlphabetStage(0);
+                
                 // Then update global counter 1 second later
                 wordsTimerRef.current = setTimeout(() => {
                   const page8Words = calculatePageWordsRef.current?.(8) || 0;
@@ -1888,7 +1886,10 @@ export default function ReaderDemoWidget({
       {showAlphabetProgress && (
         <AlphabetProgressContainer>
           <ProgressHint>
-            Keep reading to unlock all letters!
+            {alphabetStage === 0 && "Your alphabet journey begins!"}
+            {alphabetStage === 1 && "Keep going! More letters await..."}
+            {alphabetStage === 2 && "Almost there! Just one more page..."}
+            {alphabetStage === 3 && "Amazing! You've collected the entire alphabet!"}
           </ProgressHint>
           {showCompletionMessage && (
             <ProgressMessage>
@@ -1898,7 +1899,8 @@ export default function ReaderDemoWidget({
           {alphabetArray.map((letter, index) => {
             const isActive = activeLetters.includes(letter);
             const activeIndex = activeLetters.indexOf(letter);
-            const animationDelay = isActive ? activeIndex * 0.1 : 0;
+            // Stagger animations based on when the letter was added
+            const animationDelay = isActive ? activeIndex * 0.05 : 0;
             
             return (
               <AlphabetLetter
