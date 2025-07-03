@@ -70,7 +70,8 @@ export type ReferralSource = 'reddit' | 'instagram' | 'facebook' | 'twitter' | '
 // Context type definition
 interface VisitorContextType {
   selectedLanguage: Language | null;
-  setSelectedLanguage: (language: Language | null) => void;
+  selectedLanguageLevel: string | null;
+  setSelectedLanguage: (language: Language | null, level?: string | null) => void;
   availableLanguages: Language[];
   nativeLanguage: Language | null;
   referralSource: ReferralSource;
@@ -144,6 +145,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   availableLanguages = DEFAULT_LANGUAGES 
 }) => {
   const [selectedLanguage, setSelectedLanguageState] = useState<Language | null>(defaultLanguage);
+  const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<string | null>(null);
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
   const [hasSelectedLanguage, setHasSelectedLanguageState] = useState<boolean>(false);
@@ -166,6 +168,11 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
             setSelectedLanguageState(lang);
             setHasSelectedLanguageState(true);
           }
+        }
+        
+        // Restore selected language level
+        if (data.selectedLanguageLevel) {
+          setSelectedLanguageLevelState(data.selectedLanguageLevel);
         }
         
         // Restore native language
@@ -203,8 +210,9 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   }, []);
 
   // Custom setSelectedLanguage that also persists to localStorage
-  const setSelectedLanguage = (language: Language | null) => {
+  const setSelectedLanguage = (language: Language | null, level?: string | null) => {
     setSelectedLanguageState(language);
+    setSelectedLanguageLevelState(level || null);
     
     // Persist to localStorage
     if (typeof window !== 'undefined') {
@@ -220,6 +228,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
       }
       
       data.selectedLanguage = language?.code || null;
+      data.selectedLanguageLevel = level || null;
       if (nativeLanguage) {
         data.nativeLanguage = nativeLanguage.code;
       }
@@ -253,6 +262,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
 
   const value: VisitorContextType = {
     selectedLanguage,
+    selectedLanguageLevel,
     setSelectedLanguage,
     availableLanguages,
     nativeLanguage,
@@ -300,6 +310,7 @@ export const setReferralSourceCookie = (source: ReferralSource): void => {
 export const getVisitorAnalytics = (context: VisitorContextType) => {
   return {
     selectedLanguageCode: context.selectedLanguage?.code || 'none',
+    selectedLanguageLevel: context.selectedLanguageLevel || 'none',
     nativeLanguageCode: context.nativeLanguage?.code || 'unknown',
     referralSource: context.referralSource,
     languageMatch: context.selectedLanguage?.code === context.nativeLanguage?.code,

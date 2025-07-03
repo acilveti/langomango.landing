@@ -12,6 +12,7 @@ interface LanguageSelectorModalProps {
   onClose: () => void;
   languages: Language[];
   selectedLanguage: Language | null;
+  selectedLevel?: string;
   onLanguageSelect: (language: Language, level?: string) => void;
   isDark?: boolean;
   hasUserSelected?: boolean;
@@ -23,6 +24,7 @@ export default function LanguageSelectorModal({
   onClose,
   languages,
   selectedLanguage,
+  selectedLevel: initialSelectedLevel,
   onLanguageSelect,
   isDark = false,
   hasUserSelected = false,
@@ -30,7 +32,7 @@ export default function LanguageSelectorModal({
 }: LanguageSelectorModalProps) {
   const [showLevelSelection, setShowLevelSelection] = useState(false);
   const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState<string>('');
+  const [selectedLevel, setSelectedLevel] = useState<string>(initialSelectedLevel || '');
   
   useEscClose({ onClose: isOpen ? onClose : () => {} });
 
@@ -38,11 +40,15 @@ export default function LanguageSelectorModal({
     if (requireLevel) {
       setTempSelectedLanguage(language);
       setShowLevelSelection(true);
+      // If selecting the same language that's already selected, preserve the level
+      if (language.code === selectedLanguage?.code && initialSelectedLevel) {
+        setSelectedLevel(initialSelectedLevel);
+      }
     } else {
       onLanguageSelect(language);
       onClose();
     }
-  }, [onLanguageSelect, onClose, requireLevel]);
+  }, [onLanguageSelect, onClose, requireLevel, selectedLanguage, initialSelectedLevel]);
 
   const handleLevelSelect = useCallback((level: string) => {
     if (tempSelectedLanguage) {
@@ -90,7 +96,7 @@ export default function LanguageSelectorModal({
             <LevelGrid>
               <LevelOption
                 onClick={() => handleLevelSelect('A1')}
-                isSelected={selectedLevel === 'A1'}
+                isSelected={selectedLevel === 'A1' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'A1')}
                 isDark={isDark}
               >
                 <LevelEmoji>🌱</LevelEmoji>
@@ -100,7 +106,7 @@ export default function LanguageSelectorModal({
               
               <LevelOption
                 onClick={() => handleLevelSelect('A2')}
-                isSelected={selectedLevel === 'A2'}
+                isSelected={selectedLevel === 'A2' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'A2')}
                 isDark={isDark}
               >
                 <LevelEmoji>🌿</LevelEmoji>
@@ -110,7 +116,7 @@ export default function LanguageSelectorModal({
               
               <LevelOption
                 onClick={() => handleLevelSelect('B1')}
-                isSelected={selectedLevel === 'B1'}
+                isSelected={selectedLevel === 'B1' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'B1')}
                 isDark={isDark}
               >
                 <LevelEmoji>🍀</LevelEmoji>
@@ -120,7 +126,7 @@ export default function LanguageSelectorModal({
               
               <LevelOption
                 onClick={() => handleLevelSelect('B2')}
-                isSelected={selectedLevel === 'B2'}
+                isSelected={selectedLevel === 'B2' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'B2')}
                 isDark={isDark}
               >
                 <LevelEmoji>🌳</LevelEmoji>
@@ -130,7 +136,7 @@ export default function LanguageSelectorModal({
               
               <LevelOption
                 onClick={() => handleLevelSelect('C1')}
-                isSelected={selectedLevel === 'C1'}
+                isSelected={selectedLevel === 'C1' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'C1')}
                 isDark={isDark}
               >
                 <LevelEmoji>🌲</LevelEmoji>
@@ -140,7 +146,7 @@ export default function LanguageSelectorModal({
               
               <LevelOption
                 onClick={() => handleLevelSelect('C2')}
-                isSelected={selectedLevel === 'C2'}
+                isSelected={selectedLevel === 'C2' || (tempSelectedLanguage?.code === selectedLanguage?.code && initialSelectedLevel === 'C2')}
                 isDark={isDark}
               >
                 <LevelEmoji>🎯</LevelEmoji>
@@ -160,7 +166,9 @@ export default function LanguageSelectorModal({
                 <LanguageFlag>{language.flag}</LanguageFlag>
                 <LanguageName isDark={isDark}>{language.name}</LanguageName>
                 {hasUserSelected && selectedLanguage?.code === language.code && (
-                  <SelectedBadge isDark={isDark}>Selected</SelectedBadge>
+                  <SelectedBadge isDark={isDark}>
+                    Selected{initialSelectedLevel && requireLevel ? ` (${initialSelectedLevel})` : ''}
+                  </SelectedBadge>
                 )}
               </LanguageOption>
             ))}

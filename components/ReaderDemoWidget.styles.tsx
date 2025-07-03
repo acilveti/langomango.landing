@@ -2755,7 +2755,7 @@ const AutoAdvanceNote = styled.p`
 // Alphabet Progress Styles
 const AlphabetProgressContainer = styled.div`
   position: absolute;
-  bottom: 6rem;
+  bottom: 0rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -2770,16 +2770,9 @@ const AlphabetProgressContainer = styled.div`
   max-width: 95%;
   overflow: hidden;
   position: relative;
-  
-  ${media('<=tablet')} {
-    bottom: 5rem;
-    gap: 0.1rem;
-    padding: 0.8rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  
+      
   ${media('<=phone')} {
-    bottom: 4.5rem;
+    bottom: 0rem;
     gap: 0.08rem;
     padding: 0.6rem 1rem;
     max-width: 98%;

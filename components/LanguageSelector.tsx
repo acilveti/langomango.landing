@@ -43,9 +43,9 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   isDark = false,
   requireLevel = false
 }, ref) => {
-  const { selectedLanguage: contextLanguage, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
+  const { selectedLanguage: contextLanguage, selectedLanguageLevel: contextLanguageLevel, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
-  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(undefined);
+  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(contextLanguageLevel || undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -53,12 +53,13 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   // Sync with context when it changes
   useEffect(() => {
     setSelectedLanguage(contextLanguage);
-  }, [contextLanguage]);
+    setSelectedLevel(contextLanguageLevel || undefined);
+  }, [contextLanguage, contextLanguageLevel]);
 
   function handleLanguageSelect(language: Language, level?: string) {
     setSelectedLanguage(language);
     setSelectedLevel(level);
-    setContextLanguage(language); // Update context
+    setContextLanguage(language, level); // Update context with both language and level
     setHasSelectedLanguage(true); // Mark that user has selected a language
     setIsModalOpen(false);
     
@@ -111,7 +112,10 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
           {selectedLanguage && hasSelectedLanguage ? (
             <>
               <SelectedLanguageFlag>{selectedLanguage.flag}</SelectedLanguageFlag>
-              <SelectedLanguageName isDark={isDark}>{selectedLanguage.name}</SelectedLanguageName>
+              <SelectedLanguageName isDark={isDark}>
+                {selectedLanguage.name}
+                {selectedLevel && ` (${selectedLevel})`}
+              </SelectedLanguageName>
               {isProcessing && <ProcessingSpinner />}
               {showConfirmation && !isProcessing && <CheckmarkIcon>✓</CheckmarkIcon>}
             </>
@@ -128,6 +132,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         onClose={() => setIsModalOpen(false)}
         languages={languages}
         selectedLanguage={selectedLanguage}
+        selectedLevel={selectedLevel}
         onLanguageSelect={handleLanguageSelect}
         isDark={isDark}
         hasUserSelected={hasSelectedLanguage}

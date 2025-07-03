@@ -151,6 +151,7 @@ export default function ReaderDemoWidget({
 }: ReaderDemoWidgetProps) {
   const { 
     selectedLanguage: contextLanguage, 
+    selectedLanguageLevel: contextLanguageLevel,
     setSelectedLanguage: setContextLanguage, 
     nativeLanguage,
     hasSelectedLanguage,
@@ -171,7 +172,7 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('');
-  const [demoLevel, setDemoLevel] = useState<string>(''); // Track level for demo content
+  const [demoLevel, setDemoLevel] = useState<string>(contextLanguageLevel || ''); // Track level for demo content
   const [showExpandedForm, setShowExpandedForm] = useState(true);
   const [isEditingNative, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
@@ -203,13 +204,19 @@ export default function ReaderDemoWidget({
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   
-  // Get level from sessionStorage on mount
+  // Sync demo level with context level
   useEffect(() => {
-    const storedLevel = sessionStorage.getItem('selectedLevel');
-    if (storedLevel) {
-      setDemoLevel(storedLevel);
+    if (contextLanguageLevel) {
+      setDemoLevel(contextLanguageLevel);
+      sessionStorage.setItem('selectedLevel', contextLanguageLevel);
+    } else {
+      // Fallback to sessionStorage if context doesn't have level yet
+      const storedLevel = sessionStorage.getItem('selectedLevel');
+      if (storedLevel) {
+        setDemoLevel(storedLevel);
+      }
     }
-  }, []);
+  }, [contextLanguageLevel]);
 
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
@@ -377,8 +384,8 @@ export default function ReaderDemoWidget({
   // Handle level selection
   const handleLevelSelectInDropdown = (level: string) => {
     if (tempSelectedLanguage) {
-      // Update context language
-      setContextLanguage(tempSelectedLanguage);
+      // Update context language with level
+      setContextLanguage(tempSelectedLanguage, level);
       setHasSelectedLanguage(true);
       
       // Store the selected level
@@ -2001,7 +2008,7 @@ export default function ReaderDemoWidget({
                               setIsEditingNative(false);
                             } else if (isEditingTarget) {
                               setTempTargetLanguage(language);
-                              setContextLanguage(language);
+                              setContextLanguage(language); // Don't pass level here, keep existing level
                               setIsEditingTarget(false);
                               setHasSelectedTarget(true);
                               setHasSelectedLanguage(true);
@@ -2024,42 +2031,42 @@ export default function ReaderDemoWidget({
                 {/* Level selector - comes AFTER language selection and BEFORE registration */}
                 <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
                   <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
-                  {/* If level is already selected (from demo), show only that level */}
-                  {demoLevel ? (
+                  {/* If level is already selected (from context or demo), show only that level */}
+                  {(contextLanguageLevel || demoLevel) ? (
                     <div style={{
                       display: 'flex',
                       justifyContent: 'center',
                       marginTop: '1.5rem'
                     }}>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === (contextLanguageLevel || demoLevel)}
                         onClick={() => {
                           if (isFullRegister) {
                             // Don't do anything yet, just visual selection
-                            setSelectedLevel(demoLevel);
+                            setSelectedLevel(contextLanguageLevel || demoLevel);
                           } else {
-                            handleLevelSelect(demoLevel);
+                            handleLevelSelect(contextLanguageLevel || demoLevel);
                           }
                         }}
                         $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                         style={{ width: '120px' }}
                       >
                         <LevelEmoji>
-                          {demoLevel === 'A1' && '🌱'}
-                          {demoLevel === 'A2' && '🌿'}
-                          {demoLevel === 'B1' && '🍀'}
-                          {demoLevel === 'B2' && '🌳'}
-                          {demoLevel === 'C1' && '🌲'}
-                          {demoLevel === 'C2' && '🎯'}
+                          {(contextLanguageLevel || demoLevel) === 'A1' && '🌱'}
+                          {(contextLanguageLevel || demoLevel) === 'A2' && '🌿'}
+                          {(contextLanguageLevel || demoLevel) === 'B1' && '🍀'}
+                          {(contextLanguageLevel || demoLevel) === 'B2' && '🌳'}
+                          {(contextLanguageLevel || demoLevel) === 'C1' && '🌲'}
+                          {(contextLanguageLevel || demoLevel) === 'C2' && '🎯'}
                         </LevelEmoji>
-                        <LevelName>{demoLevel}</LevelName>
+                        <LevelName>{contextLanguageLevel || demoLevel}</LevelName>
                         <LevelDesc>
-                          {demoLevel === 'A1' && 'Beginner'}
-                          {demoLevel === 'A2' && 'Elementary'}
-                          {demoLevel === 'B1' && 'Intermediate'}
-                          {demoLevel === 'B2' && 'Upper Int.'}
-                          {demoLevel === 'C1' && 'Advanced'}
-                          {demoLevel === 'C2' && 'Mastery'}
+                          {(contextLanguageLevel || demoLevel) === 'A1' && 'Beginner'}
+                          {(contextLanguageLevel || demoLevel) === 'A2' && 'Elementary'}
+                          {(contextLanguageLevel || demoLevel) === 'B1' && 'Intermediate'}
+                          {(contextLanguageLevel || demoLevel) === 'B2' && 'Upper Int.'}
+                          {(contextLanguageLevel || demoLevel) === 'C1' && 'Advanced'}
+                          {(contextLanguageLevel || demoLevel) === 'C2' && 'Mastery'}
                         </LevelDesc>
                       </LevelButton>
                     </div>
@@ -2067,7 +2074,7 @@ export default function ReaderDemoWidget({
                     /* Show full grid if no level is selected */
                     <LevelButtons>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'A1'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('A1');
@@ -2083,7 +2090,7 @@ export default function ReaderDemoWidget({
                         <LevelDesc>Beginner</LevelDesc>
                       </LevelButton>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'A2'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('A2');
@@ -2099,7 +2106,7 @@ export default function ReaderDemoWidget({
                         <LevelDesc>Elementary</LevelDesc>
                       </LevelButton>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'B1'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('B1');
@@ -2115,7 +2122,7 @@ export default function ReaderDemoWidget({
                         <LevelDesc>Intermediate</LevelDesc>
                       </LevelButton>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'B2'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('B2');
@@ -2131,7 +2138,7 @@ export default function ReaderDemoWidget({
                         <LevelDesc>Upper Int.</LevelDesc>
                       </LevelButton>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'C1'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('C1');
@@ -2147,7 +2154,7 @@ export default function ReaderDemoWidget({
                         <LevelDesc>Advanced</LevelDesc>
                       </LevelButton>
                       <LevelButton 
-                        $isActive={false}
+                        $isActive={selectedLevel === 'C2'}
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('C2');
@@ -2168,7 +2175,7 @@ export default function ReaderDemoWidget({
                 
                 {/* Registration section - shown AFTER level selection */}
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered} style={{ flexDirection: 'column' }}>
+                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel} style={{ flexDirection: 'column' }}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
                       <EmailRegistrationInputCompact
                         type="email"
@@ -2184,7 +2191,7 @@ export default function ReaderDemoWidget({
                             }
                           }
                         }}
-                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
                         $isValid={showValidEmailIndicator}
                         style={{ flex: 1 }}
                       />
@@ -2239,7 +2246,7 @@ export default function ReaderDemoWidget({
                           console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
                           window.location.href = googleAuthUrl;
                         }}
-                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered}
+                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
                         style={{ width: '100%' }}
                       >
                         <svg viewBox="0 0 24 24" width="16" height="16">
