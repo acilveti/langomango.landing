@@ -475,7 +475,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ' and found himself facing the boatswain who, a few inches away and with water running down his face, was shouting at him at the top of his lungs.'
+              text: ' and found himself facing the boatswain who, a few inches away and with water running down his face.'
             }
           ],
           indent: true
@@ -559,7 +559,7 @@ export default function ReaderDemoWidget({
               showTranslation: true
             },
             {
-              text: ' groaned under the assault of wind and waves, its timbers creaking ominously.'
+              text: ' groaned under the assault of wind and waves.'
             }
           ],
           indent: true

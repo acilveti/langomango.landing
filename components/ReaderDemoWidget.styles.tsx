@@ -261,13 +261,13 @@ const ReaderContainer = styled.div<{ $inModal?: boolean }>`
   background: ${props => props.$inModal ? 'transparent' : 'white'};
   
   ${media('<=tablet')} {
-    padding: 1.5rem 5rem;
+    padding: 0.5rem 5rem;
     flex-direction: column;
     gap: 2rem;
   }
   
   ${media('<=phone')} {
-    padding: 1.5rem 4rem;
+    padding: 0.5rem 4rem;
     flex-direction: column;
     gap: 2rem;
   }
@@ -523,7 +523,7 @@ const BookContent = styled.div`
   flex-direction: column;
 
   ${media('<=tablet')} {
-    padding: 1.5rem 0.5rem;
+    padding: 1.5rem 0.5rem 0.3rem 0.5rem;
     max-width: 100%;
     min-height: 30rem;
   }
