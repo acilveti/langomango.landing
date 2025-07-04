@@ -240,7 +240,7 @@ const ReaderWrapper = styled.div<{ $inModal?: boolean }>`
   border-radius: ${props => props.$inModal ? '0' : '1.6rem'};
   overflow: ${props => props.$inModal ? 'visible' : 'hidden'};
   box-shadow: ${props => props.$inModal ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.2)'};
-  max-width: ${props => props.$inModal ? 'none' : '50rem'};
+  max-width: ${props => props.$inModal ? 'none' : '60rem'};
   margin: 0 auto;
   position: relative;
   border: ${props => props.$inModal ? 'none' : '3px solid rgb(var(--secondary))'};
@@ -258,12 +258,12 @@ const ReaderContainer = styled.div<{ $inModal?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 3rem;
+  padding: 2rem 4rem;
   position: relative;
   background: ${props => props.$inModal ? 'transparent' : 'white'};
   
   ${media('<=tablet')} {
-    padding: 0.5rem 2.5rem;
+    padding: 0.5rem 3.5rem;
     flex-direction: column;
     gap: 2rem;
   }
@@ -512,11 +512,11 @@ const NavButtonRight = styled.button<{ $shouldAnimate?: boolean }>`
 
 const BookContent = styled.div`
   flex: 1;
-  max-width: 32rem;
+  max-width: 42rem;
   min-height: 40rem;
   background: white;
   border-radius: 0.8rem;
-  padding: 2.5rem 1.5rem;
+  padding: 3rem 2rem;
   margin: 0 auto;
   overflow-y: auto;
   overflow-x: hidden;
@@ -525,7 +525,7 @@ const BookContent = styled.div`
   flex-direction: column;
 
   ${media('<=tablet')} {
-    padding: 1.2rem 0.3rem 0.3rem 0.3rem;
+    padding: 1.5rem 0.5rem 0.3rem 0.5rem;
     max-width: 100%;
     min-height: 30rem;
   }
