@@ -225,6 +225,8 @@ const successGlow = keyframes`
 const WidgetWrapper = styled.div<{ $expanded: boolean; $isFullscreen: boolean }>`
   position: relative;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   ${props => props.$expanded && !props.$isFullscreen && `
     .reader-wrapper {
       transform: scale(0.85);
@@ -238,7 +240,7 @@ const ReaderWrapper = styled.div<{ $inModal?: boolean }>`
   border-radius: ${props => props.$inModal ? '0' : '1.6rem'};
   overflow: ${props => props.$inModal ? 'visible' : 'hidden'};
   box-shadow: ${props => props.$inModal ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.2)'};
-  max-width: ${props => props.$inModal ? 'none' : '90rem'};
+  max-width: ${props => props.$inModal ? 'none' : '50rem'};
   margin: 0 auto;
   position: relative;
   border: ${props => props.$inModal ? 'none' : '3px solid rgb(var(--secondary))'};
@@ -256,18 +258,18 @@ const ReaderContainer = styled.div<{ $inModal?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 7rem;
+  padding: 2rem 3rem;
   position: relative;
   background: ${props => props.$inModal ? 'transparent' : 'white'};
   
   ${media('<=tablet')} {
-    padding: 0.5rem 5rem;
+    padding: 0.5rem 2.5rem;
     flex-direction: column;
     gap: 2rem;
   }
   
   ${media('<=phone')} {
-    padding: 0.5rem 4rem;
+    padding: 0.5rem 3rem;
     flex-direction: column;
     gap: 2rem;
   }
@@ -510,11 +512,11 @@ const NavButtonRight = styled.button<{ $shouldAnimate?: boolean }>`
 
 const BookContent = styled.div`
   flex: 1;
-  max-width: 45rem;
+  max-width: 32rem;
   min-height: 40rem;
   background: white;
   border-radius: 0.8rem;
-  padding: 3rem 2rem;
+  padding: 2.5rem 1.5rem;
   margin: 0 auto;
   overflow-y: auto;
   overflow-x: hidden;
@@ -523,7 +525,7 @@ const BookContent = styled.div`
   flex-direction: column;
 
   ${media('<=tablet')} {
-    padding: 1.5rem 0.5rem 0.3rem 0.5rem;
+    padding: 1.2rem 0.3rem 0.3rem 0.3rem;
     max-width: 100%;
     min-height: 30rem;
   }
@@ -1136,7 +1138,7 @@ const SignupSection = styled.div<{ $isFullscreen: boolean }>`
     transform: translate(-50%, -50%);
     width: 90vw;
     height: 90vh;
-    max-width: 65rem;
+    max-width: 48rem;
     max-height: 90vh;
     border-radius: 1.6rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
@@ -1344,7 +1346,7 @@ const SignupExpanded = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  max-width: 40rem;
+  max-width: 35rem;
   margin: 0 auto;
   text-align: center;
   padding: 2rem;
@@ -1577,7 +1579,7 @@ const LanguageSetupContainer = styled.div`
   gap: 1.5rem;
   width: 100%;
   margin: 0 auto;
-  max-width: 700px;
+  max-width: 400px;
   padding-bottom: 1rem;
   pointer-events: auto !important;
   position: relative;
@@ -1596,12 +1598,12 @@ const LanguageSetupRow = styled.div`
   gap: 2rem;
   flex-wrap: nowrap;
   width: 100%;
-  max-width: 500px;
+  max-width: 380px;
   margin: 0 auto;
   
   ${media('<=tablet')} {
     gap: 1.5rem;
-    max-width: 450px;
+    max-width: 380px;
   }
   
   ${media('<=phone')} {
@@ -1628,7 +1630,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   border: 2px solid ${props => props.$isEditing ? '#ff9800' : props.$isPulsing ? '#ff9800' : '#e5e7eb'};
   border-radius: 1.2rem;
   padding: 1.8rem;
-  min-width: 220px;
+  min-width: 180px;
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -1660,7 +1662,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   }
   
   ${media('<=tablet')} {
-    min-width: 180px;
+    min-width: 160px;
     padding: 1.4rem;
     
     &::after {
@@ -1671,7 +1673,7 @@ const LanguageBox = styled.div<{ $isEditing?: boolean; $isPulsing?: boolean }>`
   }
   
   ${media('<=phone')} {
-    min-width: 140px;
+    min-width: 120px;
     padding: 1.2rem;
   }
 `;
@@ -1856,18 +1858,18 @@ const LevelButtons = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   justify-content: center;
-  max-width: 420px;
+  max-width: 360px;
   margin: 0 auto;
   
   ${media('<=tablet')} {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.8rem;
-    max-width: 360px;
+    max-width: 320px;
   }
   
   ${media('<=phone')} {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 280px;
+    max-width: 260px;
   }
 `;
 
@@ -1907,7 +1909,7 @@ const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean; $
   border-radius: 1rem;
   cursor: ${props => props.$isDisabled ? 'not-allowed' : 'pointer'};
   transition: all 0.2s ease;
-  min-width: 100px;
+  min-width: 90px;
   color: ${props => props.$isDisabled ? '#9ca3af' : props.$isActive ? 'white' : '#374151'};
   opacity: ${props => props.$isDisabled ? '0.6' : '1'};
   position: relative;
@@ -1938,7 +1940,7 @@ const LevelButton = styled.button<{ $isActive: boolean; $isDisabled?: boolean; $
   
   ${media('<=tablet')} {
     padding: 1rem 1.2rem;
-    min-width: 90px;
+    min-width: 80px;
   }
 `;
 
@@ -2414,7 +2416,7 @@ const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean; $le
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
-  width: 160px;
+  width: 140px;
   position: relative;
   
   ${props => (props.$needsAttention || props.$levelSelected) && css`
@@ -2531,7 +2533,7 @@ const EmailRegistrationInputCompact = styled.input.attrs({
   autoCorrect: 'off',
   spellCheck: false
 })<{ $needsAttention?: boolean; $isValid?: boolean; $levelSelected?: boolean }>`
-  width: 160px;
+  width: 140px;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;
   border: 2px solid ${props => props.$isValid ? '#22c55e' : (props.$needsAttention || props.$levelSelected) ? '#ff9800' : '#e5e7eb'};

@@ -1881,7 +1881,7 @@ export default function ReaderDemoWidget({
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
                   gap: '1rem',
-                  maxWidth: '380px',
+                  maxWidth: '300px',
                   margin: '0 auto',
                   fontSize: '1.4rem'
                 }}>
@@ -1933,7 +1933,7 @@ export default function ReaderDemoWidget({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '1.5rem',
-                  maxWidth: '450px',
+                  maxWidth: '350px',
                   margin: '0 auto'
                 }}>
                   <div style={{
@@ -2353,7 +2353,7 @@ export default function ReaderDemoWidget({
                       flexDirection: 'column',
                       gap: '1rem',
                       width: '100%',
-                      maxWidth: '500px',
+                      maxWidth: '400px',
                       margin: '0 auto',
                       padding: '1rem',
                       animation: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
