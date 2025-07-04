@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
-import { createEnhancedCheckoutSession, getUserSubscriptionStatus, CreateCheckoutSessionRequest } from '../../services/apiService';
+import { CreateCheckoutSessionRequest, createEnhancedCheckoutSession, getUserSubscriptionStatus } from '../../services/apiService';
 
 interface PricingPlan {
   id: string;

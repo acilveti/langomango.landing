@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
-import { apiService, createEnhancedCheckoutSession, CreateCheckoutSessionRequest } from 'services/apiService';
+import { apiService, CreateCheckoutSessionRequest, createEnhancedCheckoutSession } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import PricingPage from './PricingPage/PricingPage';
 
