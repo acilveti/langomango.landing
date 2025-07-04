@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
+import { createEnhancedCheckoutSession, getUserSubscriptionStatus, CreateCheckoutSessionRequest } from '../../services/apiService';
 
 interface PricingPlan {
   id: string;
@@ -13,15 +14,26 @@ interface PricingPlan {
   recommended?: boolean;
   discount?: string;
   buttonText: string;
+  stripeLookupKey: string;
 }
 
 interface PricingPageProps {
-  onSelectPlan: (planId: string) => void;
+  onSelectPlan?: (planId: string) => void;
   isLoading?: boolean;
+  userToken?: string; // JWT token if user is authenticated
+  isAuthenticated?: boolean;
 }
 
-const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) => {
+const PricingPage: React.FC<PricingPageProps> = ({ 
+  onSelectPlan, 
+  isLoading: externalLoading, 
+  userToken,
+  isAuthenticated = false 
+}) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [hasTrialed, setHasTrialed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
     {
@@ -37,7 +49,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
         'Books in App Library',
         'iOS & Android App'
       ],
-      buttonText: 'Start Free Trial'
+      buttonText: 'Start Free Trial',
+      stripeLookupKey: 'price_monthly'
     },
     {
       id: 'yearly',
@@ -56,7 +69,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
       ],
       recommended: true,
       discount: 'Save €71.88',
-      buttonText: 'Start Free Trial'
+      buttonText: 'Start Free Trial',
+      stripeLookupKey: 'price_yearly'
     },
     {
       id: '3year',
@@ -73,86 +87,181 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
         'One-time Payment'
       ],
       discount: '67% OFF',
-      buttonText: 'Get 3 Year Access'
+      buttonText: 'Get 3 Year Access',
+      stripeLookupKey: 'price_3year'
     }
   ];
 
-  const handlePlanSelect = (planId: string) => {
+  // Check if user has already trialed
+  useEffect(() => {
+    const checkTrialStatus = async () => {
+      if (isAuthenticated && userToken) {
+        try {
+          const status = await getUserSubscriptionStatus(userToken);
+          setHasTrialed(
+            status.isTrialing === true ||
+            status.isActive === true ||
+            status.hasTrialed === true ||
+            status.status !== 'None'
+          );
+        } catch (error) {
+          console.error('Error checking trial status:', error);
+        }
+      }
+    };
+    checkTrialStatus();
+  }, [isAuthenticated, userToken]);
+
+  const handlePlanSelect = async (planId: string) => {
     setSelectedPlan(planId);
-    onSelectPlan(planId);
+    setError(null);
+    
+    // Call the parent handler if provided
+    if (onSelectPlan) {
+      onSelectPlan(planId);
+    }
+
+    // Find the selected plan
+    const selectedPlanData = plans.find(plan => plan.id === planId);
+    if (!selectedPlanData) {
+      setError('Invalid plan selected');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // If user is not authenticated, redirect to sign up
+      if (!isAuthenticated) {
+        // Store the selected plan for after login
+        localStorage.setItem('selectedPlan', planId);
+        localStorage.setItem('returnToCheckout', 'true');
+        
+        // Redirect to your app's sign-up page
+        window.location.href = 'https://beta-app.langomango.com/sign-up';
+        return;
+      }
+
+      // Create checkout session
+      const checkoutRequest: CreateCheckoutSessionRequest = {
+        priceLookupKey: selectedPlanData.stripeLookupKey,
+        planType: planId === '1month' ? 'monthly' : planId === 'yearly' ? 'yearly' : '3year',
+        includeTrial: !hasTrialed,
+        returnUrl: window.location.origin + '/payment-success' // Adjust this to your success page
+      };
+
+      const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, userToken);
+
+      if (!checkoutData || !checkoutData.url) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      // Store session ID if needed
+      if (checkoutData.sessionId) {
+        localStorage.setItem('stripe-session-id', checkoutData.sessionId);
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = checkoutData.url;
+
+    } catch (error: any) {
+      console.error('Error initiating checkout:', error);
+      setError(error.message || 'Failed to start checkout. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
+  const isLoading = externalLoading || isProcessing;
 
   return (
     <PricingWrapper>
       <PricingContent>
         <Header>
-        <Title>Learn Languages by Reading What You Love</Title>
-        <Subtitle>Choose Your LangoMango Plan</Subtitle>
-        <SubtitleNote>7-day free trial • Cancel anytime</SubtitleNote>
-      </Header>
+          <Title>Learn Languages by Reading What You Love</Title>
+          <Subtitle>Choose Your LangoMango Plan</Subtitle>
+          <SubtitleNote>7-day free trial • Cancel anytime</SubtitleNote>
+        </Header>
 
-      <PlansContainer>
-        {plans.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            $recommended={plan.recommended}
-            $isLifetime={plan.id === '3year'}
-            $isSelected={selectedPlan === plan.id}
-            onClick={() => !isLoading && handlePlanSelect(plan.id)}
-          >
-            {plan.recommended && <RecommendedBadge>MOST POPULAR</RecommendedBadge>}
-            
-            <PlanHeader $has3YearDiscount={plan.id === '3year'}>
-              <PlanName>{plan.name}</PlanName>
-              <PriceContainer>
-                {plan.originalPrice && (
-                  <OriginalPrice>{plan.originalPrice}</OriginalPrice>
-                )}
-                <CurrentPrice>
-                  {plan.price}
-                  {plan.pricePerMonth && <PriceUnit>{plan.pricePerMonth}</PriceUnit>}
-                </CurrentPrice>
-                {plan.discount && plan.id === 'yearly' && (
-                  <DiscountAmount>{plan.discount}</DiscountAmount>
-                )}
-              </PriceContainer>
-              {plan.discount && plan.id === '3year' && (
-                <DiscountBadge>{plan.discount}</DiscountBadge>
-              )}
-            </PlanHeader>
+        {error && (
+          <ErrorMessage>
+            {error}
+          </ErrorMessage>
+        )}
 
-            <FeaturesList>
-              {plan.features.map((feature, index) => (
-                <Feature key={index}>
-                  <CheckIcon>✓</CheckIcon>
-                  <FeatureText>{feature}</FeatureText>
-                </Feature>
-              ))}
-            </FeaturesList>
-
-            <SelectButton
+        <PlansContainer>
+          {plans.map((plan) => (
+            <PlanCard
+              key={plan.id}
               $recommended={plan.recommended}
               $isLifetime={plan.id === '3year'}
-              disabled={isLoading}
+              $isSelected={selectedPlan === plan.id}
+              onClick={() => !isLoading && handlePlanSelect(plan.id)}
             >
-              {isLoading && selectedPlan === plan.id ? (
-                <LoadingSpinner />
-              ) : (
-                plan.buttonText
-              )}
-            </SelectButton>
-          </PlanCard>
-        ))}
-      </PlansContainer>
+              {plan.recommended && <RecommendedBadge>MOST POPULAR</RecommendedBadge>}
+              
+              <PlanHeader $has3YearDiscount={plan.id === '3year'}>
+                <PlanName>{plan.name}</PlanName>
+                <PriceContainer>
+                  {plan.originalPrice && (
+                    <OriginalPrice>{plan.originalPrice}</OriginalPrice>
+                  )}
+                  <CurrentPrice>
+                    {plan.price}
+                    {plan.pricePerMonth && <PriceUnit>{plan.pricePerMonth}</PriceUnit>}
+                  </CurrentPrice>
+                  {plan.discount && plan.id === 'yearly' && (
+                    <DiscountAmount>{plan.discount}</DiscountAmount>
+                  )}
+                </PriceContainer>
+                {plan.discount && plan.id === '3year' && (
+                  <DiscountBadge>{plan.discount}</DiscountBadge>
+                )}
+              </PlanHeader>
 
-      <GuaranteeSection>
-        <GuaranteeBadge>
-          <GuaranteeText>7 DAYS</GuaranteeText>
-          <GuaranteeSubtext>FREE TRIAL</GuaranteeSubtext>
-        </GuaranteeBadge>
-      </GuaranteeSection>
+              <FeaturesList>
+                {plan.features.map((feature, index) => (
+                  <Feature key={index}>
+                    <CheckIcon>✓</CheckIcon>
+                    <FeatureText>{feature}</FeatureText>
+                  </Feature>
+                ))}
+              </FeaturesList>
 
-        <CTAButton onClick={() => handlePlanSelect(selectedPlan)} disabled={!selectedPlan || isLoading}>
+              <SelectButton
+                $recommended={plan.recommended}
+                $isLifetime={plan.id === '3year'}
+                disabled={isLoading}
+              >
+                {isLoading && selectedPlan === plan.id ? (
+                  <LoadingSpinner />
+                ) : (
+                  plan.buttonText
+                )}
+              </SelectButton>
+            </PlanCard>
+          ))}
+        </PlansContainer>
+
+        <GuaranteeSection>
+          <GuaranteeBadge>
+            <GuaranteeText>7 DAYS</GuaranteeText>
+            <GuaranteeSubtext>FREE TRIAL</GuaranteeSubtext>
+          </GuaranteeBadge>
+        </GuaranteeSection>
+
+        <PaymentMethods>
+          <PaymentMethodsText>Secure payment with</PaymentMethodsText>
+          <PaymentIcons>
+            <PaymentIcon>💳 Credit Card</PaymentIcon>
+            <PaymentIcon>🅿️ PayPal</PaymentIcon>
+          </PaymentIcons>
+        </PaymentMethods>
+
+        <CTAButton 
+          onClick={() => handlePlanSelect(selectedPlan)} 
+          disabled={!selectedPlan || isLoading}
+        >
           {isLoading ? 'Processing...' : selectedPlan === '3year' ? 'Get 3 Year Access' : 'Start Your Free Trial'}
         </CTAButton>
       </PricingContent>
@@ -225,6 +334,15 @@ const SubtitleNote = styled.p`
   ${media('<=tablet')} {
     font-size: 1.3rem;
   }
+`;
+
+const ErrorMessage = styled.div`
+  background: #ef4444;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
 `;
 
 const PlansContainer = styled.div`
@@ -512,6 +630,28 @@ const GuaranteeSubtext = styled.div`
   ${media('<=tablet')} {
     font-size: 0.8rem;
   }
+`;
+
+const PaymentMethods = styled.div`
+  text-align: center;
+  margin-bottom: 2rem;
+`;
+
+const PaymentMethodsText = styled.p`
+  color: #9ca3af;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+`;
+
+const PaymentIcons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+`;
+
+const PaymentIcon = styled.span`
+  font-size: 1.4rem;
+  color: #d1d5db;
 `;
 
 const CTAButton = styled.button`

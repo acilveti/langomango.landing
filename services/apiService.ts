@@ -1,6 +1,7 @@
 // API configuration
 //const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
 
 // Type definitions
 export interface DemoSignupRequest {
@@ -174,17 +175,48 @@ class ApiService {
     });
   }
 
-  // Full signup with email endpoint
+  // Signup with email endpoint (creates user with language preferences)
   async signupWithEmail(data: SignupWithEmailRequest): Promise<SignupWithEmailResponse> {
-    return this.request<SignupWithEmailResponse>('/auth/signup-email', {
+    const response = await fetch(`${this.baseUrl}/auth/register-withoutpass`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: data.email,
+        referralCode: '' // Add if you have referral functionality
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Failed to create account');
+    }
+
+    const result = await response.json();
+    
+    // The response includes a token for auto-login
+    return {
+      success: true,
+      token: result.token,
+      user: {
+        id: '', // Will be populated by profile update
+        username: data.email.split('@')[0],
+        email: data.email,
+        name: data.email.split('@')[0],
+        profile: {
+          nativeLanguage: getLanguageDetails(data.nativeLanguage),
+          targetLanguage: getLanguageDetails(data.targetLanguage),
+          level: data.level
+        }
+      },
+      redirectUrl: 'https://beta-app.langomango.com/reader'
+    };
   }
 
   // Update user profile endpoint for authenticated users
   async updateUserProfile(data: UpdateUserProfileRequest, token: string): Promise<UpdateUserProfileResponse> {
-    return this.request<UpdateUserProfileResponse>('/auth/update-profile', {
+    return this.request<UpdateUserProfileResponse>('/auth/update-demo-profile', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
@@ -214,5 +246,88 @@ class ApiService {
   }
 }
 
+// Helper function to get language details
+function getLanguageDetails(code: string): LanguageDetails {
+  const languages: Record<string, LanguageDetails> = {
+    'de': { code: 'de', name: 'German', flag: '🇩🇪' },
+    'es': { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+    'fr': { code: 'fr', name: 'French', flag: '🇫🇷' },
+    'it': { code: 'it', name: 'Italian', flag: '🇮🇹' },
+    'pt': { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+    'zh': { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+    'ja': { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+    'ko': { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+    'ru': { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+    'en': { code: 'en', name: 'English', flag: '🇬🇧' }
+  };
+
+  return languages[code] || { code: code, name: code.toUpperCase(), flag: '🌐' };
+}
+
 // Export singleton instance
 export const apiService = new ApiService();
+
+// Stripe integration types and functions
+export interface CreateCheckoutSessionRequest {
+  priceLookupKey: string;
+  planType: string;
+  includeTrial: boolean;
+  returnUrl: string;
+}
+
+export interface CreateCheckoutSessionResponse {
+  url: string;
+  sessionId: string;
+}
+
+export interface UserSubscriptionStatus {
+  isActive: boolean;
+  isTrialing?: boolean;
+  hasTrialed?: boolean;
+  status: string;
+  endDate?: string;
+  lastPaymentDate?: string;
+  trialEndDate?: string;
+}
+
+// Add these methods to the ApiService class
+export async function createEnhancedCheckoutSession(
+  request: CreateCheckoutSessionRequest,
+  token?: string
+): Promise<CreateCheckoutSessionResponse> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_URL}/stripe/create-checkout-session-enhanced`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Failed to create checkout session');
+  }
+
+  return response.json();
+}
+
+export async function getUserSubscriptionStatus(token: string): Promise<UserSubscriptionStatus> {
+  const response = await fetch(`${API_URL}/stripe/subscription-status`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get subscription status');
+  }
+
+  return response.json();
+}

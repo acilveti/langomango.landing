@@ -1224,6 +1224,9 @@ const EmailInputCompact = styled.input<{ $hasError: boolean }>`
   outline: none;
   transition: all 0.2s ease;
   background: white;
+  color: #1f2937;
+  -webkit-text-fill-color: #1f2937;
+  opacity: 1;
   
   &:focus {
     border-color: ${props => props.$hasError ? '#ef4444' : 'rgb(var(--primary))'};
@@ -1351,6 +1354,14 @@ const SignupExpanded = styled.div`
   justify-content: flex-start;
   overflow-y: auto;
   overflow-x: hidden;
+  pointer-events: auto !important;
+  
+  /* Ensure all form elements are interactive */
+  input, button, select, textarea {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+  }
   
   /* Custom scrollbar */
   &::-webkit-scrollbar {
@@ -1417,6 +1428,10 @@ const EmailInputExpanded = styled.input<{ $hasError: boolean }>`
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.2s ease;
+  background: white;
+  color: #1f2937;
+  -webkit-text-fill-color: #1f2937;
+  opacity: 1;
   
   &:focus {
     border-color: ${props => props.$hasError ? '#ef4444' : 'rgb(var(--primary))'};
@@ -1564,6 +1579,14 @@ const LanguageSetupContainer = styled.div`
   margin: 0 auto;
   max-width: 700px;
   padding-bottom: 1rem;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+  
+  /* Ensure all descendants can receive events */
+  * {
+    pointer-events: auto !important;
+  }
 `;
 
 const LanguageSetupRow = styled.div`
@@ -2246,6 +2269,10 @@ const EmailRegistrationInput = styled.input`
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.2s ease;
+  background: white;
+  color: #1f2937;
+  -webkit-text-fill-color: #1f2937;
+  opacity: 1;
   
   &:focus {
     border-color: #ff9800;
@@ -2372,14 +2399,14 @@ const OrDividerCompact = styled.span`
   }
 `;
 
-const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean }>`
+const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean; $levelSelected?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
   padding: 0.9rem 1.4rem;
   background: white;
-  border: 2px solid ${props => props.$needsAttention ? '#ff9800' : '#e1e5e9'};
+  border: 2px solid ${props => (props.$needsAttention || props.$levelSelected) ? '#ff9800' : '#e1e5e9'};
   border-radius: 0.8rem;
   font-size: 1.3rem;
   font-weight: 500;
@@ -2390,10 +2417,11 @@ const GoogleSignupButtonCompact = styled.button<{ $needsAttention?: boolean }>`
   width: 160px;
   position: relative;
   
-  ${props => props.$needsAttention && css`
+  ${props => (props.$needsAttention || props.$levelSelected) && css`
     animation: ${levelPulse} 2s ease-in-out infinite;
     animation-delay: 0.5s;
     border-color: #ff9800;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
     
     &::after {
       content: '';
@@ -2462,6 +2490,21 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean; $isCo
   position: relative;
   width: 100%;
   max-width: 500px;
+  pointer-events: auto !important;
+  z-index: 100;
+  
+  /* Ensure all children can receive events */
+  * {
+    pointer-events: auto !important;
+  }
+  
+  /* Specifically for input elements */
+  input {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+  }
   
   ${props => props.$isCompleted && css`
     background: rgba(34, 197, 94, 0.05);
@@ -2482,21 +2525,86 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean; $isCo
   }
 `;
 
-const EmailRegistrationInputCompact = styled.input<{ $needsAttention?: boolean; $isValid?: boolean }>`
+const EmailRegistrationInputCompact = styled.input.attrs({
+  autoComplete: 'email',
+  autoCapitalize: 'off',
+  autoCorrect: 'off',
+  spellCheck: false
+})<{ $needsAttention?: boolean; $isValid?: boolean; $levelSelected?: boolean }>`
   width: 160px;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;
-  border: 2px solid ${props => props.$isValid ? '#22c55e' : props.$needsAttention ? '#ff9800' : '#e5e7eb'};
+  border: 2px solid ${props => props.$isValid ? '#22c55e' : (props.$needsAttention || props.$levelSelected) ? '#ff9800' : '#e5e7eb'};
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.3s ease;
-  background: white;
+  background: white !important;
+  background-color: white !important;
   position: relative;
-  z-index: 20;
+  z-index: 101;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  opacity: 1 !important;
+  font-family: inherit;
+  caret-color: #1f2937 !important;
   
-  ${props => props.$needsAttention && !props.$isValid && css`
+  /* Force input to be interactive */
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  
+  /* Ensure text is visible */
+  &::-webkit-input-placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+  
+  &::-moz-placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+  
+  /* Ensure input text is visible when typing */
+  &:focus {
+    color: #1f2937 !important;
+    -webkit-text-fill-color: #1f2937 !important;
+    background: white !important;
+    background-color: white !important;
+  }
+  
+  /* Remove any filters or transforms that might hide text */
+  filter: none !important;
+  transform: none !important;
+  
+  /* Ensure no text shadow is hiding the text */
+  text-shadow: none !important;
+  
+  /* Force the text to be visible */
+  visibility: visible !important;
+  
+  /* Remove any potential blend modes */
+  mix-blend-mode: normal !important;
+  
+  /* Ensure the input is not covered */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  ${props => (props.$needsAttention || props.$levelSelected) && !props.$isValid && css`
     animation: ${levelPulse} 2s ease-in-out infinite;
     border-color: #ff9800;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
     
     &::after {
       content: '';

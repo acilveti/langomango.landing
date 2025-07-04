@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
-import { apiService } from 'services/apiService';
+import { apiService, createEnhancedCheckoutSession, CreateCheckoutSessionRequest } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import PricingPage from './PricingPage/PricingPage';
 
@@ -185,6 +185,7 @@ export default function ReaderDemoWidget({
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
+  const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
   const [hasValidEmail, setHasValidEmail] = useState(false);
   const [showValidEmailIndicator, setShowValidEmailIndicator] = useState(false);
@@ -236,7 +237,65 @@ export default function ReaderDemoWidget({
       isFullRegister
     });
     
-    // Check sessionStorage for OAuth return
+    // Check for OAuth return with pricing flow
+    const showPricingAfterAuth = localStorage.getItem('showPricingAfterAuth');
+    const authToken = localStorage.getItem('token');
+    const pendingPrefs = localStorage.getItem('pendingLanguagePrefs');
+    
+    if (showPricingAfterAuth === 'true' && authToken && pendingPrefs) {
+      console.log('OAuth return detected, updating profile and showing pricing');
+      
+      // Parse stored preferences
+      const prefs = JSON.parse(pendingPrefs);
+      
+      // Update user profile with language preferences
+      apiService.updateUserProfile({
+        nativeLanguage: prefs.nativeLanguage,
+        targetLanguage: prefs.targetLanguage,
+        level: prefs.level
+      }, authToken).then(response => {
+        if (response.success) {
+          // Clean up localStorage
+          localStorage.removeItem('showPricingAfterAuth');
+          localStorage.removeItem('pendingLanguagePrefs');
+          localStorage.removeItem('returnToWidget');
+          
+          // Restore language selections in UI
+          setSelectedLevel(prefs.level);
+          setDemoLevel(prefs.level);
+          if (prefs.targetLanguage) {
+            const targetLang = DEFAULT_LANGUAGES.find(l => l.code === prefs.targetLanguage);
+            if (targetLang) {
+              setTempTargetLanguage(targetLang);
+              setContextLanguage(targetLang, prefs.level);
+              setHasSelectedTarget(true);
+              setHasSelectedLanguage(true);
+            }
+          }
+          
+          // Mark as registered and show pricing
+          setHasRegistered(true);
+          setShowSignupExpanded(true);
+          setShowPricingPage(true);
+          
+          if (onSignupVisibilityChange) {
+            onSignupVisibilityChange(true);
+          }
+        }
+      }).catch(error => {
+        console.error('Failed to update profile after OAuth:', error);
+        setSignupError('Failed to complete setup. Please try again.');
+        // Still show signup form so user can see the error
+        setShowSignupExpanded(true);
+        if (onSignupVisibilityChange) {
+          onSignupVisibilityChange(true);
+        }
+      });
+      
+      return; // Exit early to prevent normal flow
+    }
+    
+    // Check sessionStorage for OAuth return (old flow)
     const returnToWidget = sessionStorage.getItem('returnToWidget');
     const registrationFlow = sessionStorage.getItem('registrationFlow');
     
@@ -302,6 +361,7 @@ export default function ReaderDemoWidget({
   
   // Update valid email state when email changes
   useEffect(() => {
+    console.log('Registration email state updated:', registrationEmail);
     if (registrationEmail) {
       const isValid = validateEmail(registrationEmail);
       setHasValidEmail(isValid);
@@ -1537,63 +1597,79 @@ export default function ReaderDemoWidget({
     };
   }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
+  // Auto-focus email input when level is selected
+  useEffect(() => {
+    if (selectedLevel && hasSelectedTarget && !isEditingTarget && !hasRegistered && isFullRegister) {
+      // Focus the email input after a short delay to ensure it's rendered
+      setTimeout(() => {
+        if (emailInputRef.current) {
+          emailInputRef.current.focus();
+          // Add a visual indicator that the input is ready
+          emailInputRef.current.style.animation = 'focusFlash 0.5s ease-out';
+          setTimeout(() => {
+            if (emailInputRef.current) {
+              emailInputRef.current.style.animation = '';
+            }
+          }, 500);
+        }
+      }, 300);
+    }
+  }, [selectedLevel, hasSelectedTarget, isEditingTarget, hasRegistered, isFullRegister]);
+  
   // Handle pricing plan selection
   const handlePricingPlanSelect = useCallback(async (planId: string) => {
     console.log('Selected pricing plan:', planId);
-    if (!pendingUserData) {
-      console.error('No pending user data found');
-      return;
-    }
     
     setIsPricingLoading(true);
     
     try {
-      // First, create the account with the stored user data
-      if (pendingUserData.email) {
-        // Email registration
-        const response = await apiService.signupWithEmail({
-          email: pendingUserData.email,
-          nativeLanguage: pendingUserData.nativeLanguage,
-          targetLanguage: pendingUserData.targetLanguage,
-          level: pendingUserData.level
-        });
-        
-        if (response.success && response.token) {
-          localStorage.setItem('token', response.token);
-        } else {
-          throw new Error('Failed to create account');
-        }
-      } else {
-        // Google OAuth flow - for now, we'll handle this differently
-        // You might need to implement a different flow for Google users
-        console.log('Google signup with pricing - implement OAuth flow');
+      // User is already authenticated at this point
+      const authToken = localStorage.getItem('token');
+      if (!authToken) {
+        throw new Error('No authentication token found. Please sign in again.');
       }
       
-      // Track signup event
-      trackRedditConversion(RedditEventTypes.SIGNUP, {
-        signup_type: 'paid',
+      // Map plan IDs to Stripe price lookup keys
+      const priceLookupKey = {
+        '1month': 'price_monthly',
+        'yearly': 'price_yearly', 
+        '3year': 'price_3year'
+      }[planId] || 'price_monthly';
+      
+      // Create Stripe checkout session with the auth token
+      const checkoutRequest: CreateCheckoutSessionRequest = {
+        priceLookupKey: priceLookupKey,
+        planType: planId === '1month' ? 'monthly' : planId === 'yearly' ? 'yearly' : '3year',
+        includeTrial: true, // New users always get trial
+        returnUrl: 'https://beta-app.langomango.com/payment-room'
+      };
+      
+      const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, authToken);
+      
+      if (!checkoutData || !checkoutData.url) {
+        throw new Error('Failed to create checkout session');
+      }
+      
+      // Store session ID for tracking
+      if (checkoutData.sessionId) {
+        localStorage.setItem('stripe-session-id', checkoutData.sessionId);
+      }
+      
+      // Track conversion event
+      trackRedditConversion(RedditEventTypes.PURCHASE, {
         plan: planId,
-        native_language: pendingUserData.nativeLanguage,
-        target_language: pendingUserData.targetLanguage,
-        level: pendingUserData.level,
         source: 'reader_widget_pricing'
       });
       
-      // For now, just redirect to Stripe (you'll implement this later)
-      setTimeout(() => {
-        // This is where you'd redirect to Stripe with the selected plan
-        alert(`Redirecting to Stripe for plan: ${planId}\n\nIn production, this would:\n1. Create a Stripe checkout session\n2. Include the user token\n3. Redirect to Stripe's hosted checkout`);
-        setIsPricingLoading(false);
-        
-        // For now, just redirect to the app
-        window.location.href = 'https://beta-app.langomango.com/reader';
-      }, 1000);
+      // Redirect to Stripe Checkout
+      window.location.href = checkoutData.url;
+      
     } catch (error) {
-      console.error('Error during signup:', error);
-      alert('Failed to create account. Please try again.');
+      console.error('Error during checkout:', error);
+      alert(error instanceof Error ? error.message : 'Failed to process payment. Please try again.');
       setIsPricingLoading(false);
     }
-  }, [pendingUserData]);
+  }, []);
 
   const setBookContentRef = useCallback((el: HTMLDivElement | null) => {
     if (pageRef.current !== el) {
@@ -2012,6 +2088,8 @@ export default function ReaderDemoWidget({
         <PricingPage 
           onSelectPlan={handlePricingPlanSelect}
           isLoading={isPricingLoading}
+          userToken={localStorage.getItem('token') || undefined}
+          isAuthenticated={true}
         />
       )}
       
@@ -2250,83 +2328,292 @@ export default function ReaderDemoWidget({
                 
                 {/* Registration section - shown AFTER level selection */}
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                  <CompactRegistrationSection $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel} style={{ flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', width: '100%' }}>
-                      <EmailRegistrationInputCompact
+                  <>
+
+                    
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1rem',
+                      width: '100%',
+                      maxWidth: '500px',
+                      margin: '0 auto',
+                      padding: '1rem',
+                      animation: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
+                      borderRadius: '12px',
+                      position: 'relative',
+                      background: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
+                      border: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '2px dashed rgba(255, 152, 0, 0.3)' : '2px dashed transparent',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <style>
+                        {`
+                          @keyframes pulseGlow {
+                            0% {
+                              box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+                            }
+                            50% {
+                              box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+                            }
+                            100% {
+                              box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+                            }
+                          }
+                          
+                          @keyframes shake {
+                            0%, 100% { transform: translateX(0); }
+                            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                            20%, 40%, 60%, 80% { transform: translateX(2px); }
+                          }
+                          
+                          @keyframes focusFlash {
+                            0% {
+                              box-shadow: 0 0 0 3px rgba(255, 152, 0, 0);
+                            }
+                            50% {
+                              box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.4);
+                            }
+                            100% {
+                              box-shadow: 0 0 0 3px rgba(255, 152, 0, 0);
+                            }
+                          }
+                          
+                          .email-input-wrapper {
+                            display: flex;
+                            gap: 8px;
+                            align-items: center;
+                            width: 100%;
+                            animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'shake 0.5s ease-in-out' : 'none'};
+                            animation-delay: 0.5s;
+                          }
+                          
+                          .email-input {
+                            flex: 1;
+                            padding: 12px 16px;
+                            font-size: 14px;
+                            border: 2px solid ${showValidEmailIndicator ? '#22c55e' : (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '#ff9800' : '#e5e7eb'};
+                            border-radius: 8px;
+                            outline: none;
+                            background-color: white !important;
+                            color: #1f2937 !important;
+                            -webkit-text-fill-color: #1f2937 !important;
+                            opacity: 1 !important;
+                            transition: all 0.3s ease;
+                            animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'borderPulse 2s ease-in-out infinite' : 'none'};
+                          }
+                          
+                          @keyframes borderPulse {
+                            0%, 100% {
+                              border-color: #ff9800;
+                            }
+                            50% {
+                              border-color: #ffc107;
+                            }
+                          }
+                          
+                          .email-input:focus {
+                            border-color: #ff9800;
+                            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+                            background-color: white !important;
+                            color: #1f2937 !important;
+                            -webkit-text-fill-color: #1f2937 !important;
+                          }
+                          
+                          .email-input::placeholder {
+                            color: #9ca3af;
+                            opacity: 1;
+                          }
+                          
+                          .email-input:-webkit-autofill,
+                          .email-input:-webkit-autofill:hover,
+                          .email-input:-webkit-autofill:focus {
+                            -webkit-text-fill-color: #1f2937 !important;
+                            -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+                            background-color: white !important;
+                          }
+                          
+                          .google-button {
+                            animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'subtle-pulse 2s ease-in-out infinite' : 'none'};
+                            animation-delay: 0.5s;
+                          }
+                          
+                          @keyframes subtle-pulse {
+                            0%, 100% {
+                              transform: scale(1);
+                            }
+                            50% {
+                              transform: scale(1.02);
+                            }
+                          }
+                        `}
+                      </style>
+                    
+                    <div className="email-input-wrapper">
+                      <input
+                        ref={emailInputRef}
+                        className="email-input"
                         type="email"
                         placeholder="Email"
                         value={registrationEmail}
-                        onChange={(e) => setRegistrationEmail(e.target.value)}
+                        onChange={(e) => {
+                          console.log('Email typed:', e.target.value);
+                          setRegistrationEmail(e.target.value);
+                        }}
                         onKeyPress={(e) => {
                           if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
-                            setHasRegistered(true);
-                            // Store user data for later
-                            setPendingUserData({
-                              email: registrationEmail,
-                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              targetLanguage: tempTargetLanguage.code,
-                              level: selectedLevel
-                            });
-                            // Show pricing page directly
-                            setShowPricingPage(true);
+                            document.querySelector<HTMLButtonElement>('.submit-button')?.click();
                           }
                         }}
-                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
-                        $isValid={showValidEmailIndicator}
-                        style={{ flex: 1 }}
+                        style={{
+                          color: '#1f2937',
+                          backgroundColor: 'white',
+                          WebkitTextFillColor: '#1f2937',
+                          WebkitAppearance: 'none'
+                        }}
+                        autoComplete="email"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        spellCheck={false}
                       />
-                      <SignupButtonCompact
-                        onClick={() => {
+                      <button
+                        className="submit-button"
+                        onClick={async () => {
+                          console.log('Button clicked with email:', registrationEmail);
                           if (registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
-                            setHasRegistered(true);
-                            // Store user data for later
-                            setPendingUserData({
-                              email: registrationEmail,
-                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              targetLanguage: tempTargetLanguage.code,
-                              level: selectedLevel
-                            });
-                            // Show pricing page directly
-                            setShowPricingPage(true);
+                            setIsLoadingSignup(true);
+                            setSignupError('');
+                            try {
+                              // Create account immediately with email
+                              const response = await apiService.signupWithEmail({
+                                email: registrationEmail,
+                                nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                                targetLanguage: tempTargetLanguage.code,
+                                level: selectedLevel
+                              });
+                              
+                              if (response.success && response.token) {
+                                // Store token - user is now authenticated
+                                localStorage.setItem('token', response.token);
+                                localStorage.setItem('userEmail', registrationEmail);
+                                
+                                // Mark as registered
+                                setHasRegistered(true);
+                                
+                                // Track signup event
+                                trackRedditConversion(RedditEventTypes.SIGNUP, {
+                                  signup_type: 'email',
+                                  native_language: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                                  target_language: tempTargetLanguage.code,
+                                  level: selectedLevel,
+                                  source: 'reader_widget'
+                                });
+                                
+                                // Show pricing page - user is already authenticated
+                                setShowPricingPage(true);
+                              } else {
+                                throw new Error('Failed to create account');
+                              }
+                            } catch (error) {
+                              console.error('Signup error:', error);
+                              setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
+                            } finally {
+                              setIsLoadingSignup(false);
+                            }
                           }
                         }}
-                        disabled={!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel}
+                        disabled={!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup}
                         style={{ 
-                          padding: '8px 16px',
-                          opacity: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel) ? 0.5 : 1,
-                          cursor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel) ? 'not-allowed' : 'pointer'
+                          padding: '12px 20px',
+                          backgroundColor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup) ? '#ccc' : '#ff9800',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          transition: 'all 0.3s ease'
                         }}
                       >
-                        →
-                      </SignupButtonCompact>
+                        {isLoadingSignup ? '...' : '→'}
+                      </button>
                     </div>
-                    <OrDividerCompact style={{ margin: '16px 0 12px', width: '100%', textAlign: 'center', display: 'block' }}>or</OrDividerCompact>
-                    <GoogleSignupButtonCompact 
-                        onClick={() => {
-                          if (selectedLevel) {
-                            // Store user data for later (no email for Google signup)
-                            setPendingUserData({
-                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
-                              targetLanguage: tempTargetLanguage.code,
-                              level: selectedLevel
-                            });
-                            // Show pricing page directly
-                            setHasRegistered(true);
-                            setShowPricingPage(true);
-                          }
-                        }}
-                        $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
-                        style={{ width: '100%' }}
-                      >
-                        <svg viewBox="0 0 24 24" width="16" height="16">
-                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        <span>Google</span>
-                      </GoogleSignupButtonCompact>
-                  </CompactRegistrationSection>
+                    
+                    <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>or</div>
+                    
+                    <button
+                      className="google-button"
+                      onClick={() => {
+                        if (selectedLevel) {
+                          setIsLoadingSignup(true);
+                          // For Google OAuth, store preferences and redirect
+                          localStorage.setItem('pendingLanguagePrefs', JSON.stringify({
+                            nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                            targetLanguage: tempTargetLanguage.code,
+                            level: selectedLevel
+                          }));
+                          
+                          // Set flag to show pricing after OAuth return
+                          localStorage.setItem('showPricingAfterAuth', 'true');
+                          localStorage.setItem('returnToWidget', 'true');
+                          
+                          // Redirect to Google OAuth
+                          const baseUrl = 'https://staging.langomango.com';
+                          const returnUrl = encodeURIComponent('/sign-up');
+                          const frontendRedirectUrl = encodeURIComponent(window.location.origin);
+                          const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
+                          
+                          window.location.href = googleAuthUrl;
+                        }
+                      }}
+                      disabled={!selectedLevel || isLoadingSignup}
+                      style={{ 
+                        width: '100%',
+                        padding: '12px 20px',
+                        backgroundColor: 'white',
+                        color: '#374151',
+                        border: `2px solid ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '#ff9800' : '#e1e5e9'}`,
+                        borderRadius: '8px',
+                        cursor: (!selectedLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        opacity: (!selectedLevel || isLoadingSignup) ? 0.5 : 1,
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      <span>Google</span>
+                    </button>
+                    
+                    {hasValidEmail && (
+                      <div style={{ 
+                        textAlign: 'center', 
+                        color: '#22c55e', 
+                        fontSize: '12px',
+                        marginTop: '-8px',
+                        animation: 'fadeIn 0.3s ease-in'
+                      }}>
+                        <style>
+                          {`
+                            @keyframes fadeIn {
+                              from { opacity: 0; transform: translateY(-5px); }
+                              to { opacity: 1; transform: translateY(0); }
+                            }
+                          `}
+                        </style>
+                        ✓ Valid email entered
+                      </div>
+                    )}
+                  </div>
+                  </>
                 )}
                 
                 {isFullRegister && hasSelectedTarget && !isEditingTarget && hasRegistered && (
