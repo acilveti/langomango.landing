@@ -4,6 +4,7 @@ import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
+import PricingPage from './PricingPage/PricingPage';
 
 import {
   AlphabetLetter,
@@ -203,6 +204,14 @@ export default function ReaderDemoWidget({
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
+  const [showPricingPage, setShowPricingPage] = useState(false);
+  const [isPricingLoading, setIsPricingLoading] = useState(false);
+  const [pendingUserData, setPendingUserData] = useState<{
+    email?: string;
+    nativeLanguage: string;
+    targetLanguage: string;
+    level: string;
+  } | null>(null);
   
   // Sync demo level with context level
   useEffect(() => {
@@ -1528,6 +1537,64 @@ export default function ReaderDemoWidget({
     };
   }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
 
+  // Handle pricing plan selection
+  const handlePricingPlanSelect = useCallback(async (planId: string) => {
+    console.log('Selected pricing plan:', planId);
+    if (!pendingUserData) {
+      console.error('No pending user data found');
+      return;
+    }
+    
+    setIsPricingLoading(true);
+    
+    try {
+      // First, create the account with the stored user data
+      if (pendingUserData.email) {
+        // Email registration
+        const response = await apiService.signupWithEmail({
+          email: pendingUserData.email,
+          nativeLanguage: pendingUserData.nativeLanguage,
+          targetLanguage: pendingUserData.targetLanguage,
+          level: pendingUserData.level
+        });
+        
+        if (response.success && response.token) {
+          localStorage.setItem('token', response.token);
+        } else {
+          throw new Error('Failed to create account');
+        }
+      } else {
+        // Google OAuth flow - for now, we'll handle this differently
+        // You might need to implement a different flow for Google users
+        console.log('Google signup with pricing - implement OAuth flow');
+      }
+      
+      // Track signup event
+      trackRedditConversion(RedditEventTypes.SIGNUP, {
+        signup_type: 'paid',
+        plan: planId,
+        native_language: pendingUserData.nativeLanguage,
+        target_language: pendingUserData.targetLanguage,
+        level: pendingUserData.level,
+        source: 'reader_widget_pricing'
+      });
+      
+      // For now, just redirect to Stripe (you'll implement this later)
+      setTimeout(() => {
+        // This is where you'd redirect to Stripe with the selected plan
+        alert(`Redirecting to Stripe for plan: ${planId}\n\nIn production, this would:\n1. Create a Stripe checkout session\n2. Include the user token\n3. Redirect to Stripe's hosted checkout`);
+        setIsPricingLoading(false);
+        
+        // For now, just redirect to the app
+        window.location.href = 'https://beta-app.langomango.com/reader';
+      }, 1000);
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('Failed to create account. Please try again.');
+      setIsPricingLoading(false);
+    }
+  }, [pendingUserData]);
+
   const setBookContentRef = useCallback((el: HTMLDivElement | null) => {
     if (pageRef.current !== el) {
       (pageRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
@@ -1940,8 +2007,16 @@ export default function ReaderDemoWidget({
       </BottomBar>
     </ReaderWrapper>
       
+      {/* Pricing Page */}
+      {showPricingPage && (
+        <PricingPage 
+          onSelectPlan={handlePricingPlanSelect}
+          isLoading={isPricingLoading}
+        />
+      )}
+      
       {/* Inline Signup Section */}
-      {useInlineSignup && showSignupExpanded && (
+      {useInlineSignup && showSignupExpanded && !showPricingPage && (
         <SignupSection $isFullscreen={signupMode === 'fullscreen'}>
           <CloseButton 
             onClick={() => {
@@ -2183,12 +2258,17 @@ export default function ReaderDemoWidget({
                         value={registrationEmail}
                         onChange={(e) => setRegistrationEmail(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail)) {
+                          if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
                             setHasRegistered(true);
-                            // Now trigger the actual signup with the selected level
-                            if (selectedLevel) {
-                              handleLevelSelect(selectedLevel);
-                            }
+                            // Store user data for later
+                            setPendingUserData({
+                              email: registrationEmail,
+                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              targetLanguage: tempTargetLanguage.code,
+                              level: selectedLevel
+                            });
+                            // Show pricing page directly
+                            setShowPricingPage(true);
                           }
                         }}
                         $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
@@ -2197,12 +2277,17 @@ export default function ReaderDemoWidget({
                       />
                       <SignupButtonCompact
                         onClick={() => {
-                          if (registrationEmail && validateEmail(registrationEmail)) {
+                          if (registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
                             setHasRegistered(true);
-                            // Now trigger the actual signup with the selected level
-                            if (selectedLevel) {
-                              handleLevelSelect(selectedLevel);
-                            }
+                            // Store user data for later
+                            setPendingUserData({
+                              email: registrationEmail,
+                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              targetLanguage: tempTargetLanguage.code,
+                              level: selectedLevel
+                            });
+                            // Show pricing page directly
+                            setShowPricingPage(true);
                           }
                         }}
                         disabled={!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel}
@@ -2218,33 +2303,17 @@ export default function ReaderDemoWidget({
                     <OrDividerCompact style={{ margin: '16px 0 12px', width: '100%', textAlign: 'center', display: 'block' }}>or</OrDividerCompact>
                     <GoogleSignupButtonCompact 
                         onClick={() => {
-                          // Language preferences are already being persisted to localStorage by VisitorContext
-                          // Just ensure they're up to date
-                          if (tempTargetLanguage) {
-                            setContextLanguage(tempTargetLanguage);
-                          }
-                          
-                          // Store the selected level if any
                           if (selectedLevel) {
-                            sessionStorage.setItem('selectedLevel', selectedLevel);
+                            // Store user data for later (no email for Google signup)
+                            setPendingUserData({
+                              nativeLanguage: tempNativeLanguage?.code || nativeLanguage?.code || 'en',
+                              targetLanguage: tempTargetLanguage.code,
+                              level: selectedLevel
+                            });
+                            // Show pricing page directly
+                            setHasRegistered(true);
+                            setShowPricingPage(true);
                           }
-                          
-                          // Mark that we're in the registration flow and need to return
-                          sessionStorage.setItem('registrationFlow', 'google');
-                          sessionStorage.setItem('returnToWidget', 'true');
-                          
-                          // Get current page URL and add state parameter
-                          const currentUrl = new URL(window.location.href);
-                          // Add state to indicate we should open signup modal on return
-                          currentUrl.searchParams.set('state', 'oauth_signup_return');
-                          
-                          // Build the Google OAuth URL
-                          const baseUrl = 'https://staging.langomango.com';
-                          // Don't include /landing-callback in returnUrl, just use root
-                          const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${encodeURIComponent('/')}&frontendRedirectUrl=${encodeURIComponent(currentUrl.toString())}`;
-                          
-                          console.log('Redirecting to Google OAuth with signup state:', googleAuthUrl);
-                          window.location.href = googleAuthUrl;
                         }}
                         $needsAttention={hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel}
                         style={{ width: '100%' }}
