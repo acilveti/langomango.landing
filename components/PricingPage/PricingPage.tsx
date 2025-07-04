@@ -33,9 +33,9 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
       duration: '1 month',
       features: [
         'Upload Your Books',
-        'Books Already in App Library',
         'Read from Kindle',
-        'Read from iOS or Android App'
+        'Books in App Library',
+        'iOS & Android App'
       ],
       buttonText: 'Start Free Trial'
     },
@@ -48,10 +48,11 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
       duration: '12 months',
       features: [
         'Upload Your Books',
-        'Books Already in App Library',
         'Read from Kindle',
-        'Read from iOS or Android App',
-        'Save 50%'
+        'Books in App Library',
+        'iOS & Android App',
+        'Save 50%',
+        'Best Value'
       ],
       recommended: true,
       discount: 'Save €71.88',
@@ -65,10 +66,11 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
       duration: '36 months',
       features: [
         'Upload Your Books',
-        'Books Already in App Library',
         'Read from Kindle',
-        'Read from iOS or Android App',
-        'Save 67%'
+        'Books in App Library',
+        'iOS & Android App',
+        'Save 67%',
+        'One-time Payment'
       ],
       discount: '67% OFF',
       buttonText: 'Get 3 Year Access'
@@ -84,7 +86,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
     <PricingWrapper>
       <PricingContent>
         <Header>
-        <Title>Learn Languages by Reading What You Love 📚</Title>
+        <Title>Learn Languages by Reading What You Love</Title>
         <Subtitle>Choose Your LangoMango Plan</Subtitle>
         <SubtitleNote>7-day free trial • Cancel anytime</SubtitleNote>
       </Header>
@@ -99,24 +101,25 @@ const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, isLoading }) =>
             onClick={() => !isLoading && handlePlanSelect(plan.id)}
           >
             {plan.recommended && <RecommendedBadge>MOST POPULAR</RecommendedBadge>}
-            {plan.discount && plan.id === '3year' && (
-              <DiscountBadge>{plan.discount}</DiscountBadge>
-            )}
             
-            <PlanName>{plan.name}</PlanName>
-            
-            <PriceContainer>
-              {plan.originalPrice && (
-                <OriginalPrice>{plan.originalPrice}</OriginalPrice>
+            <PlanHeader $has3YearDiscount={plan.id === '3year'}>
+              <PlanName>{plan.name}</PlanName>
+              <PriceContainer>
+                {plan.originalPrice && (
+                  <OriginalPrice>{plan.originalPrice}</OriginalPrice>
+                )}
+                <CurrentPrice>
+                  {plan.price}
+                  {plan.pricePerMonth && <PriceUnit>{plan.pricePerMonth}</PriceUnit>}
+                </CurrentPrice>
+                {plan.discount && plan.id === 'yearly' && (
+                  <DiscountAmount>{plan.discount}</DiscountAmount>
+                )}
+              </PriceContainer>
+              {plan.discount && plan.id === '3year' && (
+                <DiscountBadge>{plan.discount}</DiscountBadge>
               )}
-              <CurrentPrice>
-                {plan.price}
-                {plan.pricePerMonth && <PriceUnit>{plan.pricePerMonth}</PriceUnit>}
-              </CurrentPrice>
-              {plan.discount && plan.id === 'yearly' && (
-                <DiscountAmount>{plan.discount}</DiscountAmount>
-              )}
-            </PriceContainer>
+            </PlanHeader>
 
             <FeaturesList>
               {plan.features.map((feature, index) => (
@@ -167,7 +170,7 @@ const PricingWrapper = styled.div`
   background: #2a2a2a;
   color: white;
   overflow-y: auto;
-  z-index: 999999;
+  z-index: 2147483647;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -177,64 +180,65 @@ const PricingContent = styled.div`
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 2rem 2rem;
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 
   ${media('<=tablet')} {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 `;
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 `;
 
 const Title = styled.h2`
-  font-size: 2.4rem;
+  font-size: 2rem;
   font-weight: 600;
   color: #f59e0b;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  
+  ${media('<=tablet')} {
+    font-size: 1.8rem;
+  }
+`;
+
+const Subtitle = styled.h3`
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
   
   ${media('<=tablet')} {
     font-size: 2rem;
   }
 `;
 
-const Subtitle = styled.h3`
-  font-size: 2.8rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  
-  ${media('<=tablet')} {
-    font-size: 2.2rem;
-  }
-`;
-
 const SubtitleNote = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #9ca3af;
   margin: 0;
   
   ${media('<=tablet')} {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 `;
 
 const PlansContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 const PlanCard = styled.div<{ $recommended?: boolean; $isLifetime?: boolean; $isSelected?: boolean }>`
   background: ${props => props.$isLifetime ? '#ff6b00' : 'white'};
   color: ${props => props.$isLifetime ? 'white' : '#333'};
-  border-radius: 1.5rem;
-  padding: 2.5rem;
+  border-radius: 1.2rem;
+  padding: 1.8rem;
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -250,7 +254,7 @@ const PlanCard = styled.div<{ $recommended?: boolean; $isLifetime?: boolean; $is
   }
 
   ${media('<=tablet')} {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 `;
 
@@ -268,48 +272,69 @@ const RecommendedBadge = styled.div`
 
 const DiscountBadge = styled.div`
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
   background: white;
   color: #ff6b00;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.8rem;
-  font-size: 1.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  font-size: 1.3rem;
   font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  ${media('<=tablet')} {
+    right: 10px;
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
+  }
+`;
+
+const PlanHeader = styled.div<{ $has3YearDiscount?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-right: ${props => props.$has3YearDiscount ? '90px' : '0'};
+  
+  ${media('<=tablet')} {
+    margin-bottom: 0.8rem;
+    padding-right: ${props => props.$has3YearDiscount ? '80px' : '0'};
+  }
 `;
 
 const PlanName = styled.h4`
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin: 0;
   
   ${media('<=tablet')} {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 `;
 
 const PriceContainer = styled.div`
-  margin-bottom: 2rem;
   display: flex;
   align-items: baseline;
-  gap: 1rem;
+  gap: 0.8rem;
   flex-wrap: wrap;
 `;
 
 const OriginalPrice = styled.span`
   text-decoration: line-through;
   color: #9ca3af;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 `;
 
 const CurrentPrice = styled.div`
-  font-size: 3.2rem;
+  font-size: 2rem;
   font-weight: bold;
   display: flex;
   align-items: baseline;
   
   ${media('<=tablet')} {
-    font-size: 2.8rem;
+    font-size: 1.8rem;
   }
 `;
 
@@ -320,41 +345,66 @@ const PriceUnit = styled.span`
 `;
 
 const DiscountAmount = styled.span`
-  color: #ff6b00;
-  font-size: 1.8rem;
+  color: #f59e0b;
+  font-size: 1.4rem;
   font-weight: bold;
 `;
 
 const FeaturesList = styled.ul`
   list-style: none;
   padding: 0;
-  margin: 0 0 2rem 0;
+  margin: 0 0 1.2rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 1rem;
+  
+  ${media('<=tablet')} {
+    gap: 0.5rem 0.8rem;
+  }
+  
+  ${media('<=phone')} {
+    gap: 0.4rem 0.6rem;
+  }
 `;
 
 const Feature = styled.li`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 1.6rem;
+  gap: 0.6rem;
+  font-size: 1.3rem;
   
   ${media('<=tablet')} {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
+    gap: 0.4rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+    gap: 0.3rem;
   }
 `;
 
 const CheckIcon = styled.span`
   color: #22c55e;
-  font-size: 2rem;
+  font-size: 1.4rem;
   font-weight: bold;
+  flex-shrink: 0;
+  
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+  }
+  
+  ${media('<=phone')} {
+    font-size: 1rem;
+  }
 `;
 
 const FeatureText = styled.span``;
 
 const SelectButton = styled.button<{ $recommended?: boolean; $isLifetime?: boolean }>`
   width: 100%;
-  padding: 1.2rem 2.4rem;
-  font-size: 1.6rem;
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
   font-weight: bold;
   border: none;
   border-radius: 0.8rem;
@@ -383,57 +433,91 @@ const SelectButton = styled.button<{ $recommended?: boolean; $isLifetime?: boole
   }
   
   ${media('<=tablet')} {
-    font-size: 1.4rem;
-    padding: 1rem 2rem;
+    font-size: 1.3rem;
+    padding: 0.8rem 1.6rem;
   }
 `;
 
 const GuaranteeSection = styled.div`
   display: flex;
-  justify-content: center;
-  margin-bottom: 3rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 const GuaranteeBadge = styled.div`
-  background: #333;
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 3px solid #666;
+  border: 3px solid #4b5563;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 2px dashed #4b5563;
+    animation: rotate 20s linear infinite;
+  }
+  
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
   
   ${media('<=tablet')} {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
+    
+    &::after {
+      width: 100px;
+      height: 100px;
+    }
   }
 `;
 
 const GuaranteeText = styled.div`
-  font-size: 2.4rem;
+  font-size: 2rem;
   font-weight: bold;
+  color: white;
+  z-index: 1;
   
   ${media('<=tablet')} {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 `;
 
 const GuaranteeSubtext = styled.div`
-  font-size: 1rem;
+  font-size: 0.9rem;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.1;
+  color: #d1d5db;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  z-index: 1;
   
   ${media('<=tablet')} {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 `;
 
 const CTAButton = styled.button`
   width: 100%;
-  padding: 1.8rem;
-  font-size: 2rem;
+  padding: 1.4rem;
+  font-size: 1.8rem;
   font-weight: bold;
   background: #f59e0b;
   color: white;
@@ -454,8 +538,8 @@ const CTAButton = styled.button`
   }
   
   ${media('<=tablet')} {
-    font-size: 1.8rem;
-    padding: 1.5rem;
+    font-size: 1.6rem;
+    padding: 1.2rem;
   }
 `;
 
