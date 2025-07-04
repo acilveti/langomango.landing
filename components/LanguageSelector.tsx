@@ -43,7 +43,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   isDark = false,
   requireLevel = false
 }, ref) => {
-  const { selectedLanguage: contextLanguage, selectedLanguageLevel: contextLanguageLevel, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage } = useVisitor();
+  const { selectedLanguage: contextLanguage, selectedLanguageLevel: contextLanguageLevel, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage, setHasSelectedLevel } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
   const [selectedLevel, setSelectedLevel] = useState<string | undefined>(contextLanguageLevel || undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,6 +61,9 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setSelectedLevel(level);
     setContextLanguage(language, level); // Update context with both language and level
     setHasSelectedLanguage(true); // Mark that user has selected a language
+    if (level) {
+      setHasSelectedLevel(true); // Mark that user has selected a level
+    }
     setIsModalOpen(false);
     
     // Call the immediate callback

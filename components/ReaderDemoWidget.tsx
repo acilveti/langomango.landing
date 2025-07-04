@@ -156,7 +156,9 @@ export default function ReaderDemoWidget({
     setSelectedLanguage: setContextLanguage, 
     nativeLanguage,
     hasSelectedLanguage,
-    setHasSelectedLanguage 
+    setHasSelectedLanguage,
+    hasSelectedLevel,
+    setHasSelectedLevel 
   } = useVisitor();
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
@@ -173,7 +175,7 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('');
-  const [demoLevel, setDemoLevel] = useState<string>(contextLanguageLevel || ''); // Track level for demo content
+  const [demoLevel, setDemoLevel] = useState<string>('A1'); // Default demo level is A1
   const [showExpandedForm, setShowExpandedForm] = useState(true);
   const [isEditingNative, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
@@ -214,19 +216,17 @@ export default function ReaderDemoWidget({
     level: string;
   } | null>(null);
   
-  // Sync demo level with context level
+  // Sync demo level with context level only if user has selected it
   useEffect(() => {
-    if (contextLanguageLevel) {
+    if (contextLanguageLevel && hasSelectedLevel) {
       setDemoLevel(contextLanguageLevel);
+      setSelectedLevel(contextLanguageLevel);
       sessionStorage.setItem('selectedLevel', contextLanguageLevel);
-    } else {
-      // Fallback to sessionStorage if context doesn't have level yet
-      const storedLevel = sessionStorage.getItem('selectedLevel');
-      if (storedLevel) {
-        setDemoLevel(storedLevel);
-      }
+    } else if (contextLanguageLevel && !hasSelectedLevel) {
+      // If there's a level but user hasn't selected it, use it for demo but not for selection
+      setDemoLevel(contextLanguageLevel);
     }
-  }, [contextLanguageLevel]);
+  }, [contextLanguageLevel, hasSelectedLevel]);
 
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
@@ -248,6 +248,22 @@ export default function ReaderDemoWidget({
       // Parse stored preferences
       const prefs = JSON.parse(pendingPrefs);
       
+      // Restore language selections in UI immediately
+      setSelectedLevel(prefs.level);
+      setDemoLevel(prefs.level);
+      setHasSelectedLevel(true); // User had selected this level before OAuth
+      sessionStorage.setItem('selectedLevel', prefs.level);
+      
+      if (prefs.targetLanguage) {
+        const targetLang = DEFAULT_LANGUAGES.find(l => l.code === prefs.targetLanguage);
+        if (targetLang) {
+          setTempTargetLanguage(targetLang);
+          setContextLanguage(targetLang, prefs.level);
+          setHasSelectedTarget(true);
+          setHasSelectedLanguage(true);
+        }
+      }
+      
       // Update user profile with language preferences
       apiService.updateUserProfile({
         nativeLanguage: prefs.nativeLanguage,
@@ -259,19 +275,6 @@ export default function ReaderDemoWidget({
           localStorage.removeItem('showPricingAfterAuth');
           localStorage.removeItem('pendingLanguagePrefs');
           localStorage.removeItem('returnToWidget');
-          
-          // Restore language selections in UI
-          setSelectedLevel(prefs.level);
-          setDemoLevel(prefs.level);
-          if (prefs.targetLanguage) {
-            const targetLang = DEFAULT_LANGUAGES.find(l => l.code === prefs.targetLanguage);
-            if (targetLang) {
-              setTempTargetLanguage(targetLang);
-              setContextLanguage(targetLang, prefs.level);
-              setHasSelectedTarget(true);
-              setHasSelectedLanguage(true);
-            }
-          }
           
           // Mark as registered and show pricing
           setHasRegistered(true);
@@ -331,6 +334,12 @@ export default function ReaderDemoWidget({
           setHasSelectedLanguage(true);
           setHasSelectedTarget(true);
         }
+        
+        // Also ensure level is properly set from context if user has selected it
+        if (contextLanguageLevel && hasSelectedLevel) {
+          setSelectedLevel(contextLanguageLevel);
+          setDemoLevel(contextLanguageLevel);
+        }
       }
       
       // Add a small delay to ensure component is fully mounted
@@ -342,7 +351,7 @@ export default function ReaderDemoWidget({
         }
       }, 300); // Increased delay
     }
-  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange]);
+  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange, contextLanguage, contextLanguageLevel, hasSelectedLanguage, setHasSelectedLanguage]);
   
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
@@ -456,6 +465,7 @@ export default function ReaderDemoWidget({
       // Update context language with level
       setContextLanguage(tempSelectedLanguage, level);
       setHasSelectedLanguage(true);
+      setHasSelectedLevel(true); // Mark level as explicitly selected by user
       
       // Store the selected level
       setSelectedLevel(level);
@@ -1196,6 +1206,7 @@ export default function ReaderDemoWidget({
     
     setSelectedLevel(level);
     setDemoLevel(level); // Update demo level for content display
+    setHasSelectedLevel(true); // Mark level as selected by user
     sessionStorage.setItem('selectedLevel', level);
     setSignupError('');
     setIsLoadingSignup(true);
@@ -1288,7 +1299,7 @@ export default function ReaderDemoWidget({
       setIsLoadingSignup(false);
       setSelectedLevel('');
     }
-  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage, registrationEmail]);
+  }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage, registrationEmail, setHasSelectedLevel]);
 
   const hidePopup = useCallback(() => {
     setPopup(prev => ({ ...prev, visible: false }));
@@ -2184,42 +2195,42 @@ export default function ReaderDemoWidget({
                 {/* Level selector - comes AFTER language selection and BEFORE registration */}
                 <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
                   <LevelLabel>Select your {tempTargetLanguage.name} level:</LevelLabel>
-                  {/* If level is already selected (from context or demo), show only that level */}
-                  {(contextLanguageLevel || demoLevel) ? (
+                  {/* If user has selected a level, show only that level */}
+                  {hasSelectedLevel && selectedLevel ? (
                     <div style={{
                       display: 'flex',
                       justifyContent: 'center',
                       marginTop: '1.5rem'
                     }}>
                       <LevelButton 
-                        $isActive={selectedLevel === (contextLanguageLevel || demoLevel)}
+                        $isActive={true}
                         onClick={() => {
                           if (isFullRegister) {
                             // Don't do anything yet, just visual selection
-                            setSelectedLevel(contextLanguageLevel || demoLevel);
+                            setSelectedLevel(selectedLevel);
                           } else {
-                            handleLevelSelect(contextLanguageLevel || demoLevel);
+                            handleLevelSelect(selectedLevel);
                           }
                         }}
                         $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
                         style={{ width: '120px' }}
                       >
                         <LevelEmoji>
-                          {(contextLanguageLevel || demoLevel) === 'A1' && '🌱'}
-                          {(contextLanguageLevel || demoLevel) === 'A2' && '🌿'}
-                          {(contextLanguageLevel || demoLevel) === 'B1' && '🍀'}
-                          {(contextLanguageLevel || demoLevel) === 'B2' && '🌳'}
-                          {(contextLanguageLevel || demoLevel) === 'C1' && '🌲'}
-                          {(contextLanguageLevel || demoLevel) === 'C2' && '🎯'}
+                          {selectedLevel === 'A1' && '🌱'}
+                          {selectedLevel === 'A2' && '🌿'}
+                          {selectedLevel === 'B1' && '🍀'}
+                          {selectedLevel === 'B2' && '🌳'}
+                          {selectedLevel === 'C1' && '🌲'}
+                          {selectedLevel === 'C2' && '🎯'}
                         </LevelEmoji>
-                        <LevelName>{contextLanguageLevel || demoLevel}</LevelName>
+                        <LevelName>{selectedLevel}</LevelName>
                         <LevelDesc>
-                          {(contextLanguageLevel || demoLevel) === 'A1' && 'Beginner'}
-                          {(contextLanguageLevel || demoLevel) === 'A2' && 'Elementary'}
-                          {(contextLanguageLevel || demoLevel) === 'B1' && 'Intermediate'}
-                          {(contextLanguageLevel || demoLevel) === 'B2' && 'Upper Int.'}
-                          {(contextLanguageLevel || demoLevel) === 'C1' && 'Advanced'}
-                          {(contextLanguageLevel || demoLevel) === 'C2' && 'Mastery'}
+                          {selectedLevel === 'A1' && 'Beginner'}
+                          {selectedLevel === 'A2' && 'Elementary'}
+                          {selectedLevel === 'B1' && 'Intermediate'}
+                          {selectedLevel === 'B2' && 'Upper Int.'}
+                          {selectedLevel === 'C1' && 'Advanced'}
+                          {selectedLevel === 'C2' && 'Mastery'}
                         </LevelDesc>
                       </LevelButton>
                     </div>
@@ -2231,6 +2242,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('A1');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('A1');
                           }
@@ -2247,6 +2259,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('A2');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('A2');
                           }
@@ -2263,6 +2276,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('B1');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('B1');
                           }
@@ -2279,6 +2293,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('B2');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('B2');
                           }
@@ -2295,6 +2310,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('C1');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('C1');
                           }
@@ -2311,6 +2327,7 @@ export default function ReaderDemoWidget({
                         onClick={() => {
                           if (isFullRegister) {
                             setSelectedLevel('C2');
+                            setHasSelectedLevel(true);
                           } else {
                             handleLevelSelect('C2');
                           }

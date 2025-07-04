@@ -77,6 +77,8 @@ interface VisitorContextType {
   referralSource: ReferralSource;
   hasSelectedLanguage: boolean;
   setHasSelectedLanguage: (value: boolean) => void;
+  hasSelectedLevel: boolean;
+  setHasSelectedLevel: (value: boolean) => void;
 }
 
 // Create the context
@@ -149,6 +151,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
   const [hasSelectedLanguage, setHasSelectedLanguageState] = useState<boolean>(false);
+  const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
 
   // Load persisted data from localStorage on mount
   useEffect(() => {
@@ -173,6 +176,11 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
         // Restore selected language level
         if (data.selectedLanguageLevel) {
           setSelectedLanguageLevelState(data.selectedLanguageLevel);
+        }
+        
+        // Restore hasSelectedLevel flag
+        if (data.hasSelectedLevel !== undefined) {
+          setHasSelectedLevelState(data.hasSelectedLevel);
         }
         
         // Restore native language
@@ -214,6 +222,11 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     setSelectedLanguageState(language);
     setSelectedLanguageLevelState(level || null);
     
+    // If level is explicitly provided, mark it as selected
+    if (level) {
+      setHasSelectedLevelState(true);
+    }
+    
     // Persist to localStorage
     if (typeof window !== 'undefined') {
       const currentData = localStorage.getItem('languagePreferences');
@@ -229,6 +242,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
       
       data.selectedLanguage = language?.code || null;
       data.selectedLanguageLevel = level || null;
+      data.hasSelectedLevel = level ? true : data.hasSelectedLevel || false;
       if (nativeLanguage) {
         data.nativeLanguage = nativeLanguage.code;
       }
@@ -260,6 +274,28 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     }
   };
 
+  // Custom setHasSelectedLevel that also persists
+  const setHasSelectedLevel = (value: boolean) => {
+    setHasSelectedLevelState(value);
+    
+    // Update localStorage
+    if (typeof window !== 'undefined') {
+      const currentData = localStorage.getItem('languagePreferences');
+      let data: any = {};
+      
+      try {
+        if (currentData) {
+          data = JSON.parse(currentData);
+        }
+      } catch (e) {
+        console.error('Failed to parse existing preferences:', e);
+      }
+      
+      data.hasSelectedLevel = value;
+      localStorage.setItem('languagePreferences', JSON.stringify(data));
+    }
+  };
+
   const value: VisitorContextType = {
     selectedLanguage,
     selectedLanguageLevel,
@@ -269,6 +305,8 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     referralSource,
     hasSelectedLanguage,
     setHasSelectedLanguage,
+    hasSelectedLevel,
+    setHasSelectedLevel,
   };
 
   return (
