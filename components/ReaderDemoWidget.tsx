@@ -2065,7 +2065,7 @@ export default function ReaderDemoWidget({
       </ReaderContainer>
 
       {/* Alphabet Progress */}
-      {showAlphabetProgress && (
+        {showAlphabetProgress && (
         <AlphabetProgressContainer>
           <ProgressHint>
             {alphabetStage === 0 && "Your alphabet journey begins!"}
@@ -2099,19 +2099,65 @@ export default function ReaderDemoWidget({
 
       {/* Bottom Navigation Bar */}
       <BottomBar $inModal={signupMode === 'fullscreen'} $isLoading={isCalculatingWords}>
-        <PageNavigation>
-          <PageInputContainer>
-            <PageInput
-              type="text"
-              value={pageInput}
-              onChange={(e) => handlePageInputChange(e.target.value)}
-              onBlur={handlePageInputSubmit}
-              onKeyPress={(e) => e.key === 'Enter' && handlePageInputSubmit()}
-              maxLength={3}
-            />
-            <PageTotal>/ {totalPages}</PageTotal>
-          </PageInputContainer>
-        </PageNavigation>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          position: 'relative'
+        }}>
+          {/* Page Navigation - Left Side */}
+          <PageNavigation style={{ position: 'static', margin: 0 }}>
+            <PageInputContainer>
+              <PageInput
+                type="text"
+                value={pageInput}
+                onChange={(e) => handlePageInputChange(e.target.value)}
+                onBlur={handlePageInputSubmit}
+                onKeyPress={(e) => e.key === 'Enter' && handlePageInputSubmit()}
+                maxLength={3}
+              />
+              <PageTotal>/ {totalPages}</PageTotal>
+            </PageInputContainer>
+          </PageNavigation>
+          
+          {/* Start Learning Button - Right Side */}
+          {!showSignupExpanded && (
+            <button
+              onClick={() => {
+                setShowSignupExpanded(true);
+                if (onSignupVisibilityChange) {
+                  onSignupVisibilityChange(true);
+                }
+              }}
+              style={{
+                padding: '8px 24px',
+                backgroundColor: '#ff9800',
+                color: 'white',
+                border: 'none',
+                borderRadius: '20px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 6px rgba(255, 152, 0, 0.3)',
+                fontFamily: 'inherit'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f57c00';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 10px rgba(255, 152, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#ff9800';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(255, 152, 0, 0.3)';
+              }}
+            >
+              Start Learning
+            </button>
+          )}
+        </div>
       </BottomBar>
     </ReaderWrapper>
       
