@@ -186,6 +186,9 @@ export default function ReaderDemoWidget({
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+  const [autoScrollPerformed, setAutoScrollPerformed] = useState(false);
+  const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
+  const [hasStartedInitialAnimation, setHasStartedInitialAnimation] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
@@ -1002,7 +1005,10 @@ export default function ReaderDemoWidget({
         
         // Continue with educational message flow
         setShowEducationalMessage(true);
-        lockScroll();
+        // Only lock scroll if initial animation is not complete
+        if (!isInitialAnimationComplete) {
+          lockScroll();
+        }
         
         // After 3.5 seconds, start hiding animation
         setTimeout(() => {
@@ -1034,7 +1040,9 @@ export default function ReaderDemoWidget({
                 setTimeout(() => {
                   setJustUpdated(false);
                   // Unlock scroll after the entire animation is complete
-                  unlockScroll();
+                  if (!isInitialAnimationComplete) {
+                    unlockScroll();
+                  }
                 }, 1000);
               }, 1000);
             }, 100); // Small delay after loading completes
@@ -1049,7 +1057,7 @@ export default function ReaderDemoWidget({
         
         // Show second educational message on second click
         setShowSecondEducationalMessage(true);
-        lockScroll();
+        // Don't lock scroll after initial animation is complete
         
         // Hide after 4.5 seconds
         setTimeout(() => {
@@ -1058,7 +1066,6 @@ export default function ReaderDemoWidget({
           setTimeout(() => {
             setShowSecondEducationalMessage(false);
             setIsHidingSecondEducationalMessage(false);
-            unlockScroll();
           
           // Update word count after second message
           setTimeout(() => {
@@ -1090,7 +1097,7 @@ export default function ReaderDemoWidget({
         
         // Show third educational message on third click
         setShowThirdEducationalMessage(true);
-        lockScroll();
+        // Don't lock scroll after initial animation is complete
         
         // Hide after 4.5 seconds
         setTimeout(() => {
@@ -1099,7 +1106,6 @@ export default function ReaderDemoWidget({
           setTimeout(() => {
             setShowThirdEducationalMessage(false);
             setIsHidingThirdEducationalMessage(false);
-            unlockScroll();
           
           // Update word count after third message
           setTimeout(() => {
@@ -1148,7 +1154,7 @@ export default function ReaderDemoWidget({
         }, 300);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened]);
+  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
@@ -1460,13 +1466,16 @@ export default function ReaderDemoWidget({
   // Auto-scroll to reader when it becomes visible
   useEffect(() => {
     // Only auto-scroll if not in fullscreen mode and haven't scrolled yet
-    if (!hasAutoScrolled && signupMode !== 'fullscreen' && readerWrapperRef.current) {
+    if (!hasAutoScrolled && !autoScrollPerformed && signupMode !== 'fullscreen' && readerWrapperRef.current) {
       const observer = new IntersectionObserver(
         ([entry]) => {
           // Trigger when 10% is visible
           if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
             // Lock scroll immediately before auto-scroll starts
-            lockScroll();
+            // Only lock if initial animation hasn't been completed yet
+            if (!isInitialAnimationComplete) {
+              lockScroll();
+            }
             
             const rect = entry.target.getBoundingClientRect();
             const windowHeight = window.innerHeight;
@@ -1483,6 +1492,8 @@ export default function ReaderDemoWidget({
             }
             
             setHasAutoScrolled(true);
+            setAutoScrollPerformed(true);
+            // Don't unlock scroll here - wait for word count animation to complete
             observer.disconnect();
           }
         },
@@ -1497,7 +1508,7 @@ export default function ReaderDemoWidget({
       
       return () => observer.disconnect();
     }
-  }, [hasAutoScrolled, signupMode]);
+  }, [hasAutoScrolled, autoScrollPerformed, signupMode]);
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
@@ -1506,10 +1517,16 @@ export default function ReaderDemoWidget({
     // Reset the timer tracking when language changes
     hasStartedTimerRef.current = false;
     
+    // Clear any existing timer when language changes
+    if (visibilityTimerRef.current) {
+      clearTimeout(visibilityTimerRef.current);
+      visibilityTimerRef.current = null;
+    }
+    
     const checkVisibility = () => {
       console.log('[checkVisibility] Called, hasStartedTimer:', hasStartedTimerRef.current);
       
-      if (readerContainerRef.current && !hasStartedTimerRef.current) {
+      if (readerContainerRef.current && !hasStartedTimerRef.current && !hasStartedInitialAnimation) {
         const rect = readerContainerRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight || document.documentElement.clientHeight;
         
@@ -1526,14 +1543,18 @@ export default function ReaderDemoWidget({
         if (isFullyVisible) {
           console.log('[checkVisibility] Reader is fully visible! Starting timer...');
           // If not already timing, start the 2-second visibility timer
-          if (!visibilityTimerRef.current) {
+          if (!visibilityTimerRef.current && !hasStartedInitialAnimation) {
             console.log('[checkVisibility] Setting 2-second visibility timer');
-            // Don't lock scroll here - it's already locked from auto-scroll
-            setIsCalculatingWords(true); // Start loading animation
+            // Only lock scroll if initial animation hasn't been completed
+            if (!isInitialAnimationComplete) {
+                  lockScroll();
+                }
+                setIsCalculatingWords(true); // Start loading animation
             setShouldAnimateButton(false); // Stop button animation during loading
             visibilityTimerRef.current = setTimeout(() => {
               console.log('[visibilityTimer] 2 seconds elapsed, updating word counts');
               hasStartedTimerRef.current = true;
+              setHasStartedInitialAnimation(true); // Mark that initial animation has started
               // Stop loading animation just before showing word counts
               setIsCalculatingWords(false);
               setShouldAnimateButton(true); // Start button animation after loading
@@ -1556,7 +1577,8 @@ export default function ReaderDemoWidget({
                   setJustUpdated(true);
                   setTimeout(() => {
                     setJustUpdated(false);
-                    // Unlock scroll after the entire animation is complete
+                    // Mark initial animation as complete and unlock scroll
+                    setIsInitialAnimationComplete(true);
                     unlockScroll();
                   }, 1000);
                 }, 1000); // 1 second after word counts appear
@@ -1571,8 +1593,7 @@ export default function ReaderDemoWidget({
             visibilityTimerRef.current = null;
             setIsCalculatingWords(false); // Stop loading animation if reader is scrolled away
             setShouldAnimateButton(true); // Re-enable button animation
-            // Unlock scroll if it was locked
-            unlockScroll();
+            // Don't unlock scroll here - only unlock after initial animation completes
           }
         }
       }
@@ -1606,7 +1627,7 @@ export default function ReaderDemoWidget({
       // Ensure scroll is unlocked on cleanup
       unlockScroll();
     };
-  }, [currentLanguage.code]); // Only depend on language code to avoid object reference issues
+  }, [currentLanguage.code, autoScrollPerformed, isInitialAnimationComplete]); // Only depend on language code to avoid object reference issues
 
   // Auto-focus email input when level is selected
   useEffect(() => {
