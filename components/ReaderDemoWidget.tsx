@@ -984,6 +984,88 @@ export default function ReaderDemoWidget({
   }, [currentPage, handleInteraction]);
 
   const handleNextPage = useCallback(() => {
+    // Check if we're currently showing an educational message
+    if (showEducationalMessage || isHidingEducationalMessage) {
+      // Hide first message immediately and show second message
+      setShowEducationalMessage(false);
+      setIsHidingEducationalMessage(false);
+      setShowSecondEducationalMessage(true);
+      
+      // Add letters for second stage
+      setAlphabetStage(2);
+      const newLetters = getRandomLetters(7, activeLetters);
+      setActiveLetters(prev => [...prev, ...newLetters]);
+      
+      // Set timer to hide second message
+      setTimeout(() => {
+        setIsHidingSecondEducationalMessage(true);
+        setTimeout(() => {
+          setShowSecondEducationalMessage(false);
+          setIsHidingSecondEducationalMessage(false);
+        }, 500);
+      }, 4500);
+      
+      return; // Don't advance page
+    } else if (showSecondEducationalMessage || isHidingSecondEducationalMessage) {
+      // Hide second message immediately and show third message
+      setShowSecondEducationalMessage(false);
+      setIsHidingSecondEducationalMessage(false);
+      setShowThirdEducationalMessage(true);
+      
+      // Add letters for third stage
+      setAlphabetStage(3);
+      const remainingLetters = getRandomLetters(6, activeLetters);
+      setActiveLetters(prev => [...prev, ...remainingLetters]);
+      
+      // Show completion message
+      setTimeout(() => {
+        setShowCompletionMessage(true);
+        setTimeout(() => {
+          setShowCompletionMessage(false);
+        }, 3000);
+      }, 600);
+      
+      // Set timer to hide third message
+      setTimeout(() => {
+        setIsHidingThirdEducationalMessage(true);
+        setTimeout(() => {
+          setShowThirdEducationalMessage(false);
+          setIsHidingThirdEducationalMessage(false);
+          
+          // Show signup after third educational message
+          if (!showSignupExpanded && useInlineSignup) {
+            setTimeout(() => {
+              setShowSignupExpanded(true);
+              if (onSignupVisibilityChange) {
+                onSignupVisibilityChange(true);
+              }
+            }, 1500);
+          } else if (!useInlineSignup) {
+            setIsModalOpened(true);
+          }
+        }, 500);
+      }, 4500);
+      
+      return; // Don't advance page
+    } else if (showThirdEducationalMessage || isHidingThirdEducationalMessage) {
+      // Just hide the third message immediately
+      setShowThirdEducationalMessage(false);
+      setIsHidingThirdEducationalMessage(false);
+      
+      // Show signup immediately
+      if (!showSignupExpanded && useInlineSignup) {
+        setShowSignupExpanded(true);
+        if (onSignupVisibilityChange) {
+          onSignupVisibilityChange(true);
+        }
+      } else if (!useInlineSignup) {
+        setIsModalOpened(true);
+      }
+      
+      return; // Don't advance page
+    }
+    
+    // Normal page navigation logic
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
       setPageInput((currentPage + 1).toString());
@@ -1154,7 +1236,7 @@ export default function ReaderDemoWidget({
         }, 300);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete]);
+  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
