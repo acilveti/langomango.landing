@@ -20,19 +20,23 @@
       "adjustable_language": {
         "title": "Presencia ajustable del idioma objetivo en tu texto",
         "description": "Controla tu exposición al idioma que estás aprendiendo para adaptarlo a tu nivel. Logra disfrutar mientras aprendes."
+      },
+      "fourth_feature": {
+        "title": "¡Eso es todo! Después de los primeros 5 minutos, se volverá natural para ti",
+        "description": "Solo disfruta de la lectura, construye el hábito y diviértete en el proceso. ¡No se requiere esfuerzo!"
       }
     }
   },
   "cta": {
     "title": "Prueba el lector inteligente",
-    "subtitle": "Usa la demo",
-    "description": "Descubre la exposición que podrías lograr leyendo eBooks con el lector de Langomango.",
-    "button": "Hacer un recorrido"
+    "subtitle": "Comienza tu prueba gratuita",
+    "description": "Toma menos tiempo saltar directamente a la prueba gratuita que seguir preguntándote cómo será",
+    "button": "Usa la demo"
   },
   "waveCta": {
     "title": "¿Listo para transformar tu experiencia de lectura?",
-    "description": "Únete a LangoMango hoy y empieza a aprender idiomas mientras disfrutas de tus libros favoritos.",
-    "mainButton": "Comienza ahora",
+    "description": "Únete a LangoMango hoy con una prueba gratuita de 7 días y empieza a aprender idiomas mientras disfrutas de tus libros favoritos.",
+    "mainButton": "Usa la demo",
     "secondaryButton": "Conoce más sobre nuestra plataforma"
   },
   "authorCta": {
@@ -51,7 +55,7 @@
       "description": "Genera ingresos cuando los lectores usen tus libros para aprender idiomas. Alcanza una nueva audiencia de estudiantes mientras recibes una compensación justa por tu trabajo."
     },
     "section1": {
-      "title": "Monetiza tu audiencia",
+      "title": "Recibe pago por tu trabajo",
       "overTitle": "Un nuevo canal para monetizar tu trabajo",
       "description": "Retribución justa y generosa para autores por las lecturas dentro de la app y por referir usuarios.",
       "bulletPoint": {
@@ -60,9 +64,9 @@
       }
     },
     "section2": {
-      "title": "La alternativa para evitar la pirateria",
-      "overTitle": "Consigue ingresos por tu trabajo",
-      "description": "Tus libros y audiencia se convierten en herramientas valiosas para el aprendizaje, monetizalos y consigue generar ingresos."
+      "title": "Expande el alcance de tu audiencia",
+      "overTitle": "Conecta con estudiantes de idiomas en todo el mundo",
+      "description": "Aprovecha un mercado creciente de estudiantes de idiomas que buscan contenido atractivo. Tus libros se convierten en herramientas valiosas de aprendizaje, ayudando a los lectores a mejorar sus habilidades lingüísticas mientras disfrutan de tus historias."
     },
     "section3": {
       "title": "Proceso de integración sencillo",
@@ -75,9 +79,9 @@
       "description": "Accede a estadísticas completas sobre cómo interactúan los lectores con tus libros. Identifica tus títulos más populares y tasas de finalización."
     },
     "section5": {
-      "title": "Apoyo global a autores",
-      "overTitle": "Comunidad internacional de autores",
-      "description": "Únete a autores de todo el mundo. Soporte múltiples idiomas y recursos para triunfar en el mercado global."
+      "title": "Esta podría ser tu historia de éxito",
+      "overTitle": "¿Cómo será después de 1 año?",
+      "description": "Como cada noche, tomé mi kindle para disfrutar durante una hora, cuando me di cuenta de que estaba leyendo Juego de Tronos casi todo en sueco. Me había acostumbrado tanto a leer así, que se había convertido en lo normal para mí."
     },
     "videoSection": {
       "title": "Cómo funciona LangoMango para autores"
