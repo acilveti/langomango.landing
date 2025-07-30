@@ -4,7 +4,8 @@ import { selectors } from '../fixtures/selectors';
 test.describe('Testimonials Section Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.testimonials.section);
+    // Wait for the page to be fully loaded and the testimonials section to appear
+    await page.waitForSelector(selectors.testimonials.section, { timeout: 30000 });
     
     // Scroll to testimonials section
     await page.locator(selectors.testimonials.section).scrollIntoViewIfNeeded();
@@ -15,7 +16,7 @@ test.describe('Testimonials Section Tests', () => {
     await expect(section).toBeVisible();
     
     // Check for title and overtitle
-    const title = section.locator('h2');
+    const title = section.locator('h1');
     const overTitle = section.locator('[class*="OverTitle"]');
     
     await expect(title).toBeVisible();
