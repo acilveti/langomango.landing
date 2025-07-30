@@ -18,11 +18,12 @@ export default function Accordion({ title, isOpen, children }: PropsWithChildren
   const [hasCollapsed, setHasCollapsed] = useState(!isOpen);
   const isActive = !hasCollapsed;
   return (
-    <AccordionWrapper onClick={() => setHasCollapsed((prev) => !prev)}>
-      <TitleWrapper>
-        <Title>{title}</Title>
-        
-      </TitleWrapper>
+    <AccordionWrapper>
+      <div onClick={() => setHasCollapsed((prev) => !prev)} style={{ cursor: 'pointer' }}>
+        <TitleWrapper>
+          <Title>{title}</Title>
+        </TitleWrapper>
+      </div>
       <Collapse isOpen={isActive} duration={300}>
         <Description>
           <RichText>{children}</RichText>

@@ -16,6 +16,9 @@
       "Bash(ls:*)",
       "Bash(git worktree:*)"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "C:\\Users\\cilve\\fsi.main\\LangoMango\\landing"
+    ]
   }
 }

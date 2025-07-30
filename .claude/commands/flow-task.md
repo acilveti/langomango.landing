@@ -15,11 +15,12 @@ The task description will be available as `$ARGUMENTS`.
 ### 1. Setup Worktree and Branch
 - Parse task description from `$ARGUMENTS`
 - Check if we're in a git repository
-- Get the parent directory path
 - Create a branch name from `$ARGUMENTS` (convert to kebab-case)
-- Check if worktree already exists
-- If not, create new worktree in parent directory: `../langomango.landing-{branch-name}`
-- Create and checkout the new branch
+- **FIRST**: Use `/add-dir ..` to include parent directory in the session
+  - This is required to create sibling worktrees
+- Create a worktree at `../langomango-[feature-name]` with branch `feature/[feature-name]`
+- Navigate to the new worktree directory
+- Install dependencies
 
 ### 2. Implement Task Step-by-Step
 For each implementation step:
@@ -36,9 +37,9 @@ For each implementation step:
 - Follow existing code patterns and conventions
 
 #### c. Test Locally
-- Run `yarn dev` to test the changes work
-- Run `yarn lint` to check for linting errors
-- Run `npx tsc --noEmit` to check for TypeScript errors
+- Test the changes work locally
+- Check for linting errors
+- Check for TypeScript errors
 - Fix any errors before proceeding
 
 #### d. Commit Changes
@@ -47,13 +48,13 @@ For each implementation step:
 - Commit with message format: `{type}: {description of step}`
 
 #### e. Push and Check CI
-- Push the commit to remote: `git push -u origin {branch-name}`
+- Push the commit to remote
 - **WAIT for GitHub Actions to start running**
-- Monitor the workflow status using `gh run list --branch {branch-name}`
+- Monitor the workflow status
 - **WAIT for all checks to complete** (this may take several minutes)
 - Check the status of the latest workflow run
 - If checks fail:
-  - Analyze the error logs using `gh run view {run-id}`
+  - Analyze the error logs
   - Fix the issues locally
   - Amend the commit or create a fix commit
   - Push again
@@ -68,7 +69,7 @@ For each implementation step:
 
 ### 3. Create Pull Request
 - Ensure all commits are pushed and all checks are passing
-- Create PR targeting `develop` branch using `gh pr create`
+- Create PR targeting `develop` branch
 - PR title should summarize `$ARGUMENTS`
 - PR body should include:
   - Summary of changes based on `$ARGUMENTS`
@@ -78,10 +79,10 @@ For each implementation step:
 
 ### 4. Verify PR Checks
 - **WAIT for PR checks to start**
-- Monitor PR status checks using `gh pr checks`
+- Monitor PR status checks
 - **WAIT for all PR checks to complete** (this may take several minutes)
 - If any checks fail:
-  - View detailed logs: `gh pr checks --watch`
+  - View detailed logs
   - Pull the latest changes
   - Fix the failing checks
   - Push fixes
@@ -89,102 +90,58 @@ For each implementation step:
   - Re-verify all checks pass
 - Ensure PR is ready for review
 
-## Implementation Script
+## Implementation Steps
 
-```bash
-# Parse arguments
-TASK_DESCRIPTION="$ARGUMENTS"
-
-# Convert task description to branch name (kebab-case)
-# Example: "Add dark mode toggle" -> "add-dark-mode-toggle"
-BRANCH_NAME="feat/$(echo "$TASK_DESCRIPTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')"
-
-# Get parent directory
-PARENT_DIR=$(dirname $(pwd))
-WORKTREE_DIR="$PARENT_DIR/langomango.landing-${BRANCH_NAME#feat/}"
-
-# Check if worktree exists
-if [ -d "$WORKTREE_DIR" ]; then
-    echo "Worktree already exists at $WORKTREE_DIR"
-    cd "$WORKTREE_DIR"
-else
-    echo "Creating new worktree for: $TASK_DESCRIPTION"
-    cd "$PARENT_DIR"
-    git worktree add "langomango.landing-${BRANCH_NAME#feat/}" -b "$BRANCH_NAME"
-    cd "$WORKTREE_DIR"
-fi
-
-# Install dependencies
-yarn install
-
-# Now proceed with implementation based on $ARGUMENTS
-echo "Ready to implement: $TASK_DESCRIPTION"
-```
+1. Parse task description from `$ARGUMENTS`
+2. Use `/add-dir ..` to include parent directory (required for sibling worktrees)
+3. Convert task description to kebab-case for branch naming
+4. Create branch name as `feature/[feature-name]`
+5. Create worktree at `../langomango-[feature-name]`
+6. Navigate to the new worktree
+7. Install dependencies
+8. Begin implementation based on `$ARGUMENTS`
 
 ## Monitoring GitHub Actions
 
 ### Check workflow runs
-```bash
-# List recent runs for the branch
-gh run list --branch {branch-name}
-
-# Watch a specific run (waits until completion)
-gh run watch {run-id}
-
-# View run details and logs
-gh run view {run-id} --log
-```
+- List recent runs for the branch
+- Watch specific runs until completion
+- View run details and logs when needed
 
 ### Check PR status
-```bash
-# Check PR checks status
-gh pr checks {pr-number}
-
-# Watch PR checks (waits until completion)
-gh pr checks {pr-number} --watch
-```
+- Monitor PR checks status
+- Watch PR checks until completion
+- Review any failed checks
 
 ## Example with $ARGUMENTS
 
-When called with:
-```
-/flow-task "Add dark mode toggle to header component"
-```
+When called with a task description like "Add dark mode toggle to header component":
 
 The command will:
-1. Set `$ARGUMENTS` = "Add dark mode toggle to header component"
-2. Create branch name: `feat/add-dark-mode-toggle-to-header-component`
-3. Create worktree: `../langomango.landing-add-dark-mode-toggle-to-header-component`
-4. Implement step by step, **waiting for CI checks after each commit**
-5. Create PR only after all commits pass their checks
-6. **Wait for PR checks to complete** before marking task as done
+1. Set `$ARGUMENTS` to the task description
+2. Use `/add-dir ..` to include parent directory in the session
+3. Create feature name from the task description (kebab-case)
+4. Create branch name: `feature/[feature-name]`
+5. Create worktree: `../langomango-[feature-name]`
+6. Navigate to the worktree and install dependencies
+7. Implement step by step, **waiting for CI checks after each commit**
+8. Create PR only after all commits pass their checks
+9. **Wait for PR checks to complete** before marking task as done
 
 ## Creating the PR
 
-When creating the PR, always target the `develop` branch:
-```bash
-gh pr create --base develop --title "feat: $TASK_DESCRIPTION" --body "$(cat <<'EOF'
-## Summary
-Implements: $TASK_DESCRIPTION
-
-## Changes
-- [List of changes made]
-
-## Test Plan
-- [How to test the changes]
-
-## Checklist
-- [ ] All tests pass
-- [ ] Lint checks pass
-- [ ] TypeScript checks pass
-- [ ] Tested locally
-- [ ] CI/CD checks pass
-EOF
-)"
-```
+When creating the PR:
+- Always target the `develop` branch
+- Use a descriptive title based on `$ARGUMENTS`
+- Include in the PR body:
+  - Summary of implementation
+  - List of changes made
+  - Test plan
+  - Checklist of validations
 
 ## Important Notes
 
+- **CRITICAL**: The parent directory must be included in the Claude session to create sibling worktrees
 - `$ARGUMENTS` contains the full task description as provided by the user
 - The PR must always target the `develop` branch
 - **ALWAYS WAIT for CI/CD checks to complete before proceeding**
