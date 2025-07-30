@@ -148,7 +148,7 @@ class ApiClient {
     this.api.interceptors.request.use(
       async (config) => {
         const token = await SimpleAuthService.getToken();
-        if (token) {
+        if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;

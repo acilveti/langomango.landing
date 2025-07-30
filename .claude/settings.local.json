@@ -3,7 +3,17 @@
     "allow": [
       "Bash(npx tsc:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr view:*)",
+      "gh",
+      "Bash(gh run view:*)",
+      "Bash(gh api:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(yarn build)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

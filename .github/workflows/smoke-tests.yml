@@ -1,0 +1,42 @@
+name: Smoke Tests
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  smoke-test:
+    name: Quick Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        
+    - name: Install dependencies
+      run: yarn install
+      
+    - name: Install Playwright
+      run: yarn playwright:install chromium
+      
+    - name: Run smoke tests
+      run: yarn test:smoke
+      env:
+        MOCK_EXTERNAL_SERVICES: true
+        
+    - name: Upload test results on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: smoke-test-failure
+        path: test-results/
+        retention-days: 7
