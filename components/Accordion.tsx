@@ -60,7 +60,7 @@ const Description = styled.div`
   font-weight: normal;
 `;
 
-const AccordionWrapper = styled.div`
+const AccordionWrapper = styled.div<{ onClick: () => void }>`
   display: flex;
   flex-direction: column;
   padding: 2rem 1.5rem;
