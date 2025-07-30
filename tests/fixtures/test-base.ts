@@ -1,9 +1,22 @@
 import { test as base } from '@playwright/test';
+import { mockExternalServices, mockApiEndpoints } from './mock-external-services';
 
 // Custom test fixtures that extend Playwright's base test
 export const test = base.extend({
-  // Add custom fixtures here if needed
-  // For example, authenticated page, test data, etc.
+  // Auto-mock external services for faster tests
+  page: async ({ page }, use) => {
+    // Only mock in test environment
+    if (process.env.MOCK_EXTERNAL_SERVICES !== 'false') {
+      await mockExternalServices(page);
+    }
+    
+    // Mock API endpoints if requested
+    if (process.env.MOCK_API_ENDPOINTS === 'true') {
+      await mockApiEndpoints(page);
+    }
+    
+    await use(page);
+  },
 });
 
 export { expect } from '@playwright/test';
