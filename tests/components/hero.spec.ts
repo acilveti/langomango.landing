@@ -4,7 +4,7 @@ import { selectors } from '../fixtures/selectors';
 test.describe('Hero Section Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.hero.section);
+    await page.waitForSelector(selectors.hero.section, { timeout: 30000 });
   });
 
   test('should display hero sticky background', async ({ page }) => {

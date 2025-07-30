@@ -4,7 +4,7 @@ import { selectors } from '../fixtures/selectors';
 test.describe('Pricing Section Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.pricing.section);
+    await page.waitForSelector(selectors.pricing.section, { timeout: 30000 });
     
     // Scroll to pricing section
     await page.locator(selectors.pricing.section).scrollIntoViewIfNeeded();

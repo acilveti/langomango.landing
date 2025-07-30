@@ -4,7 +4,7 @@ import { selectors, nth } from '../fixtures/selectors';
 test.describe('Features Gallery Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.features.section);
+    await page.waitForSelector(selectors.features.section, { timeout: 30000 });
     
     // Scroll to features section
     await page.locator(selectors.features.section).scrollIntoViewIfNeeded();

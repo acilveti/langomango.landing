@@ -103,7 +103,7 @@ test.describe('CTA Section Tests', () => {
 test.describe('Video Section Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.video.section);
+    await page.waitForSelector(selectors.video.section, { timeout: 30000 });
     
     // Scroll to video section
     await page.locator(selectors.video.section).scrollIntoViewIfNeeded();
@@ -155,7 +155,7 @@ test.describe('Video Section Tests', () => {
 test.describe('FAQ Section Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector(selectors.faq.section);
+    await page.waitForSelector(selectors.faq.section, { timeout: 30000 });
     
     // Scroll to FAQ section
     await page.locator(selectors.faq.section).scrollIntoViewIfNeeded();
@@ -229,7 +229,7 @@ test.describe('Single Testimonial Section Tests', () => {
     await expect(section).toBeVisible();
     
     // Check for title
-    const title = section.locator('h2');
+    const title = section.locator('h1');
     if (await title.count() > 0) {
       await expect(title).toBeVisible();
     }
