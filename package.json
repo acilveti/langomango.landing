@@ -6,7 +6,11 @@
     "dev": "yarn tinacms server:start -c \"next dev\"",
     "build": "yarn tinacms server:start -c \"next build\"",
     "start": "yarn tinacms server:start -c \"next start\"",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node node_modules/@playwright/test/cli.js test",
+    "test:ui": "node node_modules/@playwright/test/cli.js test --ui",
+    "playwright:install": "node node_modules/@playwright/test/cli.js install",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@accessible/drawer": "^3.0.2",
@@ -75,6 +79,15 @@
     "remark-gfm": "^3.0.1",
     "remark-sectionize": "^2.0.0",
     "remark-slug": "^7.0.1",
-    "typescript": "4.6.3"
+    "typescript": "4.6.3",
+    "@playwright/test": "^1.40.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "yarn lint",
+      "yarn test"
+    ]
   }
 }
