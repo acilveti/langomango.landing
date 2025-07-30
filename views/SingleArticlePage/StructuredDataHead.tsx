@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { jsonLdScriptProps } from 'react-schemaorg';
 import { TechArticle, WebSite } from 'schema-dts';
-import { EnvVars } from 'env.production';
+import { config } from '../../config/environment';
 
 interface StructuredDataHeadProps {
   slug: string;
@@ -15,10 +15,10 @@ interface StructuredDataHeadProps {
 export default function StructuredDataHead(props: StructuredDataHeadProps) {
   const { slug, title, date, description, tags, author } = props;
 
-  const currentSiteUrl = EnvVars.URL + 'blog/' + slug;
-  const ogImageUrl = EnvVars.OG_IMAGES_URL + `${slug}.png`;
-  const domainName = EnvVars.URL.replace('https://', '');
-  const logoUrl = EnvVars.URL + 'logo.png';
+  const currentSiteUrl = config.landingUrl + '/blog/' + slug;
+  const ogImageUrl = config.ogImagesUrl + `${slug}.png`;
+  const domainName = config.landingUrl.replace('https://', '').replace('http://', '');
+  const logoUrl = config.landingUrl + '/logo.png';
 
   return (
     <Head>
@@ -58,7 +58,7 @@ export default function StructuredDataHead(props: StructuredDataHeadProps) {
           '@type': 'WebSite',
           name: domainName,
           alternateName: domainName,
-          url: EnvVars.URL,
+          url: config.landingUrl,
         })}
       />
     </Head>

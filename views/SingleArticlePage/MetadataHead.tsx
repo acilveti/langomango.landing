@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import React from 'react';
-import { EnvVars } from 'env.production';
+import { config } from '../../config/environment';
 
 interface MetadataHeadProps {
   title: string;
@@ -14,7 +14,7 @@ export default function MetadataHead(props: MetadataHeadProps) {
   return (
     <Head>
       <title>
-        {title} | {EnvVars.SITE_NAME}
+        {title} | {config.siteName}
       </title>
       <meta name="description" content={description} />
       <meta name="author" content={author} />

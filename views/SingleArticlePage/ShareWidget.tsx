@@ -1,6 +1,6 @@
 import { FacebookIcon, FacebookShareButton, LinkedinIcon, LinkedinShareButton, TwitterIcon, TwitterShareButton } from 'react-share';
 import styled from 'styled-components';
-import { EnvVars } from 'env.production';
+import { config } from '../../config/environment';
 import { media } from 'utils/media';
 
 interface ShareWidgetProps {
@@ -10,7 +10,7 @@ interface ShareWidgetProps {
 
 export default function ShareWidget({ title, slug }: ShareWidgetProps) {
   const shareMessage = 'New article: ' + title;
-  const currentUrl = EnvVars.URL + 'blog/' + slug;
+  const currentUrl = config.landingUrl + '/blog/' + slug;
 
   return (
     <Wrapper>
