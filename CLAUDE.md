@@ -121,3 +121,8 @@ The site is configured for Vercel deployment. Required environment variables:
 - `SENDGRID_API_KEY` - SendGrid API key for email sending
 - `NEXT_PUBLIC_ORGANIZATION_NAME` - (Optional) Tina Cloud organization
 - `NEXT_PUBLIC_TINA_CLIENT_ID` - (Optional) Tina Cloud client ID
+```
+
+### Code Modification Workflow
+
+- Every time you think you have finished modifying code, you will have to run `yarn dev`, and check that the output is clean, and that there are no errors. If you find errors you have introduced, fix them
