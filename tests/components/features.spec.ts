@@ -14,8 +14,8 @@ test.describe('Features Gallery Tests', () => {
     const section = page.locator(selectors.features.section);
     await expect(section).toBeVisible();
     
-    // Check section title
-    const title = section.locator('h2').first();
+    // Check section title - SectionTitle is a div, not h2
+    const title = section.locator('[class*="SectionTitle"]').first();
     await expect(title).toContainText('How does it work?');
     
     // Check overtitle
