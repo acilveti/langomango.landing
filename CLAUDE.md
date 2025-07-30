@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies
 yarn install
 
-# Development server with TinaCMS
+# Development server
 yarn dev
 
 # Production build
@@ -32,7 +32,6 @@ This is a Next.js 12 marketing website for LangoMango, a language learning platf
 - **Next.js 12.1.0** with React 17
 - **TypeScript** with strict mode
 - **Styled Components** for CSS-in-JS styling
-- **TinaCMS** for content management
 - **next-i18next** for internationalization (EN/ES)
 - **Formik** and **React Hook Form** for form handling
 - **SendGrid** for transactional emails
@@ -90,8 +89,6 @@ This is a Next.js 12 marketing website for LangoMango, a language learning platf
 ### Content Management
 
 - Blog posts in `/posts/*.mdx` with frontmatter metadata
-- TinaCMS integration for visual editing (access via `/admin`)
-- Logout from editing mode via `/admin/logout`
 
 ### Performance Considerations
 
