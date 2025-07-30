@@ -147,7 +147,7 @@ test.describe('Homepage Integration Tests', () => {
   test('should display content in correct language', async ({ page }) => {
     // Check hero CTA button text
     const ctaButton = page.locator(selectors.hero.ctaButton).first();
-    await expect(ctaButton).toHaveText('Use the demo');
+    await expect(ctaButton).toHaveText('USE DEMO');
     
     // Check features section title
     const featuresTitle = page.locator(selectors.features.section).locator('h2').first();

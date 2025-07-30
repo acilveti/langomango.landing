@@ -27,7 +27,7 @@ test.describe('Navigation Tests', () => {
     const isDesktop = await page.viewportSize()?.width! > 1024;
     if (isDesktop) {
       await expect(ctaButton).toBeVisible();
-      await expect(ctaButton).toHaveText('Use the demo');
+      await expect(ctaButton).toHaveText('USE DEMO');
     }
   });
 

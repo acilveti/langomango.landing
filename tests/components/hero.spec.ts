@@ -69,7 +69,7 @@ test.describe('Hero Section Tests', () => {
     // Check first CTA button
     const firstButton = ctaButtons.first();
     await expect(firstButton).toBeVisible();
-    await expect(firstButton).toHaveText('Use the demo');
+    await expect(firstButton).toHaveText('USE DEMO');
   });
 
   test('should have proper mobile/desktop layout', async ({ page, viewport }) => {

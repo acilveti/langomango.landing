@@ -4,7 +4,7 @@ export const selectors = {
   nav: {
     container: 'nav',
     logo: 'nav a[href="/"]',
-    ctaButton: 'nav button:has-text("Use the demo")',
+    ctaButton: 'nav button:has-text("USE DEMO")',
     mobileMenuButton: '[aria-label="Menu"]'
   },
 
@@ -15,7 +15,7 @@ export const selectors = {
     title: 'h1',
     subtitle: 'h2',
     readerWidget: '[class*="DemoContainer"]',
-    ctaButton: '#hero-section button:has-text("Use the demo")',
+    ctaButton: '#hero-section button:has-text("USE DEMO")',
     backgroundImage: '#hero-sticky-section img'
   },
 
