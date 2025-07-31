@@ -279,6 +279,7 @@ export interface LanguageRegistrationModalProps {
   selectedLanguage: Language;
   onClose: () => void;
   onSuccess?: () => void;
+  redirectToCheckout?: boolean;
 }
 
 // Simplified Yup validation schema - only email now
@@ -291,7 +292,8 @@ const validationSchema = Yup.object({
 export default function LanguageRegistrationModal({ 
   selectedLanguage, 
   onClose, 
-  onSuccess 
+  onSuccess,
+  redirectToCheckout = false 
 }: LanguageRegistrationModalProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [apiError, setApiError] = useState<string>('');
@@ -307,8 +309,14 @@ export default function LanguageRegistrationModal({
       onSuccess?.();
       setTimeout(() => {
         onClose();
-        const token = localStorage.getItem('auth_token');
-        window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(token || '')}&type=google`;
+        if (redirectToCheckout) {
+          // If redirectToCheckout is true, go to checkout page
+          window.location.href = '/checkout';
+        } else {
+          // Otherwise, go to beta app login with token
+          const token = localStorage.getItem('auth_token');
+          window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(token || '')}&type=google`;
+        }
       }, 2000);
     }
   }, [onSuccess, onClose]);
@@ -343,10 +351,16 @@ export default function LanguageRegistrationModal({
         setIsSuccess(true);
         onSuccess?.();
         
-        // Auto-redirect to login with token in URL after 2 seconds
+        // Auto-redirect after 2 seconds
         setTimeout(() => {
           onClose();
-          window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(response.data.token)}&type=email`;
+          if (redirectToCheckout) {
+            // If redirectToCheckout is true, go to checkout page
+            window.location.href = '/checkout';
+          } else {
+            // Otherwise, go to beta app login with token
+            window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(response.data.token)}&type=email`;
+          }
         }, 2000);
       } else {
         console.error('Registration failed - no token in response:', response.data); // Debug log
