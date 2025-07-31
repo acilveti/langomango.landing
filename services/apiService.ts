@@ -1,7 +1,7 @@
+import { getBaseApiUrl, config } from '../config/environment';
+
 // API configuration
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
+const API_URL = getBaseApiUrl().slice(0, -1); // Remove trailing slash for consistency
 
 // Type definitions
 export interface DemoSignupRequest {
@@ -210,7 +210,7 @@ class ApiService {
           level: data.level
         }
       },
-      redirectUrl: 'https://beta-app.langomango.com/reader'
+      redirectUrl: `${config.appUrl}/reader`
     };
   }
 
@@ -229,7 +229,7 @@ class ApiService {
   getGoogleLoginUrl(params: RegisterWithGoogleRequest): string {
     const queryParams = new URLSearchParams({
       returnUrl: '/sign-up',
-      frontendRedirectUrl: 'https://beta-app.langomango.com/',
+      frontendRedirectUrl: config.appUrl,
       ...(params.referralCode && { referralCode: params.referralCode })
     });
     
