@@ -41,45 +41,10 @@ jobs:
           echo "No test script found in package.json"
         fi
 
-  # Second: Deploy to Vercel (only if tests pass)
-  vercel-deploy:
-    name: Deploy to Vercel
-    needs: unit-tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    if: success()
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
-        
-    - name: Install dependencies
-      run: yarn install
-      
-    - name: Build project
-      run: yarn build
-      env:
-        NEXT_PUBLIC_ENVIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'preview' }}
-      
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        vercel-args: ${{ github.ref == 'refs/heads/master' && '--prod' || '' }}
-        scope: ${{ secrets.VERCEL_ORG_ID }}
-
-  # Third: Run Playwright tests (only if Vercel deployment succeeds)
+  # Second: Wait for Vercel deployment then run Playwright tests
   playwright-tests:
     name: Playwright E2E Tests
-    needs: vercel-deploy
+    needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: success()
@@ -96,6 +61,14 @@ jobs:
         
     - name: Install dependencies
       run: yarn install
+      
+    - name: Wait for Vercel deployment
+      uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+      id: wait-for-vercel
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        max_timeout: 600
+        check_interval: 30
       
     - name: Get Playwright version
       id: playwright-version
@@ -117,7 +90,7 @@ jobs:
     - name: Run Playwright tests
       run: yarn test
       env:
-        BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://langomango.com' || 'https://langomango-preview.vercel.app' }}
+        BASE_URL: ${{ steps.wait-for-vercel.outputs.url || (github.ref == 'refs/heads/master' && 'https://langomango.com' || 'https://langomango-preview.vercel.app') }}
       
     - name: Upload test report
       if: always()

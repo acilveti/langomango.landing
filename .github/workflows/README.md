@@ -2,21 +2,20 @@
 
 ## Overview
 
-The CI/CD pipeline is configured to run tests and deployments in a sequential manner:
+The CI/CD pipeline is configured to run tests in a sequential manner:
 
 1. **Unit Tests** - Runs linting, TypeScript checks, and unit tests
-2. **Vercel Deployment** - Deploys to Vercel (only if tests pass)
-3. **Playwright E2E Tests** - Runs end-to-end tests (only if deployment succeeds)
+2. **Vercel Deployment** - Automatic deployment via Vercel GitHub integration
+3. **Playwright E2E Tests** - Runs end-to-end tests after Vercel deployment completes
 
 If any step fails, the subsequent steps will not run.
 
-## Required Secrets
+## How It Works
 
-The following secrets need to be configured in the repository settings:
-
-- `VERCEL_TOKEN` - Your Vercel authentication token
-- `VERCEL_ORG_ID` - Your Vercel organization ID
-- `VERCEL_PROJECT_ID` - Your Vercel project ID
+- Unit tests run first on every push/PR
+- Vercel automatically deploys via their GitHub integration (not controlled by this workflow)
+- Playwright tests wait for the Vercel deployment to complete before running
+- Tests run against the deployed Vercel preview URL
 
 ## Workflow Files
 
