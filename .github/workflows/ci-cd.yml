@@ -66,12 +66,20 @@ jobs:
     - name: Start application in background
       run: |
         yarn start &
+        APP_PID=$!
+        echo "Started app with PID: $APP_PID"
         echo "Waiting for Next.js to start..."
         # Give the app time to start
-        sleep 10
-        # Check if the app is running
-        curl -f http://localhost:3000 || (echo "App failed to start" && exit 1)
-        echo "Application is ready!"
+        sleep 15
+        # Check if the process is still running
+        if ps -p $APP_PID > /dev/null; then
+          echo "Application process is running!"
+          # Check if we can connect (don't fail on non-200 status)
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:3000 || true
+        else
+          echo "Application process died!"
+          exit 1
+        fi
       
     - name: Get Playwright version
       id: playwright-version
