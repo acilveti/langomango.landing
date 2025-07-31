@@ -111,11 +111,11 @@ test.describe('API Integration E2E', () => {
     
     // Set up WebSocket listener
     const wsMessages: any[] = [];
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       const originalWebSocket = window.WebSocket;
       (window as any).WebSocket = new Proxy(originalWebSocket, {
         construct(target, args) {
-          const ws = new target(...args);
+          const ws = new target(...(args as [string | URL, string | string[] | undefined]));
           
           ws.addEventListener('message', (event) => {
             (window as any).wsMessages = (window as any).wsMessages || [];

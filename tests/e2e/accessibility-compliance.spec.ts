@@ -25,14 +25,14 @@ test.describe('Accessibility Compliance E2E', () => {
   test('should have alt text for all images', async ({ page }) => {
     const imagesWithoutAlt = await page.evaluate(() => {
       const images = Array.from(document.querySelectorAll('img'));
-      return images.filter(img => !img.alt || img.alt.trim() === '').length;
+      return images.filter(img => !(img as HTMLImageElement).alt || (img as HTMLImageElement).alt.trim() === '').length;
     });
     
     expect(imagesWithoutAlt).toBe(0);
     
     const decorativeImages = await page.evaluate(() => {
       const images = Array.from(document.querySelectorAll('img[role="presentation"], img[aria-hidden="true"]'));
-      return images.every(img => img.alt === '');
+      return images.every(img => (img as HTMLImageElement).alt === '');
     });
     
     expect(decorativeImages).toBeTruthy();

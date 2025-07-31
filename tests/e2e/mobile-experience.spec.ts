@@ -1,8 +1,12 @@
-import { test, expect } from '../fixtures/test-base';
+import { test as base, expect } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+// Create a mobile-specific test fixture
+const test = base.extend({
+  ...devices['iPhone 12']
+});
+
 test.describe('Mobile Experience E2E', () => {
-  test.use({ ...devices['iPhone 12'] });
 
   test('should display mobile-optimized navigation menu', async ({ page }) => {
     await page.goto('/');

@@ -84,7 +84,7 @@ test.describe('Performance Monitoring E2E', () => {
     
     page.on('response', response => {
       const url = response.url();
-      const resourceTiming = response.timing();
+      const resourceTiming = (response as any).timing?.();
       
       if (resourceTiming) {
         resources.push({

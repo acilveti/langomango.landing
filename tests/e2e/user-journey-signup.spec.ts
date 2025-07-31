@@ -79,12 +79,12 @@ test.describe('User Journey - Complete Signup Flow E2E', () => {
     const analyticsEvents: string[] = [];
     
     await page.addInitScript(() => {
-      window.dataLayer = window.dataLayer || [];
-      const originalPush = window.dataLayer.push;
-      window.dataLayer.push = function(...args: any[]) {
-        window.analyticsEvents = window.analyticsEvents || [];
-        window.analyticsEvents.push(...args);
-        return originalPush.apply(window.dataLayer, args);
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      const originalPush = (window as any).dataLayer.push;
+      (window as any).dataLayer.push = function(...args: any[]) {
+        (window as any).analyticsEvents = (window as any).analyticsEvents || [];
+        (window as any).analyticsEvents.push(...args);
+        return originalPush.apply((window as any).dataLayer, args);
       };
     });
     
@@ -95,7 +95,7 @@ test.describe('User Journey - Complete Signup Flow E2E', () => {
     await page.fill('input[name="email"]', 'analytics@example.com');
     await page.fill('input[name="password"]', 'TestPass123!');
     
-    const events = await page.evaluate(() => window.analyticsEvents || []);
+    const events = await page.evaluate(() => (window as any).analyticsEvents || []);
     
     const signupEvents = events.filter((e: any) => 
       e.event?.includes('signup') || e.event?.includes('form')
