@@ -1,0 +1,49 @@
+{
+  "title": "Muro de Agradecimientos",
+  "metaDescription": "Agradecimientos a todas las personas que han hecho posible Langomango",
+  "preface": {
+    "paragraph1": "Mi nombre es Ander, y este proyecto no habría sido posible sin el apoyo, la confianza y la generosidad de muchas personas extraordinarias. Langomango nació de un sueño: hacer que el aprendizaje de idiomas sea accesible, divertido y efectivo para todos.",
+    "paragraph2": "A lo largo de este viaje, he tenido la fortuna de cruzarme con personas increíbles que han creído en esta visión, que han dedicado su tiempo, su conocimiento y su energía para hacer realidad lo que parecía imposible. Cada conversación, cada consejo, cada palabra de aliento ha sido un ladrillo en la construcción de Langomango.",
+    "paragraph3": "Este muro es mi humilde intento de agradecer a todos aquellos que han sido parte de esta aventura. A todos los mencionados aquí, y a muchos más que por espacio no puedo incluir:",
+    "thanksNote": "gracias de corazón",
+    "paragraph3End": ". Su apoyo ha sido el combustible que mantiene viva esta misión de democratizar el aprendizaje de idiomas.",
+    "signature": "- Ander"
+  },
+  "acknowledgments": {
+    "mariaGarcia": {
+      "name": "María García",
+      "role": "Por su apoyo incondicional desde el primer día"
+    },
+    "juanMartinez": {
+      "name": "Juan Martínez",
+      "role": "Por sus valiosos consejos técnicos"
+    },
+    "anaLopez": {
+      "name": "Ana López",
+      "role": "Por creer en esta visión cuando solo era una idea"
+    },
+    "carlosRodriguez": {
+      "name": "Carlos Rodríguez",
+      "role": "Por su ayuda con el diseño y la experiencia de usuario"
+    },
+    "lauraFernandez": {
+      "name": "Laura Fernández",
+      "role": "Por sus contribuciones al contenido educativo"
+    },
+    "diegoSanchez": {
+      "name": "Diego Sánchez",
+      "role": "Por su mentoría y guía constante"
+    },
+    "patriciaGomez": {
+      "name": "Patricia Gómez",
+      "role": "Por su apoyo en la estrategia de marketing"
+    },
+    "robertoDiaz": {
+      "name": "Roberto Díaz",
+      "role": "Por compartir su experiencia en el mundo startup"
+    }
+  },
+  "closingNote": {
+    "text": "Y a ti, que estás leyendo esto, gracias por dar una oportunidad a Langomango. Cada usuario es parte de esta historia, y juntos estamos construyendo una comunidad global de aprendizaje."
+  }
+}

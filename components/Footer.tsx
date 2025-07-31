@@ -1,4 +1,3 @@
-// components/Footer.tsx
 import NextLink from 'next/link';
 import { FacebookIcon, LinkedinIcon, TwitterIcon } from 'react-share';
 import styled from 'styled-components';
@@ -16,9 +15,22 @@ export default function Footer() {
   
   const footerItems: FooterItems = [
     {
-      title: "Product",
+      title: t('common:footer.sections.product'),
       items: [
-        { title: "Languages Offered", href: '/languages' },
+        { title: t('common:footer.links.languagesOffered'), href: '/languages' },
+      ],
+    },
+    {
+      title: t('common:footer.sections.company'),
+      items: [
+        { title: t('common:footer.links.wallOfThanks'), href: '/acknowledgments' },
+      ],
+    },
+    {
+      title: t('common:footer.sections.legal'),
+      items: [
+        { title: t('common:footer.links.termsAndConditions'), href: '/terms-and-conditions' },
+        { title: t('common:footer.links.privacyPolicy'), href: '/privacy-policy' },
       ],
     },
   ];

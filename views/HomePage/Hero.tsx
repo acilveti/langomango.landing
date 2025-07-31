@@ -1,21 +1,25 @@
 // views/HomePage/Hero.tsx
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
-import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
+import VibratingButton from 'components/VibratingButton';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { addReferralToUrl } from 'utils/referral';
 import { useTranslation } from 'next-i18next';
+import ReaderDemoWidget from 'components/ReaderDemoWidget';
 
 export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
   const { setIsModalOpened } = useNewsletterModalContext();
   const [isMobile, setIsMobile] = useState(false);
+  const [darkenAmount, setDarkenAmount] = useState(0);
+  const demoContainerRef = useRef<HTMLDivElement>(null);
+  const mobileDemoContainerRef = useRef<HTMLDivElement>(null);
   
   // Check if we're on client side before using window
   useEffect(() => {
@@ -34,40 +38,66 @@ export default function Hero() {
     // Clean up
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
+
+  // Scroll effect for darkening the reader widget
+  useEffect(() => {
+    const handleScroll = () => {
+      const containerRef = isMobile ? mobileDemoContainerRef : demoContainerRef;
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const elementCenterY = rect.top + rect.height / 2;
+      const screenCenterY = windowHeight / 2;
+      
+      // Calculate distance from center of screen
+      const distanceFromCenter = Math.abs(elementCenterY - screenCenterY);
+      const maxDistance = windowHeight / 2;
+      
+      // Calculate darkening amount (0 to 1)
+      // 0 when far from center, 1 when perfectly centered
+      const darkness = Math.max(0, 1 - (distanceFromCenter / maxDistance));
+      
+      // Apply exponential curve for smoother transition
+      const smoothDarkness = Math.pow(darkness, 2);
+      
+      setDarkenAmount(smoothDarkness * 0.95); // Max 60% darkness
+    };
+
+    // Initial check
+    handleScroll();
+
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [isMobile]);
   
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
+    setIsModalOpened(true)
+    // window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
   };
   
   // Mobile content
   if (isMobile) {
     return (
-      <HeroWrapper>
+      <>
+        <PageDarkenOverlay opacity={darkenAmount} />
+        <HeroWrapper id="hero-section">
         <MobileContents>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
           <Heading>{t('home:hero.heading')}</Heading>
           <Description>
             {t('home:hero.description')}
           </Description>
-          <MobileImageContainer style={{ padding: '2px' }}>
-            <NextImage
-              src={'/portada.jpeg'}
-              alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
-              layout="fill"
-              objectFit="cover"
-            />
-          </MobileImageContainer>
-          <MobileButtonGroup>
-            <Button data-umami-event="Hero button" onClick={handleButtonClick}>
-              {t('common:startReading')} <span>&rarr;</span>
-            </Button>
-            <NextLink href="/authors" passHref>
-              <Button transparent>
-                {t('common:areYouAuthor')} <span>&rarr;</span>
-              </Button>
-            </NextLink>
-          </MobileButtonGroup>
+          <MobileDemoContainer ref={mobileDemoContainerRef} className="reader-demo-container">
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} isFullRegister={true} />
+          </MobileDemoContainer>
         </MobileContents>
 
         <style jsx>{`
@@ -102,12 +132,15 @@ export default function Hero() {
           }
         `}</style>
       </HeroWrapper>
+      </>
     );
   }
   
   // Desktop content with two columns
   return (
-    <HeroWrapper>
+    <>
+      <PageDarkenOverlay opacity={darkenAmount} />
+      <HeroWrapper id="hero-section">
       <TwoColumnLayout>
         <TextColumn>
           <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
@@ -116,9 +149,9 @@ export default function Hero() {
             {t('home:hero.description')}
           </Description>
           <CustomButtonGroup>
-            <Button data-umami-event="Hero button" onClick={handleButtonClick}>
+            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
               {t('common:startReading')} <span>&rarr;</span>
-            </Button>
+            </VibratingButton>
             <NextLink href="/authors" passHref>
               <Button transparent>
                 {t('common:areYouAuthor')} <span>&rarr;</span>
@@ -127,16 +160,11 @@ export default function Hero() {
           </CustomButtonGroup>
         </TextColumn>
         
-        <ImageColumn>
-          <ImageContainer style={{ padding: '2px' }}>
-            <NextImage
-              src={'/portada.jpeg'}
-              alt={'E-reader showing Spanish/English mixed text with pop-up translations'}
-              layout="fill"
-              objectFit="cover"
-            />
-          </ImageContainer>
-        </ImageColumn>
+        <DemoColumn>
+          <DemoContainer ref={demoContainerRef} className="reader-demo-container">
+            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} isFullRegister={true} />
+          </DemoContainer>
+        </DemoColumn>
       </TwoColumnLayout>
 
       <style jsx>{`
@@ -171,6 +199,7 @@ export default function Hero() {
         }
       `}</style>
     </HeroWrapper>
+    </>
   );
 }
 
@@ -198,9 +227,12 @@ const TextColumn = styled.div`
   max-width: 50%;
 `;
 
-const ImageColumn = styled.div`
+const DemoColumn = styled.div`
   flex: 1;
   max-width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MobileContents = styled.div`
@@ -212,49 +244,48 @@ const CustomButtonGroup = styled(ButtonGroup)`
   margin-top: 4rem;
 `;
 
-const MobileButtonGroup = styled(ButtonGroup)`
-  margin-top: 2rem;
-`;
 
-const ImageContainer = styled.div`
-  position: relative;
+
+const DemoContainer = styled.div.attrs({
+  'data-demo-container': 'true'
+})`
   width: 100%;
-  
-  &:before {
-    display: block;
-    content: '';
-    width: 100%;
-    padding-top: calc((9 / 16) * 100%);
-  }
-
-  & > div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-`;
-
-const MobileImageContainer = styled.div`
+  max-width: 60rem;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
   position: relative;
-  width: 100%;
-  margin: 1rem 0;
-  &:before {
-    display: block;
-    content: '';
-    width: 100%;
-    padding-top: calc((9 / 16) * 100%);
-  }
-
-  & > div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
+  z-index: 15;
 `;
+
+const MobileDemoContainer = styled.div.attrs({
+  'data-demo-container': 'true'
+})`
+  width: 100%;
+  margin: 2rem 0;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 15;
+`;
+
+const PageDarkenOverlay = styled.div<{ opacity: number }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: ${props => props.opacity};
+  pointer-events: none;
+  z-index: 9;
+  transition: opacity 0.3s ease-out;
+`;
+
+
 
 const Description = styled.p`
   font-size: 1.8rem;

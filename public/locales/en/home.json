@@ -2,16 +2,16 @@
   "hero": {
     "overTitle": "Learn Languages by Reading Real Novels",
     "heading": "Enjoying eBooks? Use it to learn languages",
-    "description": "Langomango smart reader makes every ebook you read a huge opportunity of getting massive exposure to the language you want to learn, through its language mixing algorithms. Leverage your reading hobby to supercharge your learning ability with low effort."
+    "description": "Our smart reader app for kindle and kobo makes reading ebooks a life changing habit. Learn a language by reading whatever you like!"
   },
   "section1": {
-    "title": "Seamless learning while reading",
+    "title": "Why not taking advantage of the time you already use to read?",
     "overTitle": "All in one solution",
-    "description": "Get massive amount of comprehensible input (~30,000 words per book for beginners), with very little effort.",
+    "description": "Thanks to the language mixing technology, you will get organic and casual learning while you keep your usual reading flow and fun.",
     "bulletPoint": {
-      "adjustable": "Adjustable language mix ratio according to your level",
-      "instant": "Instant translations with a simple touch",
-      "wordByWord": "Word-by-word assistance for difficult terms"
+      "adjustable": "Keep your usual reading flow and fun",
+      "instant": "Learn thanks to the language mixing without effort",
+      "wordByWord": "Get more done, using the same time"
     }
   },
   "section2": {
@@ -30,14 +30,14 @@
     "description": "LangoMango combines content in your native language and the target language in a ratio you can handle, creating the perfect learning environment. Built-in sentence translation and word-by-word assistance make the target language easy to read, eliminating the need for expensive textbooks or courses."
   },
   "section5": {
-    "title": "Enjoy while you read",
-    "overTitle": "Deepen Understanding with Stories",
-    "description": "The best part is that you will become so addicted to reading that you will forget you are receiving an incredible amount of input in your target language. Novel enhances your language comprehension naturally, offering an engaging story-based learning that deepens cultural understanding, idiomatic expressions, and nuanced vocabulary."
-  },
+  "title": "This could be your success story",
+  "overTitle": "What will be like after 1 year?",
+  "description": "As every night, I took my Kindle to enjoy reading for an hour, when I realized that I was reading Game of Thrones almost entirely in Swedish. I had become so accustomed to reading like this that it had become the new normal for me.\n\nHow amazing is it that through my main hobby, I was able to understand a new language? Even more remarkable, after several attempts with other apps and private tutors, I was sure I wasn't able to stick to learning. This time however, it was not boring, it has become a enjoyable habit for me. What a wonderfull feeling."
+},
   "waveCta": {
     "title": "Start your language learning journey today",
     "description": "Join thousands of readers who are learning languages while enjoying their favorite books",
-    "button": "Get Started",
+    "button": "Use the demo",
     "secondary": "Learn more"
   },
   "pricing": {
@@ -51,7 +51,31 @@
         "direct comunication with langomango founder"
       ],
       "price": "$10",
-      "period": "per 3 months"
+      "period": "per 2 months"
+    },
+    "monthly": {
+      "title": "Monthly",
+      "description": "Billed monthly",
+      "price": "€12",
+      "period": "/month"
+    },
+    "quarterly": {
+      "title": "3 Months",
+      "description": "Billed every 3 months",
+      "price": "€24",
+      "period": "/quarter"
+    },
+    "yearly": {
+      "title": "Yearly",
+      "description": "Billed annually",
+      "price": "€72",
+      "period": "/year"
+    },
+    "threeyear": {
+      "title": "3 Years",
+      "description": "Billed every 3 years",
+      "price": "€120",
+      "period": "/3 years"
     }
   },
   "videoSection": {

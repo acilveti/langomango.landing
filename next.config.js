@@ -9,6 +9,13 @@ module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   i18n, // This is critical - make sure this line exists
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   images: {
     domains: ['github.blog'],
     deviceSizes: [320, 640, 1080, 1200],

@@ -8,9 +8,8 @@ import { AppProps } from 'next/dist/shared/lib/router/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { ColorModeScript } from 'nextjs-color-mode';
-import React, { PropsWithChildren } from 'react';
-import { TinaEditProvider } from 'tinacms/dist/edit-state';
-
+import React, { PropsWithChildren, useEffect } from 'react';
+import Script from 'next/script';
 
 import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
@@ -19,79 +18,154 @@ import NavigationDrawer from 'components/NavigationDrawer';
 import NewsletterModal from 'components/NewsletterModal';
 import WaveCta from 'components/WaveCta';
 import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
-import {addReferralToUrl } from 'utils/referral'; // Adjust the path as needed
+import { addReferralToUrl } from 'utils/referral';
 import { appWithTranslation } from 'next-i18next';
-
-
-export const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-  e.preventDefault();
-  window.location.href = addReferralToUrl("https://beta-app.langomango.com/beta-phase");
-};
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
 // Define a custom nav item type that includes the onClick handler
 type NavItemWithHandler = NavItems[0] & {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
 
-// Create navigation items with the onClick handler
-const navItems: NavItemWithHandler[] = [
-  { 
-    title: 'SignUp/ Login', 
-    href: addReferralToUrl('https://beta-app.langomango.com/beta-phase'), 
-    outlined: true,
-    onClick: handleButtonClick, // Add the onClick handler
-  },
-];
 
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
+// Google Tag Manager ID
+const GTM_ID = 'GTM-PWND8SN6';
+
+// Reddit Pixel ID
+const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
+
+// Microsoft Clarity ID
+const CLARITY_ID = 'rm0v2kcv7l';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => { 
+    if (typeof window !== 'undefined') {
+      // ContentSquare Script
+      console.log('Initializing ContentSquare script');
+      
+      try {
+        injectContentsquareScript({
+          siteId: "6407230",
+          async: true,
+          defer: false
+        });
+        console.log('ContentSquare script injected successfully');
+      } catch (error) {
+        console.error('Error injecting ContentSquare script:', error);
+      }
+    }
+  }, []);
+  
   return (
     <>
+      {/* Google Tag Manager Script */}
+      <Script
+        id="gtm-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_ID}');
+          `,
+        }}
+      />
+      
+      {/* Reddit Pixel Base Code */}
+      <Script
+        id="reddit-pixel"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);rdt('init','${REDDIT_PIXEL_ID}');rdt('track', 'PageVisit');
+          `,
+        }}
+      />
+      
+      {/* Microsoft Clarity Code */}
+      <Script
+        id="clarity-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "${CLARITY_ID}");
+          `,
+        }}
+      />
+      
+      {/* Umami Analytics */}
+      <Script
+        id="umami-analytics"
+        src="https://cloud.umami.is/script.js"
+        data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"
+        strategy="afterInteractive"
+      />
+      
       <Head>
-        <script defer src="https://umami.langomango.com/script.js" data-website-id="e403e978-5d31-4d8c-b5b3-ba90fc2fc56c"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-        {/* <link rel="alternate" type="application/rss+xml" href={EnvVars.URL + 'rss'} title="RSS 2.0" /> */}
-        {/* <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-          ga('create', 'UA-117119829-1', 'auto');
-          ga('send', 'pageview');`,
-          }}
-        /> */}
-        {/* <script async src="https://www.google-analytics.com/analytics.js"></script> */}
-        <Analytics/>
       </Head>
+      
       <ColorModeScript />
       <GlobalStyle />
 
+      {/* Google Tag Manager - No Script */}
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height="0"
+          width="0"
+          style={{ display: 'none', visibility: 'hidden' }}
+        />
+      </noscript>
+
       <Providers>
-        
         <Modals />
-        <Navbar items={navItems} />
-        <TinaEditProvider
-          editMode={
-            <TinaCMS
-              query={pageProps.query}
-              variables={pageProps.variables}
-              data={pageProps.data}
-              isLocalClient={!process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-              branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-              clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-              {...pageProps}
-            >
-              {(livePageProps: any) => <Component {...livePageProps} />}
-            </TinaCMS>
-          }
-        >
-          <Component {...pageProps} />
-        </TinaEditProvider>
+        <AppContent Component={Component} pageProps={pageProps} />
         <WaveCta />
         <Footer />
       </Providers>
+      <Analytics/>
+    </>
+  );
+}
+
+function AppContent({ Component, pageProps }: { Component: any; pageProps: any }) {
+  const { setIsModalOpened } = useNewsletterModalContext();
+
+  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsModalOpened(true);
+    // Uncomment if you also want to redirect after opening modal
+    // setTimeout(() => {
+    //   window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    // }, 100);
+  };
+
+  // Create navigation items with the onClick handler
+  const navItems: NavItemWithHandler[] = [
+    { 
+      title: 'USE DEMO', 
+      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
+      outlined: true,
+      onClick: handleButtonClick,
+    },
+  ];
+
+  return (
+    <>
+      <Navbar items={navItems} />
+      <Component {...pageProps} />
+      <NavigationDrawer items={navItems} />
     </>
   );
 }
@@ -99,7 +173,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
     <NewsletterModalContextProvider>
-      <NavigationDrawer items={navItems}>{children}</NavigationDrawer>
+      <VisitorProvider>
+        {children}
+      </VisitorProvider>
     </NewsletterModalContextProvider>
   );
 }

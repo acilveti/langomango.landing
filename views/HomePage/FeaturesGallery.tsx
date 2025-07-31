@@ -1,79 +1,157 @@
 import NextImage from 'next/image';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Collapse from 'components/Collapse';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
-import { useTranslation } from 'next-i18next'; // Import the translation hook
+import { useTranslation } from 'next-i18next';
+import ExpandingButton from 'components/ExpandingButton';
+import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import LanguageRegistrationModal from 'components/LanguageRegistrationModal';
+import LanguageSelector from 'components/LanguageSelector'; // Import the new component
+import { Language } from 'contexts/VisitorContext';
+
+// Define the proper type for objectFit
+type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+
+interface TabItem {
+  titleKey: string;
+  descriptionKey: string;
+  imageUrl: string | null;
+  baseColor: string;
+  secondColor: string;
+  objectFit: ObjectFit | null;
+  isLanguageSelector?: boolean;
+}
 
 export default function FeaturesGallery() {
-  const { t } = useTranslation(); // Initialize the translation hook
-  
-  // Define tabs with translation keys instead of hardcoded text
-  const TABS = [
+  const { t } = useTranslation();
+  const { setIsModalOpened } = useNewsletterModalContext();
+
+  // Language modal states
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [selectedLanguageForModal, setSelectedLanguageForModal] = useState<Language | null>(null);
+
+  // Define tabs with proper typing
+  const TABS: TabItem[] = [
     {
       titleKey: 'features.tabs.smart_assistance.title',
       descriptionKey: 'features.tabs.smart_assistance.description',
-      imageUrl: '/feature1.jpeg',
+      imageUrl: '/feature2.jpeg',
       baseColor: '249,82,120',
       secondColor: '221,9,57',
+      objectFit: 'cover' as ObjectFit,
     },
     {
       titleKey: 'features.tabs.instant_translation.title',
       descriptionKey: 'features.tabs.instant_translation.description',
-      imageUrl: '/feature3.jpeg',
+      imageUrl: '/wordwise-text.jpeg',
       baseColor: '57,148,224',
       secondColor: '99,172,232',
+      objectFit: 'contain' as ObjectFit,
     },
     {
       titleKey: 'features.tabs.adjustable_language.title',
       descriptionKey: 'features.tabs.adjustable_language.description',
-      imageUrl: '/feature2.jpeg',
+      imageUrl: '/translated-text.jpeg',
       baseColor: '88,193,132',
       secondColor: '124,207,158',
+      objectFit: 'contain' as ObjectFit,
+    },
+    {
+      titleKey: 'features.tabs.language_selector.title',
+      descriptionKey: 'features.tabs.language_selector.description',
+      imageUrl: null,
+      baseColor: '255,152,0',
+      secondColor: '255,193,7',
+      objectFit: null,
+      isLanguageSelector: true,
+    },
+    {
+      titleKey: 'features.tabs.fourth_feature.title',
+      descriptionKey: 'features.tabs.fourth_feature.description',
+      imageUrl: null,
+      baseColor: '156,39,176',
+      secondColor: '186,104,200',
+      objectFit: null,
     },
   ];
 
   // Map translation keys to translated content
-  const translatedTabs = TABS.map(tab => ({
+  const translatedTabs = TABS.map((tab) => ({
     ...tab,
-    title: t(tab.titleKey),
-    description: `<p>${t(tab.descriptionKey)}</p>`,
+    title: tab.isLanguageSelector ? 'At this point you will experience how you are learning by the exposure' : t(tab.titleKey),
+    description: tab.isLanguageSelector
+      ? '<p>What language are you trying to learn now?.</p>'
+      : `<p>${t(tab.descriptionKey)}</p>`,
   }));
 
   const [currentTab, setCurrentTab] = useState(translatedTabs[0]);
 
-  const imagesMarkup = translatedTabs.map((singleTab, idx) => {
+  // Language selection handlers
+  function handleLanguageSelect(language: Language) {
+    console.log('Language selected:', language);
+  }
+
+  function handleLanguageProcessingComplete(language: Language) {
+    setSelectedLanguageForModal(language);
+    setIsLanguageModalOpen(true);
+  }
+
+  function handleModalClose() {
+    setIsLanguageModalOpen(false);
+    setSelectedLanguageForModal(null);
+  }
+
+  function handleModalSuccess() {
+    setIsLanguageModalOpen(false);
+    setSelectedLanguageForModal(null);
+  }
+
+  const featuresMarkup = translatedTabs.map((singleTab, idx) => {
     const isActive = singleTab.title === currentTab.title;
     const isFirst = idx === 0;
 
     return (
-      <ImageContainer key={singleTab.title} isActive={isActive}>
-        <NextImage src={singleTab.imageUrl} alt={singleTab.title} layout="fill" objectFit="cover" priority={isFirst} />
-      </ImageContainer>
-    );
-  });
+      <FeatureItem key={singleTab.title}>
+        <Tab isActive={isActive} onClick={() => handleTabClick(idx)}>
+          <TabTitleContainer>
+            <CircleContainer>
+              <ThreeLayersCircle baseColor={isActive ? 'transparent' : singleTab.baseColor} secondColor={singleTab.secondColor} />
+            </CircleContainer>
+            <h4>{singleTab.title}</h4>
+          </TabTitleContainer>
+          <Collapse isOpen={true} duration={300}>
+            <TabContent>
+              <div dangerouslySetInnerHTML={{ __html: singleTab.description }}></div>
 
-  const tabsMarkup = translatedTabs.map((singleTab, idx) => {
-    const isActive = singleTab.title === currentTab.title;
+              {/* Language selector for the language tab */}
+              {singleTab.isLanguageSelector && (
+                <LanguageSelector
+                  onLanguageSelect={handleLanguageSelect}
+                  onProcessingComplete={handleLanguageProcessingComplete}
+                  placeholder="Select a language"
+                  maxWidth="300px"
+                  showProcessingMessage={true}
+                  showConfirmationMessage={true}
+                  processingDuration={1200}
+                  confirmationDuration={1500}
+                />
+              )}
+            </TabContent>
+          </Collapse>
+        </Tab>
 
-    return (
-      <Tab isActive={isActive} key={idx} onClick={() => handleTabClick(idx)}>
-        <TabTitleContainer>
-          <CircleContainer>
-            <ThreeLayersCircle baseColor={isActive ? 'transparent' : singleTab.baseColor} secondColor={singleTab.secondColor} />
-          </CircleContainer>
-          <h4>{singleTab.title}</h4>
-        </TabTitleContainer>
-        <Collapse isOpen={isActive} duration={300}>
-          <TabContent>
-            <div dangerouslySetInnerHTML={{ __html: singleTab.description }}></div>
-          </TabContent>
-        </Collapse>
-      </Tab>
+        {/* Show image for tabs that have imageUrl and objectFit */}
+        {singleTab.imageUrl && singleTab.objectFit && (
+          <ImageContainer>
+            <NextImage src={singleTab.imageUrl} alt={singleTab.title} layout="fill" objectFit={singleTab.objectFit} priority={isFirst} />
+          </ImageContainer>
+        )}
+      </FeatureItem>
     );
   });
 
@@ -87,14 +165,21 @@ export default function FeaturesGallery() {
         <OverTitle>{t('features.overTitle')}</OverTitle>
         <SectionTitle>{t('features.title')}</SectionTitle>
       </Content>
-      <GalleryWrapper>
-        <TabsContainer>{tabsMarkup}</TabsContainer>
-        {imagesMarkup}
-      </GalleryWrapper>
+      <FeaturesContainer>{featuresMarkup}</FeaturesContainer>
+      
+      {/* Language Registration Modal */}
+      {isLanguageModalOpen && selectedLanguageForModal && (
+        <LanguageRegistrationModal
+          selectedLanguage={selectedLanguageForModal}
+          onClose={handleModalClose}
+          onSuccess={handleModalSuccess}
+        />
+      )}
     </FeaturesGalleryWrapper>
   );
 }
 
+// Styled Components (keeping only the ones still needed)
 const FeaturesGalleryWrapper = styled(Container)`
   display: flex;
   align-items: center;
@@ -102,44 +187,42 @@ const FeaturesGalleryWrapper = styled(Container)`
   justify-content: center;
 `;
 
-const GalleryWrapper = styled.div`
+const FeaturesContainer = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  width: 100%;
   margin-top: 4rem;
+  gap: 3rem;
 
   ${media('<=desktop')} {
-    flex-direction: column;
+    gap: 2rem;
   }
+`;
+
+const FeatureItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 `;
 
 const Content = styled.div`
   & > *:not(:first-child) {
     margin-top: 1rem;
   }
-  text-align: center;
+  text-align: left;
+  width: 100%;
 `;
 
-const TabsContainer = styled.div`
-  flex: 1;
-  margin-right: 4rem;
-
-  & > *:not(:first-child) {
-    margin-top: 2rem;
-  }
-
-  ${media('<=desktop')} {
-    margin-right: 0;
-    margin-bottom: 4rem;
-    width: 100%;
-  }
-`;
-
-const ImageContainer = styled.div<{ isActive: boolean }>`
+const ImageContainer = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 0.8rem;
-  flex: ${(p) => (p.isActive ? '2' : '0')};
+  border: 2px solid #d1d5db;
+  background: #f3f4f6;
+  padding: 10px;
   box-shadow: var(--shadow-md);
+  margin-top: 2rem;
+  width: 100%;
 
   &:before {
     display: block;
@@ -155,10 +238,6 @@ const ImageContainer = styled.div<{ isActive: boolean }>`
     bottom: 0;
     left: 0;
   }
-
-  ${media('<=desktop')} {
-    width: ${(p) => (p.isActive ? '100%' : '0')};
-  }
 `;
 
 const Tab = styled.div<{ isActive: boolean }>`
@@ -167,17 +246,12 @@ const Tab = styled.div<{ isActive: boolean }>`
   padding: 2rem 1.5rem;
   background: rgb(var(--cardBackground));
   box-shadow: var(--shadow-md);
-  opacity: ${(p) => (p.isActive ? 1 : 0.6)};
   cursor: pointer;
   border-radius: 0.6rem;
   transition: opacity 0.2s;
 
   font-size: 1.6rem;
   font-weight: bold;
-
-  ${media('<=desktop')} {
-    width: 100%;
-  }
 `;
 
 const TabTitleContainer = styled.div`
@@ -186,6 +260,8 @@ const TabTitleContainer = styled.div`
 
   h4 {
     flex: 1;
+    text-align: left;
+    margin: 0;
   }
 `;
 

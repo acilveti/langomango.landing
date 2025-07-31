@@ -12,7 +12,6 @@ import Features from 'views/HomePage/Features';
 import FeaturesGallery from 'views/HomePage/FeaturesGallery';
 import HeroAuthors from 'views/HomePage/HeroAuthors';
 import Partners from 'views/HomePage/Partners';
-import ScrollableBlogPosts from 'views/HomePage/ScrollableBlogPosts';
 import Testimonials from 'views/HomePage/Testimonials';
 import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
 import { useEffect } from 'react';

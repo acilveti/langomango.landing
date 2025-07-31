@@ -5,55 +5,75 @@ import styled from 'styled-components';
 import { A11y, Autoplay, Navigation } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Container from 'components/Container';
+import OverTitle from 'components/OverTitle';
 import Separator from 'components/Separator';
 import { media } from 'utils/media';
 
+// Add props interface
+interface TestimonialsProps {
+  title?: string;
+  overTitle?: string;
+}
+
 const TESTIMONIALS = [
   {
-    companyLogoUrl: '/testimonials/company-logo-1.svg',
-    content: `Really good. I am so pleased with this product. I didn't even need training.`,
+    content: `I'm really liking this, though! It's exactly what is missing in this space. I can totally see using this a lot.`,
     author: {
-      name: 'Clyde Edwards',
-      title: 'Very Serious Man',
-      avatarUrl: '/testimonials/author-photo-1.jpeg',
+      name: 'kmzafari',
+      title: 'Redditor, reader and language learner',
+      avatarUrl: '/testimonials/kmzafari.png',
     },
   },
   {
-    companyLogoUrl: '/testimonials/company-logo-2.svg',
-    content: `It's really wonderful. I use saas product often. Thank You! Saas product has really helped our business.`,
+    content: `I should not be using it... I kept reading until 3:00 AM and getting up to go to work was just too hard!`,
     author: {
-      name: 'Jimmy Hunter',
-      title: 'Sigma Male University Graduate',
-      avatarUrl: '/testimonials/author-photo-2.jpeg',
+      name: 'Pilar Alvarez',
+      title: 'Reader without self control',
+      avatarUrl: '/testimonials/default-redditor.png',
     },
   },
   {
-    companyLogoUrl: '/testimonials/company-logo-3.svg',
-    content: `Since I invested in saas product I made over 100,000 dollars profits. It really saves me time and effort. saas product is exactly what our business has been lacking.`,
+    content: `Besides that, the main selling point for me, for which I'd be down to spent the subscription, is that it runs on e readers. I hate reading on my phone but for language learning there is not really a comfortable and as efficient way to do it compared to any other digital device.`,
     author: {
-      name: 'Marjorie Morgan',
-      title: 'Chief Chad Officer',
-      avatarUrl: '/testimonials/author-photo-3.jpeg',
+      name: 'kuyikuy81',
+      title: 'Redditor, reader and language learner',
+      avatarUrl: '/testimonials/default-redditor.png',
+    },
+  },
+  {
+    content: `Wow incredible you wrote a tool for this, I often buy books that have two languages on them but theyre very limited and usually only have short stories, not entire books that I actually care to read. Incredible`,
+    author: {
+      name: 'Ok_ant8450',
+      title: 'Redditor and reader',
+      avatarUrl: '/testimonials/default-redditor.png',
+    },
+  },
+  {
+    content: `it works with basque? Oh man, take me money and let me use it! --Euskaraz funtzionatzen du? Hombre take my money eta igorri esteka otoi.`,
+    author: {
+      name: 'Hot-Ask-9962',
+      title: 'Redditor and basque learner',
+      avatarUrl: '/testimonials/default-redditor.png',
     },
   },
 ];
 
-export default function Testimonials() {
+export default function Testimonials({ title, overTitle }: TestimonialsProps) {
   return (
     <div>
       <Separator />
+      <Container>
+        <HeaderContainer>
+          {overTitle && <CustomOverTitle>{overTitle}</CustomOverTitle>}
+          {title && <Title>{title}</Title>}
+        </HeaderContainer>
+      </Container>
       <TestimonialsWrapper>
-        <Swiper modules={[Navigation, Autoplay, A11y]} slidesPerView={1} autoplay={{ delay: 8000 }} centeredSlides navigation loop>
+        <Swiper modules={[Navigation, Autoplay, A11y]} slidesPerView={1} autoplay={{ delay: 2500 }} centeredSlides navigation loop>
           {TESTIMONIALS.map((singleTestimonial, idx) => (
             <SwiperSlide key={idx}>
               <TestimonialCard>
-                <NextImage
-                  src={singleTestimonial.companyLogoUrl}
-                  alt={`${singleTestimonial.author.name}'s company logo`}
-                  width={200}
-                  height={40}
-                />
-                <Content>“{singleTestimonial.content}”</Content>
+                <Content>"{singleTestimonial.content}"</Content>
                 <AuthorContainer>
                   <AuthorImageContainer>
                     <NextImage src={singleTestimonial.author.avatarUrl} alt={singleTestimonial.author.name} width={48} height={48} />
@@ -72,6 +92,19 @@ export default function Testimonials() {
     </div>
   );
 }
+
+const HeaderContainer = styled.div`
+  margin-bottom: 6rem;
+  overflow: hidden; /* Prevents content overflow */
+
+  ${media('<=tablet')} {
+    margin-bottom: 4rem;
+  }
+`;
+
+const CustomOverTitle = styled(OverTitle)`
+  margin-bottom: 2rem;
+`;
 
 const TestimonialsWrapper = styled(Container)`
   position: relative;
@@ -143,4 +176,18 @@ const AuthorImageContainer = styled.div`
   border-radius: 10rem;
   margin-right: 1rem;
   overflow: hidden;
+`;
+
+const Title = styled.h1`
+  font-size: 5.2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 4rem;
+  letter-spacing: -0.03em;
+  max-width: 100%;
+
+  ${media('<=tablet')} {
+    font-size: 4.6rem;
+    margin-bottom: 2rem;
+  }
 `;
