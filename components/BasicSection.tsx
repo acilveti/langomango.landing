@@ -15,31 +15,37 @@ export interface BasicSectionProps {
 
 export default function BasicSection({ imageUrl, title, overTitle, reversed, children }: PropsWithChildren<BasicSectionProps>) {
   return (
-    <BasicSectionWrapper reversed={reversed}>
-      <ContentContainer>
-        <CustomOverTitle>{overTitle}</CustomOverTitle>
-        <Title>{title}</Title>
-        <RichText>{children}</RichText>
-      </ContentContainer>
-      <ImageContainer>
-        <NextImage src={imageUrl} alt={title} layout="fill" objectFit="contain" />
-      </ImageContainer>
-    </BasicSectionWrapper>
+    <Container>
+      {/* @ts-ignore */}
+      <BasicSectionWrapper reversed={reversed}>
+        <ContentContainer>
+          <CustomOverTitle>{overTitle}</CustomOverTitle>
+          <Title>{title}</Title>
+          <RichText>{children}</RichText>
+        </ContentContainer>
+        <ImageContainer>
+          <NextImage src={imageUrl} alt={title} layout="fill" objectFit="contain" />
+        </ImageContainer>
+      </BasicSectionWrapper>
+    </Container>
   );
 }
 
 export function BasicSection1({ imageUrl, title, overTitle, reversed, children }: PropsWithChildren<BasicSectionProps>) {
   return (
-    <BasicSectionWrapper reversed={reversed}>
-      <ContentContainer>
-        <CustomOverTitle>{overTitle}</CustomOverTitle>
-        <Title>{title}</Title>
-        <RichText>{children}</RichText>
-      </ContentContainer>
-      <ImageContainer>
-        <NextImage src={imageUrl} alt={title} layout="fill" objectFit="cover" />
-      </ImageContainer>
-    </BasicSectionWrapper>
+    <Container>
+      {/* @ts-ignore */}
+      <BasicSectionWrapper reversed={reversed}>
+        <ContentContainer>
+          <CustomOverTitle>{overTitle}</CustomOverTitle>
+          <Title>{title}</Title>
+          <RichText>{children}</RichText>
+        </ContentContainer>
+        <ImageContainer>
+          <NextImage src={imageUrl} alt={title} layout="fill" objectFit="cover" />
+        </ImageContainer>
+      </BasicSectionWrapper>
+    </Container>
   );
 }
 
@@ -90,7 +96,7 @@ const ContentContainer = styled.div`
 `;
 
 type Props = Pick<BasicSectionProps, 'reversed'>;
-const BasicSectionWrapper = styled(Container)`
+const BasicSectionWrapper = styled.div<Props>`
   display: flex;
   align-items: center;
   flex-direction: ${(p: Props) => (p.reversed ? 'reverse' : 'row-reverse')};
