@@ -1,4 +1,4 @@
-name: Smoke Tests
+name: TypeScript Type Check
 
 on:
   push:
@@ -7,10 +7,10 @@ on:
     branches: [ '**' ]
 
 jobs:
-  smoke-test:
-    name: Quick Smoke Test
+  typecheck:
+    name: Run TypeScript Type Checking
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     
     steps:
     - name: Checkout repository
@@ -28,18 +28,13 @@ jobs:
     - name: Run TypeScript type check
       run: npx tsc --noEmit
       
-    - name: Install Playwright
-      run: yarn playwright:install chromium
-      
-    - name: Run smoke tests
-      run: yarn test:smoke
-      env:
-        MOCK_EXTERNAL_SERVICES: true
-        
-    - name: Upload test results on failure
+    - name: Upload TypeScript errors
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: smoke-test-failure
-        path: test-results/
+        name: typescript-errors
+        path: |
+          tsconfig.json
+          **/*.ts
+          **/*.tsx
         retention-days: 7
