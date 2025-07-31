@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import { CreateCheckoutSessionRequest, createEnhancedCheckoutSession, getUserSubscriptionStatus } from '../../services/apiService';
+import { config } from '../../config/environment';
 
 interface PricingPlan {
   id: string;
@@ -138,7 +139,7 @@ const PricingPage: React.FC<PricingPageProps> = ({
         localStorage.setItem('returnToCheckout', 'true');
         
         // Redirect to your app's sign-up page
-        window.location.href = 'https://beta-app.langomango.com/sign-up';
+        window.location.href = `${config.appUrl}/sign-up`;
         return;
       }
 
