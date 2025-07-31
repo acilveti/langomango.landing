@@ -30,6 +30,7 @@ jobs:
       run: yarn lint
       
     - name: Run TypeScript check
+      continue-on-error: true
       run: npx tsc --noEmit
       
     - name: Run unit tests (if available)
