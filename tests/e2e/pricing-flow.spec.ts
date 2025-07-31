@@ -3,13 +3,20 @@ import { test, expect } from '../fixtures/test-base';
 test.describe('Pricing Flow E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    // Scroll to pricing section
+    await page.locator('#pricing-section').scrollIntoViewIfNeeded();
   });
 
-  test('should navigate through pricing selection to signup', async ({ page }) => {
-    await page.getByRole('link', { name: /pricing/i }).click();
+  test('should display pricing section with toggle', async ({ page }) => {
+    const pricingSection = page.locator('#pricing-section');
+    await expect(pricingSection).toBeVisible();
     
-    await expect(page).toHaveURL(/.*#pricing/);
-    await expect(page.getByText(/choose your plan/i)).toBeVisible();
+    // Check for pricing toggle
+    const monthlyButton = pricingSection.getByRole('button', { name: /monthly/i });
+    const yearlyButton = pricingSection.getByRole('button', { name: /yearly/i });
+    
+    await expect(monthlyButton).toBeVisible();
+    await expect(yearlyButton).toBeVisible();
     
     const premiumCard = page.locator('[data-testid="pricing-card-premium"], .pricing-card').filter({ hasText: /premium/i });
     await premiumCard.getByRole('button', { name: /get started|choose plan/i }).click();

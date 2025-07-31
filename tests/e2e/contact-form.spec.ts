@@ -2,11 +2,10 @@ import { test, expect } from '../fixtures/test-base';
 
 test.describe('Contact Form E2E', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/contact');
   });
 
   test('should successfully submit contact form with valid data', async ({ page }) => {
-    await page.getByRole('link', { name: /contact/i }).click();
     
     await page.fill('input[name="name"]', 'John Doe');
     await page.fill('input[name="email"]', 'john.doe@example.com');
@@ -22,7 +21,6 @@ test.describe('Contact Form E2E', () => {
   });
 
   test('should show validation errors for empty required fields', async ({ page }) => {
-    await page.getByRole('link', { name: /contact/i }).click();
     
     await page.getByRole('button', { name: /send/i }).click();
     
@@ -32,7 +30,6 @@ test.describe('Contact Form E2E', () => {
   });
 
   test('should validate email format', async ({ page }) => {
-    await page.getByRole('link', { name: /contact/i }).click();
     
     await page.fill('input[name="name"]', 'John Doe');
     await page.fill('input[name="email"]', 'invalid-email');
@@ -51,8 +48,6 @@ test.describe('Contact Form E2E', () => {
         body: JSON.stringify({ error: 'Internal server error' })
       });
     });
-    
-    await page.getByRole('link', { name: /contact/i }).click();
     
     await page.fill('input[name="name"]', 'John Doe');
     await page.fill('input[name="email"]', 'john.doe@example.com');

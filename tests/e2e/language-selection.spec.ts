@@ -3,10 +3,13 @@ import { test, expect } from '../fixtures/test-base';
 test.describe('Language Selection E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
+    // Scroll to features section where language selector is
+    await page.locator('#features-section').scrollIntoViewIfNeeded();
   });
 
-  test('should switch between English and Spanish languages', async ({ page }) => {
-    const languageSelector = page.locator('[data-testid="language-selector"], button:has-text("EN"), button:has-text("ES")').first();
+  test('should switch between learning languages in features section', async ({ page }) => {
+    // Look for the language selector in the features section
+    const languageSelector = page.locator('#features-section select, #features-section [role="combobox"]').first();
     
     await expect(page.getByText(/learn languages/i)).toBeVisible();
     
