@@ -811,7 +811,7 @@ const LoginText = styled.p`
   margin: 0;
 `;
 
-const LoginButton = styled.button`
+const LoginButton = styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>`
   background: transparent;
   border: 2px solid rgb(var(--primary));
   color: rgb(var(--primary));
@@ -882,7 +882,7 @@ const SkipSection = styled.div`
   text-align: center;
 `;
 
-const SkipButton = styled.button`
+const SkipButton = styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>`
   background: transparent;
   border: none;
   color: rgb(var(--textSecondary));
@@ -922,7 +922,7 @@ const DividerText = styled.span`
   font-size: 1.3rem;
 `;
 
-const GoogleButton = styled.button`
+const GoogleButton = styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>`
   display: flex;
   align-items: center;
   justify-content: center;

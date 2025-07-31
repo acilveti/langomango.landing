@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
-type ButtonProps = PropsWithChildren<{ transparent?: boolean }>;
+type ButtonProps = PropsWithChildren<{ transparent?: boolean }> & React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
 const Button = styled.a<ButtonProps>`
   border: none;

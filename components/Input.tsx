@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Input = styled.input`
+const Input = styled.input<React.InputHTMLAttributes<HTMLInputElement>>`
   border: 1px solid rgb(var(--inputBackground));
   background: rgb(var(--inputBackground));
   border-radius: 0.6rem;

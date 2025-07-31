@@ -281,7 +281,7 @@ const placeholderPulse = keyframes`
 `;
 
 // Styled Components
-const LanguageSelectorContainer = styled.div<{ maxWidth: string }>`
+const LanguageSelectorContainer = styled.div<{ maxWidth: string } & React.HTMLAttributes<HTMLDivElement>>`
   max-width: ${props => props.maxWidth};
   position: relative;
   /* Ensure messages don't affect container height */
@@ -290,7 +290,7 @@ const LanguageSelectorContainer = styled.div<{ maxWidth: string }>`
   overflow: visible;
 `;
 
-const LanguageDropdown = styled.div<{ isDark?: boolean }>`
+const LanguageDropdown = styled.div<{ isDark?: boolean } & React.HTMLAttributes<HTMLDivElement>>`
   border: 2px solid ${props => props.isDark ? 'transparent' : '#e5e7eb'};
   border-radius: 0.5rem;
   background: ${props => props.isDark ? 'rgb(255, 152, 0)' : 'white'};
@@ -345,13 +345,13 @@ const SelectedLanguage = styled.div`
   z-index: 1;
 `;
 
-const PlaceholderText = styled.span<{ isDark?: boolean }>`
+const PlaceholderText = styled.span<{ isDark?: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.9)' : '#6b7280'};
   font-weight: ${props => props.isDark ? '500' : '400'};
   animation: ${placeholderPulse} 2s ease-in-out infinite;
 `;
 
-const ChevronIcon = styled.span<{ isDark?: boolean }>`
+const ChevronIcon = styled.span<{ isDark?: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   transition: transform 0.2s ease;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.9)' : '#6b7280'};
   font-size: 0.8rem;
@@ -389,7 +389,7 @@ const SelectedLanguageFlag = styled(LanguageFlag)`
   margin-right: 0.75rem;
 `;
 
-const LanguageName = styled.span<{ isDark?: boolean }>`
+const LanguageName = styled.span<{ isDark?: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   font-size: 0.9rem;
   font-weight: ${props => props.isDark ? '500' : '500'};
   color: ${props => props.isDark ? 'white' : '#374151'};

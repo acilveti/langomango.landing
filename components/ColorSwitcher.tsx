@@ -32,7 +32,7 @@ export default function ColorSwitcher() {
   return <CustomButton onClick={toggleTheme}>{colorMode === 'light' ? moonIcon : sunIcon}</CustomButton>;
 }
 
-const CustomButton = styled.button`
+const CustomButton = styled.button<React.ButtonHTMLAttributes<HTMLButtonElement>>`
   display: flex;
   cursor: pointer;
   align-items: center;

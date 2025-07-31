@@ -124,7 +124,7 @@ const ToggleWrapper = styled.div`
   margin: 3rem 0;
 `;
 
-const ToggleLabel = styled.span<{ isActive: boolean }>`
+const ToggleLabel = styled.span<{ isActive: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   font-size: 1.6rem;
   font-weight: ${props => props.isActive ? '600' : '400'};
   color: ${props => props.isActive ? '#333' : '#666'};
@@ -141,7 +141,7 @@ const ToggleSwitch = styled.label`
   height: 34px;
 `;
 
-const ToggleInput = styled.input`
+const ToggleInput = styled.input<React.InputHTMLAttributes<HTMLInputElement>>`
   opacity: 0;
   width: 0;
   height: 0;

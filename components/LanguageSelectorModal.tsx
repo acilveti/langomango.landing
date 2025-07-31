@@ -199,7 +199,7 @@ const ModalContainer = styled.div`
   }
 `;
 
-const ModalCard = styled.div<{ isDark?: boolean }>`
+const ModalCard = styled.div<{ isDark?: boolean } & React.HTMLAttributes<HTMLDivElement>>`
   display: flex;
   position: relative;
   flex-direction: column;
@@ -249,7 +249,7 @@ const ModalHeader = styled.div`
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
-const ModalTitle = styled.h2<{ isDark?: boolean }>`
+const ModalTitle = styled.h2<{ isDark?: boolean } & React.HTMLAttributes<HTMLHeadingElement>>`
   font-size: 2.4rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -260,7 +260,7 @@ const ModalTitle = styled.h2<{ isDark?: boolean }>`
   }
 `;
 
-const ModalSubtitle = styled.p<{ isDark?: boolean }>`
+const ModalSubtitle = styled.p<{ isDark?: boolean } & React.HTMLAttributes<HTMLParagraphElement>>`
   font-size: 1.4rem;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
   margin: 0;
@@ -427,7 +427,7 @@ const LevelGrid = styled.div`
   }
 `;
 
-const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
+const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean } & React.HTMLAttributes<HTMLDivElement>>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -472,7 +472,7 @@ const LevelEmoji = styled.span`
   }
 `;
 
-const LevelName = styled.span<{ isDark?: boolean }>`
+const LevelName = styled.span<{ isDark?: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   font-size: 1.8rem;
   font-weight: 700;
   color: ${props => props.isDark ? 'white' : '#1f2937'};
@@ -482,7 +482,7 @@ const LevelName = styled.span<{ isDark?: boolean }>`
   }
 `;
 
-const LevelDesc = styled.span<{ isDark?: boolean }>`
+const LevelDesc = styled.span<{ isDark?: boolean } & React.HTMLAttributes<HTMLSpanElement>>`
   font-size: 1.2rem;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
   
