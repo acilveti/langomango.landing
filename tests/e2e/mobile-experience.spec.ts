@@ -1,4 +1,5 @@
-import { test, expect, devices } from '../fixtures/test-base';
+import { test, expect } from '../fixtures/test-base';
+import { devices } from '@playwright/test';
 
 test.describe('Mobile Experience E2E', () => {
   test.use({ ...devices['iPhone 12'] });
@@ -60,13 +61,16 @@ test.describe('Mobile Experience E2E', () => {
     
     const box = await carousel.boundingBox();
     if (box) {
-      await page.touchscreen.swipe({
-        startX: box.x + box.width - 50,
-        startY: box.y + box.height / 2,
-        endX: box.x + 50,
-        endY: box.y + box.height / 2,
-        steps: 10
-      });
+      // Simulate swipe gesture
+      const startX = box.x + box.width - 50;
+      const startY = box.y + box.height / 2;
+      const endX = box.x + 50;
+      const endY = box.y + box.height / 2;
+      
+      await page.touchscreen.tap(startX, startY);
+      await page.mouse.down();
+      await page.mouse.move(endX, endY, { steps: 10 });
+      await page.mouse.up();
       
       await page.waitForTimeout(500);
       

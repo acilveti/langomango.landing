@@ -8,33 +8,33 @@ test.describe('Analytics Tracking E2E', () => {
     
     // Intercept analytics calls
     await page.addInitScript(() => {
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function() {
-        window.dataLayer.push(arguments);
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).gtag = function() {
+        (window as any).dataLayer.push(arguments);
       };
       
       // Mock Google Analytics
-      window.ga = function() {
-        window.analyticsEvents = window.analyticsEvents || [];
-        window.analyticsEvents.push({
+      (window as any).ga = function() {
+        (window as any).analyticsEvents = (window as any).analyticsEvents || [];
+        (window as any).analyticsEvents.push({
           type: 'ga',
           args: Array.from(arguments)
         });
       };
       
       // Mock other analytics providers
-      window.analytics = {
+      (window as any).analytics = {
         track: (event: string, properties: any) => {
-          window.analyticsEvents = window.analyticsEvents || [];
-          window.analyticsEvents.push({
+          (window as any).analyticsEvents = (window as any).analyticsEvents || [];
+          (window as any).analyticsEvents.push({
             type: 'track',
             event,
             properties
           });
         },
         page: (name: string, properties: any) => {
-          window.analyticsEvents = window.analyticsEvents || [];
-          window.analyticsEvents.push({
+          (window as any).analyticsEvents = (window as any).analyticsEvents || [];
+          (window as any).analyticsEvents.push({
             type: 'page',
             name,
             properties
@@ -51,7 +51,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.waitForTimeout(1000);
     
     const pageViewEvents = await page.evaluate(() => 
-      window.analyticsEvents?.filter(e => e.type === 'page' || e.args?.[0] === 'pageview')
+      (window as any).analyticsEvents?.filter((e: any) => e.type === 'page' || e.args?.[0] === 'pageview')
     );
     
     expect(pageViewEvents.length).toBeGreaterThan(0);
@@ -60,7 +60,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.getByRole('link', { name: /features/i }).click();
     await page.waitForTimeout(1000);
     
-    const updatedEvents = await page.evaluate(() => window.analyticsEvents);
+    const updatedEvents = await page.evaluate(() => (window as any).analyticsEvents);
     const featurePageViews = updatedEvents.filter(e => 
       (e.type === 'page' && e.name?.includes('features')) ||
       (e.args && e.args[1]?.includes('features'))
@@ -77,7 +77,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.waitForTimeout(500);
     
     const clickEvents = await page.evaluate(() => 
-      window.analyticsEvents?.filter(e => 
+      (window as any).analyticsEvents?.filter(e => 
         e.type === 'track' && e.event?.includes('click')
       )
     );
@@ -95,7 +95,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.waitForTimeout(1000);
     
     const formEvents = await page.evaluate(() => 
-      window.analyticsEvents?.filter(e => 
+      (window as any).analyticsEvents?.filter(e => 
         e.type === 'track' && 
         (e.event?.includes('form') || e.event?.includes('subscribe'))
       )
@@ -117,7 +117,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.waitForTimeout(1000);
     
     const scrollEvents = await page.evaluate(() => 
-      window.analyticsEvents?.filter(e => 
+      (window as any).analyticsEvents?.filter(e => 
         e.type === 'track' && e.event?.includes('scroll')
       )
     );
@@ -142,7 +142,7 @@ test.describe('Analytics Tracking E2E', () => {
     await page.waitForTimeout(500);
     
     const timeEvents = await page.evaluate(() => 
-      window.analyticsEvents?.filter(e => 
+      (window as any).analyticsEvents?.filter(e => 
         e.type === 'track' && 
         (e.event?.includes('time') || e.event?.includes('engagement'))
       )
@@ -161,13 +161,13 @@ test.describe('Analytics Tracking E2E', () => {
     }
     
     // Clear previous events
-    await page.evaluate(() => { window.analyticsEvents = []; });
+    await page.evaluate(() => { (window as any).analyticsEvents = []; });
     
     // Try to trigger analytics events
     await page.getByRole('button', { name: /get started/i }).first().click();
     await page.waitForTimeout(1000);
     
-    const eventsAfterDecline = await page.evaluate(() => window.analyticsEvents);
+    const eventsAfterDecline = await page.evaluate(() => (window as any).analyticsEvents);
     
     // Should have minimal or no tracking
     const trackingEvents = eventsAfterDecline.filter(e => 

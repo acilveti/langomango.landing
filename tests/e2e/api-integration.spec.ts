@@ -113,13 +113,13 @@ test.describe('API Integration E2E', () => {
     const wsMessages: any[] = [];
     await page.evaluateOnNewDocument(() => {
       const originalWebSocket = window.WebSocket;
-      window.WebSocket = new Proxy(originalWebSocket, {
+      (window as any).WebSocket = new Proxy(originalWebSocket, {
         construct(target, args) {
           const ws = new target(...args);
           
           ws.addEventListener('message', (event) => {
-            window.wsMessages = window.wsMessages || [];
-            window.wsMessages.push(JSON.parse(event.data));
+            (window as any).wsMessages = (window as any).wsMessages || [];
+            (window as any).wsMessages.push(JSON.parse(event.data));
           });
           
           return ws;
@@ -132,12 +132,12 @@ test.describe('API Integration E2E', () => {
     
     // Check for WebSocket connection
     const hasWebSocket = await page.evaluate(() => {
-      return window.wsMessages && window.wsMessages.length > 0;
+      return (window as any).wsMessages && (window as any).wsMessages.length > 0;
     });
     
     if (hasWebSocket) {
-      const messages = await page.evaluate(() => window.wsMessages);
-      expect(messages.some(m => m.type === 'connection' || m.type === 'welcome')).toBeTruthy();
+      const messages = await page.evaluate(() => (window as any).wsMessages);
+      expect(messages.some((m: any) => m.type === 'connection' || m.type === 'welcome')).toBeTruthy();
     }
   });
 });
