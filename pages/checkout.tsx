@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
 import PricingPage from 'components/PricingPage/PricingPage';
 import { getUserSubscriptionStatus } from 'services/apiService';
 
@@ -36,12 +37,18 @@ export default function CheckoutPage() {
   }
 
   return (
-    <PricingPage 
-      onSelectPlan={handlePlanSelect}
-      isLoading={isLoading}
-      userToken={userToken}
-      isAuthenticated={isAuthenticated}
-    />
+    <>
+      <Head>
+        <title>Checkout - LangoMango</title>
+        <meta name="description" content="Choose your LangoMango subscription plan" />
+      </Head>
+      <PricingPage 
+        onSelectPlan={handlePlanSelect}
+        isLoading={isLoading}
+        userToken={userToken}
+        isAuthenticated={isAuthenticated}
+      />
+    </>
   );
 }
 
