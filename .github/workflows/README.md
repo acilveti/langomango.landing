@@ -12,10 +12,10 @@ If any step fails, the subsequent steps will not run.
 
 ## How It Works
 
-- Unit tests run first on every push/PR
+- Unit tests (linting, TypeScript checks) run first on every push/PR
 - Vercel automatically deploys via their GitHub integration (not controlled by this workflow)
-- Playwright tests wait for the Vercel deployment to complete before running
-- Tests run against the deployed Vercel preview URL
+- Playwright E2E tests run after unit tests pass
+- E2E tests run against a local build to avoid authentication issues with Vercel preview deployments
 
 ## Workflow Files
 

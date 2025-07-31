@@ -35,13 +35,11 @@ jobs:
       
     - name: Run unit tests (if available)
       run: |
-        if [ -f "package.json" ] && grep -q "\"test\":" package.json; then
-          yarn test || echo "No unit tests found, skipping..."
-        else
-          echo "No test script found in package.json"
-        fi
+        # Skip running tests here since we have Playwright tests that run in a separate job
+        echo "Skipping unit tests - Playwright tests will run in the next job"
 
-  # Second: Wait for Vercel deployment then run Playwright tests
+  # Second: Run Playwright tests after unit tests pass
+  # Note: Tests run against local build since Vercel preview deployments may have authentication
   playwright-tests:
     name: Playwright E2E Tests
     needs: unit-tests
@@ -62,13 +60,16 @@ jobs:
     - name: Install dependencies
       run: yarn install
       
-    - name: Wait for Vercel deployment
-      uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
-      id: wait-for-vercel
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        max_timeout: 600
-        check_interval: 30
+    - name: Build application
+      run: yarn build
+      
+    - name: Start application in background
+      run: |
+        yarn start &
+        echo "Waiting for Next.js to start..."
+        # Wait for the app to be ready
+        npx wait-on http://localhost:3000 --timeout 60000
+        echo "Application is ready!"
       
     - name: Get Playwright version
       id: playwright-version
@@ -90,7 +91,7 @@ jobs:
     - name: Run Playwright tests
       run: yarn test
       env:
-        BASE_URL: ${{ steps.wait-for-vercel.outputs.url || (github.ref == 'refs/heads/master' && 'https://langomango.com' || 'https://langomango-preview.vercel.app') }}
+        BASE_URL: http://localhost:3000
       
     - name: Upload test report
       if: always()
