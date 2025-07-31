@@ -10,6 +10,7 @@ import CloseIcon from './CloseIcon';
 import Container from './Container';
 import Input from './Input';
 import Overlay from './Overlay';
+import { config, getBaseApiUrl } from '../config/environment';
 
 // Axios imports
 import axios, {
@@ -46,8 +47,6 @@ interface RegisterResponse {
   token: string;  // lowercase to match actual response
   message: string; // lowercase to match actual response
 }
-
-import { getBaseApiUrl, config } from '../config/environment';
 
 // Environment and URL Configuration
 const getBaseUrlConfig = () => {

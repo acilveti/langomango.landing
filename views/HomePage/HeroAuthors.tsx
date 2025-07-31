@@ -9,6 +9,7 @@ import OverTitle from 'components/OverTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
+import { config } from '../../config/environment';
 
 export default function HeroAuthors() {
   const { setIsModalOpened } = useNewsletterModalContext();
@@ -33,7 +34,7 @@ export default function HeroAuthors() {
           />
         </ImageContainer>
         <CustomButtonGroup>
-          <Button data-umami-event="Hero button" href="https://beta-app.langomango.com/authors-signup">
+          <Button data-umami-event="Hero button" href={`${config.appUrl}/authors-signup`}>
             {t('common:authorPage.cta.button')} <span>&rarr;</span>
           </Button>
         </CustomButtonGroup>
