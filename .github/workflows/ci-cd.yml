@@ -67,8 +67,10 @@ jobs:
       run: |
         yarn start &
         echo "Waiting for Next.js to start..."
-        # Wait for the app to be ready
-        npx wait-on http://localhost:3000 --timeout 60000
+        # Give the app time to start
+        sleep 10
+        # Check if the app is running
+        curl -f http://localhost:3000 || (echo "App failed to start" && exit 1)
         echo "Application is ready!"
       
     - name: Get Playwright version
