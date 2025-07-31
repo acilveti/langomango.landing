@@ -4,6 +4,7 @@ import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService, CreateCheckoutSessionRequest, createEnhancedCheckoutSession } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
+import { config } from '../config/environment';
 
 import {
   AlphabetLetter,
@@ -1263,14 +1264,14 @@ export default function ReaderDemoWidget({
     
     setEmailError('');
     // Redirect with email pre-filled
-    window.location.href = `https://beta-app.langomango.com/sign-up?email=${encodeURIComponent(email)}`;
+    window.location.href = `${config.appUrl}/sign-up?email=${encodeURIComponent(email)}`;
   }, [email]);
 
   const handleGoogleSignup = useCallback(() => {
     // For the secondary signup flow
-    const baseUrl = 'https://staging.langomango.com';
+    const baseUrl = config.apiUrl;
     const returnUrl = encodeURIComponent('/sign-up');
-    const frontendRedirectUrl = encodeURIComponent('https://beta-app.langomango.com/');
+    const frontendRedirectUrl = encodeURIComponent(config.appUrl);
     const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
     
     console.log('Redirecting to Google OAuth (secondary flow):', googleAuthUrl);
@@ -1321,7 +1322,7 @@ export default function ReaderDemoWidget({
             
             // Redirect to app
             setTimeout(() => {
-              window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
+              window.location.href = response.redirectUrl || `${config.appUrl}/reader`;
             }, 1500);
           } else {
             throw new Error('Failed to create account');
@@ -1339,7 +1340,7 @@ export default function ReaderDemoWidget({
             
             if (response.success) {
               setTimeout(() => {
-                window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
+                window.location.href = response.redirectUrl || `${config.appUrl}/reader`;
               }, 1500);
             } else {
               throw new Error('Failed to update profile');
@@ -1749,7 +1750,7 @@ export default function ReaderDemoWidget({
         priceLookupKey: priceLookupKey,
         planType: planId === '1month' ? 'monthly' : planId === 'yearly' ? 'yearly' : '3year',
         includeTrial: true, // New users always get trial
-        returnUrl: 'https://beta-app.langomango.com/payment-room'
+        returnUrl: `${config.appUrl}/payment-room`
       };
       
       const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, authToken);
@@ -2707,7 +2708,7 @@ export default function ReaderDemoWidget({
                           localStorage.setItem('returnToWidget', 'true');
                           
                           // Redirect to Google OAuth
-                          const baseUrl = 'https://staging.langomango.com';
+                          const baseUrl = config.apiUrl;
                           const returnUrl = encodeURIComponent('/sign-up');
                           const frontendRedirectUrl = encodeURIComponent(window.location.origin);
                           const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
@@ -2886,7 +2887,7 @@ export default function ReaderDemoWidget({
               </ButtonContainer>
               
               <LoginPrompt>
-                Already have an account? <LoginLink href="https://beta-app.langomango.com/login">Log in</LoginLink>
+                Already have an account? <LoginLink href={`${config.appUrl}/login`}>Log in</LoginLink>
               </LoginPrompt>
               </SignupExpanded>
             </SignupExpandedWrapper>

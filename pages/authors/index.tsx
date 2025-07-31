@@ -5,7 +5,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import BasicSection, { BasicSection1 } from 'components/BasicSection';
 import Link from 'components/Link';
-import { EnvVars } from 'env.production';
+import { config } from '../../config/environment';
 import { getAllPosts } from 'utils/postsFetcher';
 import { CtaAuthors } from 'views/HomePage/Cta';
 import Features from 'views/HomePage/Features';
