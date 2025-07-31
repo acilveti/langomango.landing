@@ -23,6 +23,7 @@ import { NavItems } from 'types';
 import { addReferralToUrl } from 'utils/referral';
 import { appWithTranslation } from 'next-i18next';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
+import { config } from '../config/environment';
 
 // Define a custom nav item type that includes the onClick handler
 type NavItemWithHandler = NavItems[0] & {
@@ -147,7 +148,7 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
     setIsModalOpened(true);
     // Uncomment if you also want to redirect after opening modal
     // setTimeout(() => {
-    //   window.location.href = addReferralToUrl("https://beta-app.langomango.com/sign-up");
+    //   window.location.href = addReferralToUrl(`${config.appUrl}/sign-up`);
     // }, 100);
   };
 
@@ -155,7 +156,7 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
   const navItems: NavItemWithHandler[] = [
     { 
       title: 'USE DEMO', 
-      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
+      href: addReferralToUrl(`${config.appUrl}/sign-up`), 
       outlined: true,
       onClick: handleButtonClick,
     },

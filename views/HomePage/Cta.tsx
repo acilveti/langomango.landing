@@ -14,6 +14,7 @@ import { addReferralToUrl } from 'utils/referral';
 // Import Reddit Pixel tracking
 import { RedditEventTypes,trackRedditConversion } from 'utils/redditPixel';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { config } from '../../config/environment';
 
 // Add onCtaClick prop for external tracking
 interface CtaProps {
@@ -133,7 +134,7 @@ export function CtaAuthors({ imageSrc, imageAlt = "Author CTA Image" }: { imageS
           )}
   
           <ButtonGroup>
-            <NextLink href={addReferralToUrl("https://beta-app.langomango.com/sign-up")} passHref>
+            <NextLink href={addReferralToUrl(`${config.appUrl}/sign-up`)} passHref>
               <ExpandingButton 
                 data-umami-event="cta button"
                 onClick={handleAuthorButtonClick}

@@ -10,6 +10,7 @@ import CloseIcon from './CloseIcon';
 import Container from './Container';
 import Input from './Input';
 import Overlay from './Overlay';
+import { config, getBaseApiUrl } from '../config/environment';
 
 // Axios imports
 import axios, {
@@ -48,52 +49,11 @@ interface RegisterResponse {
 }
 
 // Environment and URL Configuration
-type Environment = 'development' | 'staging' | 'production';
-
-const getBaseURL = () => {
-  // For Next.js/Web
-  if (typeof window !== 'undefined') {
-    if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-      return process.env.NEXT_PUBLIC_API_BASE_URL;
-    }
-    
-    return process.env.NODE_ENV === 'development'
-      ? process.env.NGROK || 'http://192.168.0.14:8080/'
-      : 'https://staging.langomango.com/';
-  }
-  
-  // Server-side fallback
-  return 'https://staging.langomango.com/';
-};
-
-const API_CONFIG = {
-  development: {
-    baseURL: getBaseURL(),
-    timeout: 120000,
-  },
-  staging: {
-    baseURL: 'https://staging.langomango.com/',
-    timeout: 120000,
-  },
-  production: {
-    baseURL: 'https://staging.langomango.com/',
-    timeout: 120000,
-  },
-};
-
-const getEnvironment = (): Environment => {
-  if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENV) {
-    if (process.env.NEXT_PUBLIC_ENV === 'development') return 'development';
-    if (process.env.NEXT_PUBLIC_ENV === 'staging') return 'staging';
-    if (process.env.NEXT_PUBLIC_ENV === 'production') return 'production';
-  }
-  
-  return process.env.NODE_ENV === 'development' ? 'development' : 'production';
-};
-
 const getBaseUrlConfig = () => {
-  const environment = getEnvironment();
-  return API_CONFIG[environment];
+  return {
+    baseURL: getBaseApiUrl(),
+    timeout: 120000,
+  };
 };
 
 // Auth Service (simplified for modal)
@@ -166,7 +126,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           await SimpleAuthService.clearAuth();
           if (typeof window !== 'undefined') {
-            window.location.href = 'https://beta-app.langomango.com/login';
+            window.location.href = `${config.appUrl}/login`;
           }
           return Promise.reject(new Error('Authentication required'));
         }
@@ -276,18 +236,10 @@ async function initiateGoogleAuth(referralCode?: string, returnUrl: string = "/l
   console.log("initiateGoogleAuth");
   try {
     // Get the base URL
-    let baseUrl = getBaseUrlConfig().baseURL;
-    
-    // Replace IP address with localhost if in development environment
-    if (baseUrl.includes('192.168.') || baseUrl.includes('10.0.') || baseUrl.includes('172.16.')) {
-      // Extract the port number from the baseUrl
-      const portMatch = baseUrl.match(/:(\d+)/);
-      const port = portMatch ? portMatch[1] : '8080';
-      baseUrl = `http://localhost:${port}/`;
-    }
+    const baseUrl = getBaseApiUrl()
     
     // Get the current frontend URL
-    const frontendUrl = "https://beta-app.langomango.com/";
+    const frontendUrl = config.appUrl;
     
     // Construct URL with query parameters to match backend controller
     let authUrl = `${baseUrl}auth/login-google?returnUrl=${encodeURIComponent(returnUrl)}&frontendRedirectUrl=${encodeURIComponent(frontendUrl)}`;
@@ -358,7 +310,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
       setTimeout(() => {
         onClose();
         const token = localStorage.getItem('auth_token');
-        window.location.href = `https://beta-app.langomango.com/login?token=${encodeURIComponent(token || '')}&type=google`;
+        window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(token || '')}&type=google`;
       }, 2000);
     }
   }, [onSuccess, onClose]);
@@ -398,7 +350,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
         // Auto-redirect to /set-password with token in URL after 2 seconds
         setTimeout(() => {
           onClose();
-          window.location.href = `https://beta-app.langomango.com/login?token=${encodeURIComponent(response.data.token)}&type=email`;
+          window.location.href = `${config.appUrl}/login?token=${encodeURIComponent(response.data.token)}&type=email`;
         }, 2000);
       } else {
         console.error('Registration failed - no token in response:', response.data); // Debug log
@@ -531,7 +483,7 @@ export default function RegistrationModal({ onClose, onSuccess }: RegistrationMo
                         onClick={() => {
                           onClose();
                           // Navigate to login page
-                          window.location.href = 'https://beta-app.langomango.com/login';
+                          window.location.href = `${config.appUrl}/login`;
                         }}
                       >
                         Log in

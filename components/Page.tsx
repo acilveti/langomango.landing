@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import { EnvVars } from 'env.production';
+import { config } from '../config/environment';
 import { media } from 'utils/media';
 import Container from './Container';
 import SectionTitle from './SectionTitle';
@@ -16,7 +16,7 @@ export default function Page({ title, description, children }: PropsWithChildren
     <>
       <Head>
         <title>
-          {title} | {EnvVars.SITE_NAME}
+          {title} | {config.siteName}
         </title>
         <meta name="description" content={description} />
       </Head>
