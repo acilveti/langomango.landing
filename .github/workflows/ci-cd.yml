@@ -39,7 +39,7 @@ jobs:
         echo "Skipping unit tests - Playwright tests will run in the next job"
 
   # Second: Run Playwright tests after unit tests pass
-  # Note: Tests run against local build since Vercel preview deployments may have authentication
+  # Note: Tests run against local dev server started by Playwright
   playwright-tests:
     name: Playwright E2E Tests
     needs: unit-tests
@@ -59,27 +59,6 @@ jobs:
         
     - name: Install dependencies
       run: yarn install
-      
-    - name: Build application
-      run: yarn build
-      
-    - name: Start application in background
-      run: |
-        yarn start &
-        APP_PID=$!
-        echo "Started app with PID: $APP_PID"
-        echo "Waiting for Next.js to start..."
-        # Give the app time to start
-        sleep 15
-        # Check if the process is still running
-        if ps -p $APP_PID > /dev/null; then
-          echo "Application process is running!"
-          # Check if we can connect (don't fail on non-200 status)
-          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:3000 || true
-        else
-          echo "Application process died!"
-          exit 1
-        fi
       
     - name: Get Playwright version
       id: playwright-version
@@ -101,7 +80,8 @@ jobs:
     - name: Run Playwright tests
       run: yarn test
       env:
-        BASE_URL: http://localhost:3000
+        # Playwright will start its own dev server based on webServer config
+        CI: true
       
     - name: Upload test report
       if: always()
