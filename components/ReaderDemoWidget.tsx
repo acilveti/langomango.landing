@@ -4,7 +4,6 @@ import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService, CreateCheckoutSessionRequest, createEnhancedCheckoutSession } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
-import PricingPage from './PricingPage/PricingPage';
 
 import {
   AlphabetLetter,
@@ -210,8 +209,6 @@ export default function ReaderDemoWidget({
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
-  const [showPricingPage, setShowPricingPage] = useState(false);
-  const [isPricingLoading, setIsPricingLoading] = useState(false);
   const [pendingUserData, setPendingUserData] = useState<{
     email?: string;
     nativeLanguage: string;
@@ -279,14 +276,11 @@ export default function ReaderDemoWidget({
           localStorage.removeItem('pendingLanguagePrefs');
           localStorage.removeItem('returnToWidget');
           
-          // Mark as registered and show pricing
+          // Mark as registered and redirect to checkout
           setHasRegistered(true);
-          setShowSignupExpanded(true);
-          setShowPricingPage(true);
           
-          if (onSignupVisibilityChange) {
-            onSignupVisibilityChange(true);
-          }
+          // Redirect to checkout page
+          window.location.href = '/checkout';
         }
       }).catch(error => {
         console.error('Failed to update profile after OAuth:', error);
@@ -2243,18 +2237,8 @@ export default function ReaderDemoWidget({
       </BottomBar>
     </ReaderWrapper>
       
-      {/* Pricing Page */}
-      {showPricingPage && (
-        <PricingPage 
-          onSelectPlan={handlePricingPlanSelect}
-          isLoading={isPricingLoading}
-          userToken={localStorage.getItem('token') || undefined}
-          isAuthenticated={true}
-        />
-      )}
-      
       {/* Inline Signup Section */}
-      {useInlineSignup && showSignupExpanded && !showPricingPage && (
+      {useInlineSignup && showSignupExpanded && (
         <SignupSection $isFullscreen={signupMode === 'fullscreen'}>
           <CloseButton 
             onClick={() => {
@@ -2674,8 +2658,8 @@ export default function ReaderDemoWidget({
                                   source: 'reader_widget'
                                 });
                                 
-                                // Show pricing page - user is already authenticated
-                                setShowPricingPage(true);
+                                // Redirect to checkout page - user is already authenticated
+                                window.location.href = '/checkout';
                               } else {
                                 throw new Error('Failed to create account');
                               }
