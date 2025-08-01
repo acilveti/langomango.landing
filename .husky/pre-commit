@@ -1,2 +1,2 @@
 yarn lint
-npx playwright test --project chromium --project "Mobile Chrome"
+yarn playwright test --project 'chromium' --project 'Mobile Chrome' --project 'Mobile Safari'
