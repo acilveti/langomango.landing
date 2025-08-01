@@ -1,1 +1,2 @@
 yarn lint
+npx playwright test --project chromium --project "Mobile Chrome"
