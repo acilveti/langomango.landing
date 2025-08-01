@@ -9,7 +9,6 @@ import PricingPage from './PricingPage/PricingPage';
 import {
   AlphabetLetter,
   AlphabetProgressContainer,
-  ArrowIcon,
   ArrowIndicator,
   AutoAdvanceNote,
   BackButton,
@@ -22,28 +21,16 @@ import {
   ButtonContainer,
   ChevronIcon,
   CloseButton,
-  CompactFormRow,
   CompactRegistrationSection,
   ContentArea,
-  ContinueButton,
-  DividerCompact,
   DividerLine,
   DividerText,
   EducationalContent,
-  EmailInputCompact,
   EmailInputExpanded,
-  EmailRegistrationInput,
-  EmailRegistrationInputCompact,
-  EmailSignupButton,
   ErrorIcon,
   ErrorMessage,
   ErrorText,
-  ErrorTextCompact,
   GoogleButton,
-  GoogleButtonCompact,
-  GoogleNote,
-  GoogleSignupButton,
-  GoogleSignupButtonCompact,
   HintText,
   InlineTranslation,
   LanguageBox,
@@ -70,19 +57,12 @@ import {
   LevelSelectorContainer,
   LoginLink,
   LoginPrompt,
-  MessageIcon,
   MessageText,
-  MessageTitle,
-  MethodLabel,
   NavButtonLeft,
   NavButtonRight,
-  OrDivider,
-  OrDividerCompact,
   OriginalText,
-  OrText,
   PageInput,
   PageInputContainer,
-  PageNavButton,
   PageNavigation,
   PageTotal,
   ParagraphContainer,
@@ -93,25 +73,14 @@ import {
   ProgressMessage,
   PromptIcon,
   PromptMessage,
-  PromptText,
   PulseRing,
   ReaderContainer,
   ReaderWrapper,
-  RegistrationColumn,
-  RegistrationHeader,
-  RegistrationMethod,
-  RegistrationOptions,
-  RegistrationSection,
-  RegistrationSubtitle,
-  RegistrationTitle,
-  ScientificNote,
   SecondaryButton,
   SecondaryButtons,
   SecondaryDivider,
   SecondarySection,
   SelectedLanguage,
-  SignupButtonCompact,
-  SignupCompact,
   SignupExpanded,
   SignupExpandedWrapper,
   SignupSection,
@@ -168,7 +137,6 @@ export default function ReaderDemoWidget({
   const [emailError, setEmailError] = useState('');
   const [wordsRead, setWordsRead] = useState(0);
   const [hasClicked, setHasClicked] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -212,12 +180,6 @@ export default function ReaderDemoWidget({
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   const [showPricingPage, setShowPricingPage] = useState(false);
   const [isPricingLoading, setIsPricingLoading] = useState(false);
-  const [pendingUserData, setPendingUserData] = useState<{
-    email?: string;
-    nativeLanguage: string;
-    targetLanguage: string;
-    level: string;
-  } | null>(null);
   
   // Sync demo level with context level only if user has selected it
   useEffect(() => {

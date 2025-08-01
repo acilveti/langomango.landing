@@ -1,16 +1,13 @@
 'use client';
-import NextLink from 'next/link';
+import { useTranslation } from 'next-i18next';
+import React from 'react';
 import styled from 'styled-components';
-import Button from 'components/Button';
 import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
-import SectionTitle from 'components/SectionTitle';
 import ExpandingButton from 'components/ExpandingButton';
+import SectionTitle from 'components/SectionTitle';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
-import { addReferralToUrl } from 'utils/referral';
-import React from 'react';
-import { useTranslation } from 'next-i18next';
 
 export default function WaveCta() {
   const { t } = useTranslation(['common', 'home']);
@@ -21,12 +18,6 @@ export default function WaveCta() {
     e.preventDefault();
     // window.location.href = addReferralToUrl('https://beta-app.langomango.com/sign-up');
     setIsModalOpened(true)
-  };
-
-  // Function to handle outlined button click with proper type annotation for anchor elements
-  const handleOutlinedButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    window.location.href = '/authors';
   };
 
   return (
@@ -90,11 +81,6 @@ const Description = styled.div`
   ${media('<=tablet')} {
     max-width: 100%;
   }
-`;
-
-const OutlinedButton = styled(Button)`
-  border: 1px solid rgb(var(--textSecondary));
-  color: rgb(var(--textSecondary));
 `;
 
 const CustomButtonGroup = styled(ButtonGroup)`

@@ -1,11 +1,10 @@
 // components/SimpleCta.tsx - Simple CTA component with VibratingButton
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
 import VibratingButton from 'components/VibratingButton';
-import { useTranslation } from 'next-i18next';
-import { addReferralToUrl } from 'utils/referral';
-import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 interface SimpleCtaProps {
   buttonText?: string; // Optional custom button text

@@ -6,15 +6,11 @@ import styled from 'styled-components';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
-import { media } from 'utils/media';
-import Button from './Button';
 import Container from './Container';
 import Drawer from './Drawer';
-import { HamburgerIcon } from './HamburgerIcon';
 import Logo from './Logo2Lines';
 import ExpandingButton from './ExpandingButton';
 
-const ColorSwitcher = dynamic(() => import('../components/ColorSwitcher'), { ssr: false });
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
@@ -22,14 +18,12 @@ type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero:
 
 export default function Navbar({ items }: NavbarProps) {
   const router = useRouter();
-  const { toggle } = Drawer.useDrawer();
-  const [scrollingDirection, setScrollingDirection] = useState<ScrollingDirections>('none');
+  const [setScrollingDirection] = useState<ScrollingDirections>('none');
   const [isOverHero, setIsOverHero] = useState(true);
   const [isDarkened, setIsDarkened] = useState(false);
 
   let lastScrollY = useRef(0);
   const lastRoute = useRef('');
-  const stepSize = useRef(50);
 
   // Check if navbar is over the hero section
   useEffect(() => {

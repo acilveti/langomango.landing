@@ -126,17 +126,6 @@ const countUp = keyframes`
   }
 `;
 
-const slideInFade = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
 const bounceIn = keyframes`
   0% {
     opacity: 0;
@@ -710,29 +699,6 @@ const fadeInUp = keyframes`
   100% {
     opacity: 1;
     transform: translateY(0);
-  }
-`;
-
-// Educational message animations
-const messageSlideIn = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  20% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.02);
-  }
-  30% {
-    transform: translate(-50%, -50%) scale(0.98);
-  }
-  40%, 90% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.95);
   }
 `;
 

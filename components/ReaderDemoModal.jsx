@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
-import ReaderDemoWidget from './ReaderDemoWidget';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
-import useEscClose from 'hooks/useEscKey';
+import ReaderDemoWidget from './ReaderDemoWidget';
 
 // Reader Demo Modal component
 export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false }) {
