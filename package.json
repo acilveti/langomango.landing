@@ -6,7 +6,8 @@
     "dev": "yarn tinacms server:start -c \"next dev\"",
     "build": "yarn tinacms server:start -c \"next build\"",
     "start": "yarn tinacms server:start -c \"next start\"",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@accessible/drawer": "^3.0.2",
@@ -19,6 +20,7 @@
     "date-fns": "^2.29.3",
     "formik": "^2.4.6",
     "gray-matter": "^4.0.3",
+    "husky": "^9.1.7",
     "i18next": "21.6.16",
     "lodash": "^4.17.21",
     "next": "12.1.0",
