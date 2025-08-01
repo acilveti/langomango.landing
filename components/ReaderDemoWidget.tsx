@@ -157,7 +157,7 @@ export default function ReaderDemoWidget({
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
   const [autoScrollPerformed, setAutoScrollPerformed] = useState(false);
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
-  const [hasStartedInitialAnimation, setHasStartedInitialAnimation] = useState(false);
+  const [, setHasStartedInitialAnimation] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState('');
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
@@ -335,6 +335,21 @@ export default function ReaderDemoWidget({
   // Initialize temp language states after currentLanguage is defined
   const [tempNativeLanguage, setTempNativeLanguage] = useState(nativeLanguage);
   const [tempTargetLanguage, setTempTargetLanguage] = useState(currentLanguage);
+  
+  // Reset animation states when language changes
+  useEffect(() => {
+    console.log('[Animation Reset] Language changed, resetting animation states');
+    setHasStartedInitialAnimation(false);
+    setIsInitialAnimationComplete(false);
+    setShowWordCounts(false);
+    setWordsRead(0);
+    setJustUpdated(false);
+    setShouldAnimateButton(false);
+    setShowAlphabetProgress(false);
+    setActiveLetters([]);
+    setAlphabetStage(0);
+    hasStartedTimerRef.current = false;
+  }, [currentLanguage.code]);
   
   // Define validateEmail function before its first use
   const validateEmail = useCallback((email: string) => {
@@ -536,14 +551,113 @@ export default function ReaderDemoWidget({
     return totalWords;
   }, [getTranslation, bookContent]);
 
+  // Simple initial animation trigger
+  useEffect(() => {
+    // Only run once when component mounts and reader is ready
+    if (!showWordCounts && wordsRead === 0) {
+      console.log('[Initial Animation] Setting up initial word count animation');
+      
+      // Wait a bit for ref to be available
+      const setupTimer = setTimeout(() => {
+        if (!readerContainerRef.current) {
+          console.log('[Initial Animation] Reader ref not available yet');
+          return;
+        }
+      
+        const runInitialAnimation = () => {
+          const rect = readerContainerRef.current?.getBoundingClientRect();
+          if (!rect) return false;
+          
+          const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+          const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
+          const visibilityPercentage = visibleHeight / rect.height;
+          const isVisible = visibilityPercentage >= 0.5;
+          
+          if (isVisible) {
+            console.log('[Initial Animation] Reader is visible, starting animation');
+            
+            // Start loading animation
+            setIsCalculatingWords(true);
+            setShouldAnimateButton(false);
+            
+            // Show word counts after 2 seconds
+            setTimeout(() => {
+              setIsCalculatingWords(false);
+              setShouldAnimateButton(true);
+              
+              requestAnimationFrame(() => {
+                setTimeout(() => {
+                  setShowWordCounts(true);
+                  setShowAlphabetProgress(true);
+                  const initialLetters = getRandomLetters(7, []);
+                  setActiveLetters(initialLetters);
+                  setAlphabetStage(0);
+                  
+                  // Calculate initial words after 1 second
+                  setTimeout(() => {
+                    let totalWords = 0;
+                    for (let i = 1; i <= currentPage; i++) {
+                      totalWords += calculatePageWords(i);
+                    }
+                    console.log('[Initial Animation] Setting initial words:', totalWords);
+                    setWordsRead(totalWords);
+                    setJustUpdated(true);
+                    setTimeout(() => {
+                      setJustUpdated(false);
+                    }, 1000);
+                  }, 1000);
+                }, 50);
+              });
+            }, 2000);
+            
+            return true; // Animation started
+          }
+          return false; // Not visible yet
+        };
+        
+        // Try immediately
+        if (!runInitialAnimation()) {
+          // If not visible, check periodically
+          const checkInterval = setInterval(() => {
+            if (runInitialAnimation()) {
+              clearInterval(checkInterval);
+            }
+          }, 100);
+          
+          // Store interval in closure
+          const cleanup = () => clearInterval(checkInterval);
+          return cleanup;
+        }
+      }, 200); // Wait 200ms for ref to be available
+      
+      return () => clearTimeout(setupTimer);
+    }
+  }, [showWordCounts, wordsRead, currentPage, calculatePageWords, getRandomLetters]);
+
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-      setPageInput((currentPage - 1).toString());
+      const newPageNumber = currentPage - 1;
+      setCurrentPage(newPageNumber);
+      setPageInput(newPageNumber.toString());
       hidePopup();
       handleInteraction();
+      
+      // Update word count when going back
+      if (showWordCounts) {
+        setTimeout(() => {
+          let totalWords = 0;
+          for (let i = 1; i <= newPageNumber; i++) {
+            totalWords += calculatePageWords(i);
+          }
+          setWordsRead(totalWords);
+          setJustUpdated(true);
+          setTimeout(() => {
+            setJustUpdated(false);
+          }, 1000);
+        }, 100);
+      }
     }
-  }, [currentPage, handleInteraction, hidePopup]);
+  }, [currentPage, handleInteraction, hidePopup, showWordCounts, calculatePageWords]);
 
   const handleNextPage = useCallback(() => {
     // Check if we're currently showing an educational message
@@ -629,8 +743,9 @@ export default function ReaderDemoWidget({
     
     // Normal page navigation logic
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-      setPageInput((currentPage + 1).toString());
+      const newPageNumber = currentPage + 1;
+      setCurrentPage(newPageNumber);
+      setPageInput(newPageNumber.toString());
       hidePopup();
       handleInteraction();
       
@@ -662,6 +777,7 @@ export default function ReaderDemoWidget({
             setShowEducationalMessage(false);
             setIsHidingEducationalMessage(false);
           // Hide word counts temporarily
+          // First hide word counts to ensure animation replays
           setShowWordCounts(false);
           setIsCalculatingWords(true); // Start loading animation
           setShouldAnimateButton(false); // Stop button animation during loading
@@ -669,27 +785,29 @@ export default function ReaderDemoWidget({
           setTimeout(() => {
             setIsCalculatingWords(false); // Stop loading animation
             setShouldAnimateButton(true); // Start button animation after loading
-            // Show word counts after a brief delay
-            setTimeout(() => {
-              setShowWordCounts(true);
-              // Update global counter 1 second after word counts appear
+            // Force a small delay to ensure React re-renders
+            requestAnimationFrame(() => {
               setTimeout(() => {
-                // Calculate total words from all pages up to current
-                let totalWords = 0;
-                for (let i = 1; i <= currentPage + 1; i++) {
-                  totalWords += calculatePageWords(i);
-                }
-                setWordsRead(totalWords);
-                setJustUpdated(true);
+                setShowWordCounts(true);
+                // Update global counter 1 second after word counts appear
                 setTimeout(() => {
-                  setJustUpdated(false);
-                  // Unlock scroll after the entire animation is complete
-                  if (!isInitialAnimationComplete) {
-                    unlockScroll();
+                  // Calculate total words from all pages up to current
+                  let totalWords = 0;
+                  for (let i = 1; i <= newPageNumber; i++) {
+                    totalWords += calculatePageWords(i);
                   }
+                  setWordsRead(totalWords);
+                  setJustUpdated(true);
+                  setTimeout(() => {
+                    setJustUpdated(false);
+                    // Unlock scroll after the entire animation is complete
+                    if (!isInitialAnimationComplete) {
+                      unlockScroll();
+                    }
+                  }, 1000);
                 }, 1000);
-              }, 1000);
-            }, 100); // Small delay after loading completes
+              }, 50); // Small delay after frame
+            });
           }, 2900); // Stop just before 3 seconds
           }, 500); // 0.5 seconds for fade-out
         }, 3500); // 3.5 seconds to read the message
@@ -714,7 +832,7 @@ export default function ReaderDemoWidget({
           // Update word count after second message
           setTimeout(() => {
             let totalWords = 0;
-            for (let i = 1; i <= currentPage + 1; i++) {
+            for (let i = 1; i <= newPageNumber; i++) {
               totalWords += calculatePageWords(i);
             }
             setWordsRead(totalWords);
@@ -754,7 +872,7 @@ export default function ReaderDemoWidget({
           // Update word count after third message
           setTimeout(() => {
             let totalWords = 0;
-            for (let i = 1; i <= currentPage + 1; i++) {
+            for (let i = 1; i <= newPageNumber; i++) {
               totalWords += calculatePageWords(i);
             }
             setWordsRead(totalWords);
@@ -782,23 +900,31 @@ export default function ReaderDemoWidget({
         }, 4500); // 4.5 seconds to read
       } else {
         // After 3 clicks, alphabet is already complete
-        // Just update word count
+        // Ensure word counts are visible
+        if (!showWordCounts) {
+          setShowWordCounts(true);
+        }
+        // Always update word count for every page navigation
+        // Use a small delay to ensure page content is updated
         setTimeout(() => {
+          console.log('[handleNextPage] Calculating total words after navigation...');
           let totalWords = 0;
-          for (let i = 1; i <= currentPage + 1; i++) {
-            totalWords += calculatePageWords(i);
+          for (let i = 1; i <= newPageNumber; i++) {
+            const pageWords = calculatePageWords(i);
+            console.log(`[handleNextPage] Page ${i} has ${pageWords} words`);
+            totalWords += pageWords;
           }
-          if (totalWords > wordsRead) {
-            setWordsRead(totalWords);
-            setJustUpdated(true);
-            setTimeout(() => {
-              setJustUpdated(false);
-            }, 1000);
-          }
-        }, 300);
+          console.log(`[handleNextPage] Total words calculated: ${totalWords}, current wordsRead: ${wordsRead}`);
+          // Always update the word count
+          setWordsRead(totalWords);
+          setJustUpdated(true);
+          setTimeout(() => {
+            setJustUpdated(false);
+          }, 1000);
+        }, 100); // Reduced delay for faster response
       }
     }
-  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup]);
+  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup, showWordCounts]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
@@ -1147,23 +1273,38 @@ export default function ReaderDemoWidget({
     }
   }, [hasAutoScrolled, autoScrollPerformed, signupMode, isInitialAnimationComplete, smoothScrollTo]);
 
-  // Check if reader container is visible and start word counter
+  // Old visibility check - disabled in favor of simpler approach
+  /*
   useEffect(() => {
-    console.log('[useEffect] Visibility effect mounted or language changed');
+    console.log('[useEffect] Visibility effect mounted or dependencies changed', {
+      currentLanguage: currentLanguage.code,
+      currentPage,
+      hasStartedInitialAnimation,
+      showWordCounts
+    });
     
-    // Reset the timer tracking when language changes
-    hasStartedTimerRef.current = false;
-    
-    // Clear any existing timer when language changes
-    if (visibilityTimerRef.current) {
-      clearTimeout(visibilityTimerRef.current);
-      visibilityTimerRef.current = null;
+    // Don't reset if we're just changing pages after initial animation
+    if (!hasStartedInitialAnimation) {
+      // Reset the timer tracking when language changes
+      hasStartedTimerRef.current = false;
+      
+      // Clear any existing timer
+      if (visibilityTimerRef.current) {
+        clearTimeout(visibilityTimerRef.current);
+        visibilityTimerRef.current = null;
+      }
     }
     
     const checkVisibility = () => {
-      console.log('[checkVisibility] Called, hasStartedTimer:', hasStartedTimerRef.current);
+      console.log('[checkVisibility] Called', {
+        hasStartedTimer: hasStartedTimerRef.current,
+        hasStartedInitialAnimation,
+        showWordCounts,
+        wordsRead
+      });
       
-      if (readerContainerRef.current && !hasStartedTimerRef.current && !hasStartedInitialAnimation) {
+      // Check if we should run initial animation
+      if (readerContainerRef.current && !showWordCounts && wordsRead === 0) {
         const rect = readerContainerRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight || document.documentElement.clientHeight;
         
@@ -1178,43 +1319,56 @@ export default function ReaderDemoWidget({
           windowHeight: windowHeight,
           visibleHeight: visibleHeight,
           visibilityPercentage: visibilityPercentage,
-          isVisible: isVisible
+          isVisible: isVisible,
+          hasStartedTimer: hasStartedTimerRef.current,
+          hasStartedInitialAnimation,
+          showWordCounts
         });
         
         if (isVisible) {
-          console.log('[checkVisibility] Reader is fully visible! Starting timer...');
-          // If not already timing, start the 2-second visibility timer
-          if (!visibilityTimerRef.current && !hasStartedInitialAnimation) {
-            console.log('[checkVisibility] Setting 2-second visibility timer');
-            // Only lock scroll if initial animation hasn't been completed
-            if (!isInitialAnimationComplete) {
-                  lockScroll();
-                }
-                setIsCalculatingWords(true); // Start loading animation
-            setShouldAnimateButton(false); // Stop button animation during loading
-            visibilityTimerRef.current = setTimeout(() => {
-              console.log('[visibilityTimer] 2 seconds elapsed, updating word counts');
-              hasStartedTimerRef.current = true;
-              setHasStartedInitialAnimation(true); // Mark that initial animation has started
+          console.log('[checkVisibility] Reader is fully visible! Starting animation...');
+          // Start immediately without waiting for timer
+          console.log('[checkVisibility] Starting initial animation immediately');
+          hasStartedTimerRef.current = true;
+          setHasStartedInitialAnimation(true);
+          
+          // Only lock scroll if initial animation hasn't been completed
+          if (!isInitialAnimationComplete) {
+            lockScroll();
+          }
+          
+          setIsCalculatingWords(true); // Start loading animation
+          setShouldAnimateButton(false); // Stop button animation during loading
+          
+          // Wait 2 seconds before showing word counts
+          setTimeout(() => {
+            console.log('[Animation] 2 seconds elapsed, showing word counts');
               // Stop loading animation just before showing word counts
               setIsCalculatingWords(false);
               setShouldAnimateButton(true); // Start button animation after loading
-              // Show word counts after a brief delay
-              setTimeout(() => {
-                setShowWordCounts(true);
-                console.log('[visibilityTimer] Word count badges shown');
-                
-                // Show alphabet progress with initial letters (25% of alphabet = 6-7 letters)
-                setShowAlphabetProgress(true);
-                const initialLetters = getRandomLetters(7, []);
-                setActiveLetters(initialLetters);
-                setAlphabetStage(0);
+              // Force a frame update before showing word counts
+              requestAnimationFrame(() => {
+                setTimeout(() => {
+                  setShowWordCounts(true);
+                  console.log('[visibilityTimer] Word count badges shown');
+                  
+                  // Show alphabet progress with initial letters (25% of alphabet = 6-7 letters)
+                  setShowAlphabetProgress(true);
+                  const initialLetters = getRandomLetters(7, []);
+                  setActiveLetters(initialLetters);
+                  setAlphabetStage(0);
                 
                 // Then update global counter 1 second later
                 wordsTimerRef.current = setTimeout(() => {
-                  const page8Words = calculatePageWordsRef.current?.(8) || 0;
-                  console.log('[wordsTimer] Calculated page 8 words:', page8Words);
-                  setWordsRead(page8Words);
+                  // Calculate words for all pages up to current page
+                  let totalWords = 0;
+                  for (let i = 1; i <= currentPage; i++) {
+                    const pageWords = calculatePageWordsRef.current?.(i) || 0;
+                    console.log(`[wordsTimer] Page ${i} words:`, pageWords);
+                    totalWords += pageWords;
+                  }
+                  console.log('[wordsTimer] Total initial words:', totalWords);
+                  setWordsRead(totalWords);
                   setJustUpdated(true);
                   setTimeout(() => {
                     setJustUpdated(false);
@@ -1223,19 +1377,12 @@ export default function ReaderDemoWidget({
                     unlockScroll();
                   }, 1000);
                 }, 1000); // 1 second after word counts appear
-              }, 100); // Small delay after loading completes
-            }, 2000); // Must be visible for 2 seconds
-          }
+                }, 50); // Small delay after frame
+              });
+          }, 2000); // Must be visible for 2 seconds
         } else {
-          // Reader container is not fully visible, clear the visibility timer
-          if (visibilityTimerRef.current) {
-            console.log('[checkVisibility] Reader not fully visible, clearing timer');
-            clearTimeout(visibilityTimerRef.current);
-            visibilityTimerRef.current = null;
-            setIsCalculatingWords(false); // Stop loading animation if reader is scrolled away
-            setShouldAnimateButton(true); // Re-enable button animation
-            // Don't unlock scroll here - only unlock after initial animation completes
-          }
+          console.log('[checkVisibility] Reader not fully visible');
+          // Don't clear anything - just wait for it to become visible
         }
       }
     };
@@ -1245,9 +1392,22 @@ export default function ReaderDemoWidget({
     window.addEventListener('scroll', checkVisibility);
     window.addEventListener('resize', checkVisibility);
     
-    // Also check after mount - with a longer delay to ensure proper initialization
-    const mountTimer = setTimeout(() => {
-      console.log('[mountTimer] Checking visibility after mount');
+    // Check immediately on mount
+    checkVisibility();
+    
+    // Also check after mount with different delays to catch various scenarios
+    const mountTimer1 = setTimeout(() => {
+      console.log('[mountTimer1] Checking visibility after 100ms');
+      checkVisibility();
+    }, 100);
+    
+    const mountTimer2 = setTimeout(() => {
+      console.log('[mountTimer2] Checking visibility after 500ms');
+      checkVisibility();
+    }, 500);
+    
+    const mountTimer3 = setTimeout(() => {
+      console.log('[mountTimer3] Checking visibility after 1000ms');
       checkVisibility();
     }, 1000);
     
@@ -1255,7 +1415,9 @@ export default function ReaderDemoWidget({
       console.log('[useEffect] Cleaning up visibility effect');
       window.removeEventListener('scroll', checkVisibility);
       window.removeEventListener('resize', checkVisibility);
-      clearTimeout(mountTimer);
+      clearTimeout(mountTimer1);
+      clearTimeout(mountTimer2);
+      clearTimeout(mountTimer3);
       // Clear timers on cleanup
       if (visibilityTimerRef.current) {
         clearTimeout(visibilityTimerRef.current);
@@ -1268,7 +1430,8 @@ export default function ReaderDemoWidget({
       // Ensure scroll is unlocked on cleanup
       unlockScroll();
     };
-  }, [currentLanguage.code, autoScrollPerformed, isInitialAnimationComplete, getRandomLetters, hasStartedInitialAnimation]); // Added missing dependencies
+  }, [currentLanguage.code, currentPage, autoScrollPerformed, isInitialAnimationComplete, getRandomLetters, hasStartedInitialAnimation, calculatePageWords, showWordCounts, wordsRead]); // Added dependencies
+  */
 
   // Auto-focus email input when level is selected
   useEffect(() => {
@@ -1666,7 +1829,7 @@ export default function ReaderDemoWidget({
                     return (
                       <InlineTranslation key={key}>
                         <WordCountBadge 
-                          key={`badge-${key}`}
+                          key={`badge-${key}-${showWordCounts}`} // Add showWordCounts to key to force re-render
                           $isVisible={showWordCounts}
                           $animationDelay={animationDelay}
                           style={{ opacity: showWordCounts ? 1 : 0, visibility: showWordCounts ? 'visible' : 'hidden' }}
