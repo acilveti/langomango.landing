@@ -1167,17 +1167,21 @@ export default function ReaderDemoWidget({
         const rect = readerContainerRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight || document.documentElement.clientHeight;
         
-        // Check if the ENTIRE reader container is visible in viewport
-        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
+        // Check if at least 50% of the reader container is visible (more forgiving)
+        const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
+        const visibilityPercentage = visibleHeight / rect.height;
+        const isVisible = visibilityPercentage >= 0.5;
         
         console.log('[checkVisibility] Reader rect:', {
           top: rect.top,
           bottom: rect.bottom,
           windowHeight: windowHeight,
-          isFullyVisible: isFullyVisible
+          visibleHeight: visibleHeight,
+          visibilityPercentage: visibilityPercentage,
+          isVisible: isVisible
         });
         
-        if (isFullyVisible) {
+        if (isVisible) {
           console.log('[checkVisibility] Reader is fully visible! Starting timer...');
           // If not already timing, start the 2-second visibility timer
           if (!visibilityTimerRef.current && !hasStartedInitialAnimation) {
