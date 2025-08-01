@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
 import Container from './Container';
-import ExpandingButton from './ExpandingButton';
 import Logo from './Logo2Lines';
+import ExpandingButton from './ExpandingButton';
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
