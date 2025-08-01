@@ -6,13 +6,10 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import AutofitGrid from 'components/AutofitGrid';
 import Container from 'components/Container';
-import OverTitle from 'components/OverTitle';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import SimpleCta from 'components/SimpleCta2';
 import YoutubeVideo from 'components/YoutubeVideo';
-import { Language } from 'contexts/VisitorContext';
 import { useVisitor } from 'contexts/VisitorContext';
 import { media } from 'utils/media';
 import { getAllPosts } from 'utils/postsFetcher';
@@ -35,7 +32,7 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
-  const { selectedLanguage, setSelectedLanguage } = useVisitor();
+  const { selectedLanguage } = useVisitor();
 
   // New state variables to track our conditions
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -93,20 +90,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       // Open the modal immediately
       setShowReaderDemo(true);
     }
-  }, []);
-
-  const handleLanguageSelect = useCallback((language: Language, level?: string) => {
-    console.log('Language selected:', language, 'Level:', level);
-    setSelectedLanguage(language);
-    // Store level in sessionStorage if needed
-    if (level) {
-      sessionStorage.setItem('selectedLevel', level);
-    }
-  }, []);
-
-  const handleLanguageProcessingComplete = useCallback((language: Language, level?: string) => {
-    console.log('Processing complete for language:', language, 'Level:', level);
-    setShowReaderDemo(true);
   }, []);
 
   useEffect(() => {
@@ -504,10 +487,6 @@ const HeaderContainer = styled.div`
   }
 `;
 
-const CustomOverTitle = styled(OverTitle)`
-  margin-bottom: 2rem;
-`;
-
 const VideoTitle = styled.h1`
   font-size: 5.2rem;
   font-weight: bold;
@@ -522,103 +501,6 @@ const VideoTitle = styled.h1`
     margin-bottom: 2rem;
   }
 `;
-
-const LanguageSelectorSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4rem 2rem;
-  background: rgb(var(--secondBackground));
-  gap: 2rem;
-  
-  ${media('<=tablet')} {
-    padding: 3rem 1.5rem;
-  }
-`;
-
-const SelectorTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: rgb(var(--text));
-  text-align: center;
-  margin: 0;
-  line-height: 1.2;
-  
-  ${media('<=tablet')} {
-    font-size: 2.2rem;
-  }
-  
-  ${media('<=phone')} {
-    font-size: 1.8rem;
-  }
-`;
-
-const ReaderDemoButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 3rem 0;
-  background: rgb(var(--secondBackground));
-`;
-
-const ReaderDemoButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1.8rem 3.6rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-  border-radius: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-
-  ${media('<=tablet')} {
-    font-size: 1.6rem;
-    padding: 1.4rem 2.8rem;
-  }
-`;
-
-/* Example: How to use LanguageSelector with level selection:
-   
-   <LanguageSelectorSection>
-     <SelectorTitle>Choose your learning language and level</SelectorTitle>
-     <LanguageSelector
-       ref={languageSelectorRef}
-       languages={DEFAULT_LANGUAGES}
-       onLanguageSelect={handleLanguageSelect}
-       onProcessingComplete={handleLanguageProcessingComplete}
-       placeholder="Select language"
-       maxWidth="400px"
-       isDark={false}
-       requireLevel={true}  // This enables level selection after language
-     />
-   </LanguageSelectorSection>
-*/
-
-const CustomAutofitGrid = styled(AutofitGrid)`
-  --autofit-grid-item-size: 40rem;
-
-  ${media('<=tablet')} {
-    --autofit-grid-item-size: 30rem;
-  }
-
-  ${media('<=phone')} {
-    --autofit-grid-item-size: 100%;
-  }
-`;
-
 const PageDarkenOverlay = styled.div<{ opacity: number }>`
   position: fixed;
   top: 0;

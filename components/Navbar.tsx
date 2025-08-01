@@ -2,13 +2,11 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
 import Container from './Container';
 import ExpandingButton from './ExpandingButton';
 import Logo from './Logo2Lines';
-
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
@@ -163,8 +161,7 @@ export default function Navbar({ items }: NavbarProps) {
   );
 }
 
-function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem & { isOverHero?: boolean }) {
-  const { setIsModalOpened } = useNewsletterModalContext();
+function NavItem({ title, outlined, onClick, isOverHero }: SingleNavItem & { isOverHero?: boolean }) {
 
   // Handle the click event
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -178,9 +175,9 @@ function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem &
   return (
     <NavItemWrapper outlined={outlined} isOverHero={isOverHero}>
       <ExpandingButton style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }} data-umami-event="cta button" onClick={handleClick}>
-        <a data-umami-event="navbar button" onClick={handleClick}>
+        <p data-umami-event="navbar button">
           {title}
-        </a>
+        </p>
       </ExpandingButton>
     </NavItemWrapper>
   );

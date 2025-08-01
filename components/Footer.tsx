@@ -1,9 +1,8 @@
 import NextLink from 'next/link';
-import { FacebookIcon, LinkedinIcon, TwitterIcon } from 'react-share';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Container from 'components/Container';
 import { media } from 'utils/media';
-import { useTranslation } from 'next-i18next';
 
 type SingleFooterListItem = { title: string; href: string };
 type FooterListItems = SingleFooterListItem[];
@@ -69,7 +68,7 @@ function ListItem({ title, href }: SingleFooterListItem) {
   return (
     <ListItemWrapper>
       <NextLink href={href} passHref>
-        <a>{title}</a>
+        <p>{title}</p>
       </NextLink>
     </ListItemWrapper>
   );

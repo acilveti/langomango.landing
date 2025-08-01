@@ -1,12 +1,10 @@
-import styled from 'styled-components';
 import Head from 'next/head';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import Page from 'components/Page';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import styled from 'styled-components';
 import Container from 'components/Container';
-import SectionTitle from 'components/SectionTitle';
+import Page from 'components/Page';
 import { media } from 'utils/media';
-import BasicSection from 'components/BasicSection';
 
 export default function Acknowledgments() {
   const { t } = useTranslation(['acknowledgments']);

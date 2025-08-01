@@ -136,7 +136,7 @@ export default function ReaderDemoWidget({
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [wordsRead, setWordsRead] = useState(0);
-  const [hasClicked, setHasClicked] = useState(false);
+  const [setHasClicked] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -316,7 +316,7 @@ export default function ReaderDemoWidget({
         }
       }, 300); // Increased delay
     }
-  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange, contextLanguage, contextLanguageLevel, hasSelectedLanguage, setHasSelectedLanguage]);
+  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange, contextLanguage, contextLanguageLevel, hasSelectedLanguage, setHasSelectedLanguage, hasSelectedLevel, nativeLanguage?.name, setContextLanguage, setHasSelectedLevel, signupMode, isFullRegister]);
   
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
@@ -327,11 +327,19 @@ export default function ReaderDemoWidget({
   }, [showSignupExpanded, hasSelectedTarget, hasAutoOpenedLanguage]);
   
   // Use context language as the source of truth, with fallback to prop or default
-  const currentLanguage = contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
+  const currentLanguage = React.useMemo(() => {
+    return contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
+  }, [contextLanguage, propSelectedLanguage]);
   
   // Initialize temp language states after currentLanguage is defined
   const [tempNativeLanguage, setTempNativeLanguage] = useState(nativeLanguage);
   const [tempTargetLanguage, setTempTargetLanguage] = useState(currentLanguage);
+  
+  // Define validateEmail function before its first use
+  const validateEmail = useCallback((email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }, []);
   
   // Update valid email state when email changes
   useEffect(() => {
@@ -354,7 +362,7 @@ export default function ReaderDemoWidget({
       setHasValidEmail(false);
       setShowValidEmailIndicator(false);
     }
-  }, [registrationEmail]);
+  }, [registrationEmail, validateEmail]);
   
   // Check if we should show the language as not selected (if it's still the default German and user hasn't actively selected)
   useEffect(() => {
@@ -401,7 +409,7 @@ export default function ReaderDemoWidget({
   };
 
   // Function to get translation based on selected language
-  const getTranslation = (englishText: string) => {
+  const getTranslation = useCallback((englishText: string) => {
     if (!currentLanguage || !englishText) return englishText;
     const langCode = currentLanguage.code;
     const langTranslations = readerTranslations[langCode];
@@ -413,7 +421,7 @@ export default function ReaderDemoWidget({
     
     // If not found, use the fallback function which will return the original text
     return getFallbackTranslation(englishText);
-  };
+  }, [currentLanguage]);
 
   // Handle language selection
   const handleLanguageSelect = (language: Language) => {
@@ -491,7 +499,7 @@ export default function ReaderDemoWidget({
   const showWordsOnly = !demoLevel || demoLevel === 'A1' || demoLevel === 'A2';
   
   // Function to get random letters that haven't been added yet
-  const getRandomLetters = (count: number, existing: string[]): string[] => {
+  const getRandomLetters = useCallback((count: number, existing: string[]): string[] => {
     const availableLetters = alphabetArray.filter(letter => !existing.includes(letter));
     const selected: string[] = [];
     
@@ -502,7 +510,7 @@ export default function ReaderDemoWidget({
     }
     
     return selected;
-  };
+  }, [alphabetArray]);
 
   // Book content for WORDS ONLY (A1, A2, or unset)
   const bookContentWords: BookContent = {
@@ -901,6 +909,14 @@ export default function ReaderDemoWidget({
     }
   };
 
+  // Choose content based on level
+  const bookContent = showWordsOnly ? bookContentWords : bookContentSentences;
+
+  // hidePopup callback needs to be defined before other callbacks that use it
+  const hidePopup = useCallback(() => {
+    setPopup(prev => ({ ...prev, visible: false }));
+  }, []);
+
   // Handle interactions - either use provided callback or default behavior
   const handleInteraction = useCallback(() => {
     if (onInteraction) {
@@ -934,7 +950,7 @@ export default function ReaderDemoWidget({
     
     console.log(`[calculatePageWords] Total words for page ${pageNumber}: ${totalWords}`);
     return totalWords;
-  }, [currentLanguage, getTranslation]);
+  }, [getTranslation, bookContent]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) {
@@ -943,7 +959,7 @@ export default function ReaderDemoWidget({
       hidePopup();
       handleInteraction();
     }
-  }, [currentPage, handleInteraction]);
+  }, [currentPage, handleInteraction, hidePopup]);
 
   const handleNextPage = useCallback(() => {
     // Check if we're currently showing an educational message
@@ -1198,7 +1214,7 @@ export default function ReaderDemoWidget({
         }, 300);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, clickCount, hasClicked, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage]);
+  }, [currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
@@ -1212,12 +1228,9 @@ export default function ReaderDemoWidget({
     } else {
       setPageInput(currentPage.toString());
     }
-  }, [pageInput, totalPages, currentPage]);
+  }, [pageInput, totalPages, currentPage, hidePopup]);
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
+
 
   const handleSignup = useCallback(() => {
     if (!email) {
@@ -1232,7 +1245,7 @@ export default function ReaderDemoWidget({
     setEmailError('');
     // Redirect with email pre-filled
     window.location.href = `https://beta-app.langomango.com/sign-up?email=${encodeURIComponent(email)}`;
-  }, [email]);
+  }, [email, validateEmail]);
 
   const handleGoogleSignup = useCallback(() => {
     // For the secondary signup flow
@@ -1350,10 +1363,6 @@ export default function ReaderDemoWidget({
       setSelectedLevel('');
     }
   }, [hasSelectedTarget, isEditingTarget, isFullRegister, hasRegistered, hasValidEmail, tempNativeLanguage, nativeLanguage, tempTargetLanguage, registrationEmail, setHasSelectedLevel]);
-
-  const hidePopup = useCallback(() => {
-    setPopup(prev => ({ ...prev, visible: false }));
-  }, []);
 
   const handleLongPressStart = useCallback((e: React.MouseEvent | React.TouchEvent, segment: Segment) => {
     if ('touches' in e) {
@@ -1486,11 +1495,11 @@ export default function ReaderDemoWidget({
   };
 
   // Custom smooth scroll implementation
-  const smoothScrollTo = (targetY: number, duration: number = 300) => {
+  const smoothScrollTo = useCallback((targetY: number, duration: number = 300) => {
     const startY = window.scrollY;
     const distance = targetY - startY;
     const startTime = performance.now();
-    let animationId: number | null = null;
+
 
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime;
@@ -1500,12 +1509,12 @@ export default function ReaderDemoWidget({
       window.scrollTo(0, startY + distance * easeProgress);
       
       if (progress < 1) {
-        animationId = requestAnimationFrame(animateScroll);
+        requestAnimationFrame(animateScroll);
       }
     };
     
-    animationId = requestAnimationFrame(animateScroll);
-  };
+    requestAnimationFrame(animateScroll);
+  }, []);
 
   // Auto-scroll to reader when it becomes visible
   useEffect(() => {
@@ -1552,7 +1561,7 @@ export default function ReaderDemoWidget({
       
       return () => observer.disconnect();
     }
-  }, [hasAutoScrolled, autoScrollPerformed, signupMode]);
+  }, [hasAutoScrolled, autoScrollPerformed, signupMode, isInitialAnimationComplete, smoothScrollTo]);
 
   // Check if reader container is visible and start word counter
   useEffect(() => {
@@ -1671,7 +1680,7 @@ export default function ReaderDemoWidget({
       // Ensure scroll is unlocked on cleanup
       unlockScroll();
     };
-  }, [currentLanguage.code, autoScrollPerformed, isInitialAnimationComplete]); // Only depend on language code to avoid object reference issues
+  }, [currentLanguage.code, autoScrollPerformed, isInitialAnimationComplete, getRandomLetters, hasStartedInitialAnimation]); // Added missing dependencies
 
   // Auto-focus email input when level is selected
   useEffect(() => {
@@ -1770,8 +1779,6 @@ export default function ReaderDemoWidget({
     }
   }, [fixedHeight]);
 
-  // Choose content based on level
-  const bookContent = showWordsOnly ? bookContentWords : bookContentSentences;
   const currentContent = bookContent[currentPage] || bookContent[8];
   
   return (
