@@ -14,7 +14,7 @@ type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero:
 
 export default function Navbar({ items }: NavbarProps) {
   const router = useRouter();
-  const [setScrollingDirection] = useState<ScrollingDirections>('none');
+  const [, setScrollingDirection] = useState<ScrollingDirections>('none');
   const [isOverHero, setIsOverHero] = useState(true);
   const [isDarkened, setIsDarkened] = useState(false);
 

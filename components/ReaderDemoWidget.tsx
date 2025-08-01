@@ -136,7 +136,7 @@ export default function ReaderDemoWidget({
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [wordsRead, setWordsRead] = useState(0);
-  const [setHasClicked] = useState(false);
+  const [,setHasClicked] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -1214,7 +1214,7 @@ export default function ReaderDemoWidget({
         }, 300);
       }
     }
-  }, [currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup]);
+  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
