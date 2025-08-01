@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components';
+import { Language } from 'contexts/VisitorContext';
+import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
 import Portal from './Portal';
-import useEscClose from 'hooks/useEscKey';
-import { Language } from 'contexts/VisitorContext';
 
 interface LanguageSelectorModalProps {
   isOpen: boolean;

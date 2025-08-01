@@ -3,9 +3,6 @@ import styled, { css, keyframes } from 'styled-components';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import LanguageSelectorModal from './LanguageSelectorModal';
 
-// Define the proper type for objectFit
-type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
-
 interface LanguageSelectorProps {
   languages?: Language[];
   onLanguageSelect: (language: Language, level?: string) => void;
@@ -39,7 +36,6 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   showConfirmationMessage = true,
   className,
   maxWidth = "300px",
-  autoOpenModal = false,
   isDark = false,
   requireLevel = false
 }, ref) => {

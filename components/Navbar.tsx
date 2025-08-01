@@ -1,4 +1,3 @@
-import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -7,9 +6,8 @@ import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
 import Container from './Container';
-import Drawer from './Drawer';
-import Logo from './Logo2Lines';
 import ExpandingButton from './ExpandingButton';
+import Logo from './Logo2Lines';
 
 
 type NavbarProps = { items: NavItems };
@@ -168,10 +166,6 @@ export default function Navbar({ items }: NavbarProps) {
 function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem & { isOverHero?: boolean }) {
   const { setIsModalOpened } = useNewsletterModalContext();
 
-  function showNewsletterModal() {
-    setIsModalOpened(true);
-  }
-
   // Handle the click event
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (onClick) {
@@ -262,12 +256,4 @@ const Content = styled(Container)`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-`;
-
-const SmallButtonWrapper = styled.div`
-  button {
-    padding: 0.4rem 0.8rem !important;
-    font-size: 0.9rem !important;
-    transform: scale(0.8); /* Scale down the entire button */
-  }
 `;

@@ -3,14 +3,16 @@ import 'swiper/css/bundle';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { Analytics } from '@vercel/analytics/react';
 import { AppProps } from 'next/dist/shared/lib/router/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import Script from 'next/script';
+import { appWithTranslation } from 'next-i18next';
 import { ColorModeScript } from 'nextjs-color-mode';
 import React, { PropsWithChildren, useEffect } from 'react';
 import { TinaEditProvider } from 'tinacms/dist/edit-state';
-import Script from 'next/script';
 
 import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
@@ -22,8 +24,6 @@ import { NewsletterModalContextProvider, useNewsletterModalContext } from 'conte
 import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
 import { addReferralToUrl } from 'utils/referral';
-import { appWithTranslation } from 'next-i18next';
-import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
 // Define a custom nav item type that includes the onClick handler
 type NavItemWithHandler = NavItems[0] & {

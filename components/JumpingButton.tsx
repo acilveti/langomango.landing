@@ -2,9 +2,8 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import Button from 'components/Button';
-import { addReferralToUrl } from 'utils/referral';
-import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 // JumpingButton component props
 interface JumpingButtonProps {

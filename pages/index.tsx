@@ -1,34 +1,33 @@
-// pages/index.tsx - Updated with fixed video section and corrected styling
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import AutofitGrid from 'components/AutofitGrid';
+import Container from 'components/Container';
+import OverTitle from 'components/OverTitle';
+import ReaderDemoModal from 'components/ReaderDemoModal';
+import SimpleCta from 'components/SimpleCta2';
+import YoutubeVideo from 'components/YoutubeVideo';
+import { Language } from 'contexts/VisitorContext';
+import { useVisitor } from 'contexts/VisitorContext';
+import { media } from 'utils/media';
+import { getAllPosts } from 'utils/postsFetcher';
+import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
+import { captureReferral } from 'utils/referral';
 import Cta from 'views/HomePage/Cta';
 import FeaturesGallery from 'views/HomePage/FeaturesGallery';
 import Hero from 'views/HomePage/Hero';
-import Testimonials from 'views/HomePage/Testimonials';
-import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { captureReferral } from 'utils/referral';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
-
-import AutofitGrid from 'components/AutofitGrid';
-import OverTitle from 'components/OverTitle';
-import Container from 'components/Container';
-import YoutubeVideo from 'components/YoutubeVideo';
-import { media } from 'utils/media';
-import FaqSection from 'views/PricingPage/FaqSection';
-import { injectContentsquareScript } from '@contentsquare/tag-sdk';
-// Import the updated Reddit Pixel utilities with visibility tracking
-import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
-import SimpleCta from 'components/SimpleCta2';
-import { Language } from 'contexts/VisitorContext';
-import ReaderDemoModal from 'components/ReaderDemoModal';
-import { useVisitor } from 'contexts/VisitorContext';
-import { getAllPosts } from 'utils/postsFetcher';
+import Testimonials from 'views/HomePage/Testimonials';
+import FaqSection from 'views/PricingPage/FaqSection';
+import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
+
+// Import the updated Reddit Pixel utilities with visibility tracking
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';

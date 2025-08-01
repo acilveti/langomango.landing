@@ -1,6 +1,14 @@
+
+// Axios imports
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
+import { Formik, FormikHelpers } from 'formik';
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
@@ -10,14 +18,6 @@ import CloseIcon from './CloseIcon';
 import Container from './Container';
 import Input from './Input';
 import Overlay from './Overlay';
-
-// Axios imports
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from 'axios';
 
 // API Types and Interfaces
 interface ApiError {
