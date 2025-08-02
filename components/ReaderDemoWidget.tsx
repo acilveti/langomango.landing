@@ -604,6 +604,9 @@ export default function ReaderDemoWidget({
                     setJustUpdated(true);
                     setTimeout(() => {
                       setJustUpdated(false);
+                      // Mark initial animation as complete and unlock scroll
+                      setIsInitialAnimationComplete(true);
+                      unlockScroll();
                     }, 1000);
                   }, 1000);
                 }, 50);
@@ -804,6 +807,8 @@ export default function ReaderDemoWidget({
                     if (!isInitialAnimationComplete) {
                       unlockScroll();
                     }
+                    // Mark initial animation as complete
+                    setIsInitialAnimationComplete(true);
                   }, 1000);
                 }, 1000);
               }, 50); // Small delay after frame
@@ -1124,6 +1129,17 @@ export default function ReaderDemoWidget({
       if (longPressTimer.current) {
         clearTimeout(longPressTimer.current);
       }
+    };
+  }, []);
+  
+  // Ensure scroll is unlocked on mount and cleanup
+  useEffect(() => {
+    // Unlock any lingering scroll locks on mount
+    unlockScroll();
+    
+    return () => {
+      // Cleanup on unmount
+      unlockScroll();
     };
   }, []);
 
