@@ -32,7 +32,7 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
-  const { selectedLanguage } = useVisitor();
+  const { targetSelectedLanguage: selectedLanguage } = useVisitor();
 
   // New state variables to track our conditions
   const [hasScrolled, setHasScrolled] = useState(false);

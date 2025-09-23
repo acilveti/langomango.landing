@@ -69,16 +69,22 @@ export type ReferralSource = 'reddit' | 'instagram' | 'facebook' | 'twitter' | '
 
 // Context type definition
 interface VisitorContextType {
-  selectedLanguage: Language | null;
-  selectedLanguageLevel: string | null;
-  setSelectedLanguage: (language: Language | null, level?: string | null) => void;
+  targetSelectedLanguage: Language | null;
+  targetSelectedLanguageLevel: string | null;
+  setTargetSelectedLanguage: (language: Language | null, level?: string | null) => void;
   availableLanguages: Language[];
   nativeLanguage: Language | null;
   referralSource: ReferralSource;
-  hasSelectedLanguage: boolean;
-  setHasSelectedLanguage: (value: boolean) => void;
-  hasSelectedLevel: boolean;
+  hasTargetSelectedLanguage: boolean;
+  setHasTargetSelectedLanguage: (value: boolean) => void;
+  hasTargetSelectedLevel: boolean;
   setHasSelectedLevel: (value: boolean) => void;
+  tempTargetSelectedLanguage: Language | null;
+  tempTargetSelectedLanguageLevel: string;
+  setTempTargetSelectedLanguage: (language: Language | null, level?: string | null) => void;
+  tempNativeSelectedLanguage: Language | null;
+  tempNativeSelectedLanguageLevel: string;
+  setTempNativeSelectedLanguage: (language: Language | null, level?: string | null) => void;
 }
 
 // Create the context
@@ -149,8 +155,10 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [selectedLanguage, setSelectedLanguageState] = useState<Language | null>(defaultLanguage);
   const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<string | null>(null);
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
+  const [tempNativeSelectedLanguage, setTempNativeSelectedLanguage] = useState<Language>(availableLanguages.find(lang => lang.code === `en`)!);
+  const [tempTargetLanguage, setTempTargetLanguage] = useState<Language>();
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
-  const [hasSelectedLanguage, setHasSelectedLanguageState] = useState<boolean>(false);
+  const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
   const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
 
   // Load persisted data from localStorage on mount
@@ -169,7 +177,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
           const lang = DEFAULT_LANGUAGES.find(l => l.code === data.selectedLanguage);
           if (lang) {
             setSelectedLanguageState(lang);
-            setHasSelectedLanguageState(true);
+            setHasSelectedTargetLanguageState(true);
           }
         }
         
@@ -253,8 +261,8 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   };
   
   // Custom setHasSelectedLanguage that also persists
-  const setHasSelectedLanguage = (value: boolean) => {
-    setHasSelectedLanguageState(value);
+  const setHasTargetSelectedLanguage = (value: boolean) => {
+    setHasSelectedTargetLanguageState(value);
     
     // Update localStorage
     if (typeof window !== 'undefined') {
@@ -297,16 +305,26 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   };
 
   const value: VisitorContextType = {
-    selectedLanguage,
-    selectedLanguageLevel,
-    setSelectedLanguage,
+    targetSelectedLanguage: selectedLanguage,
+    targetSelectedLanguageLevel: selectedLanguageLevel,
+    setTargetSelectedLanguage: setSelectedLanguage,
     availableLanguages,
     nativeLanguage,
     referralSource,
-    hasSelectedLanguage,
-    setHasSelectedLanguage,
-    hasSelectedLevel,
+    hasTargetSelectedLanguage: hasSelectedTargetLanguage,
+    setHasTargetSelectedLanguage,
+    hasTargetSelectedLevel: hasSelectedLevel,
     setHasSelectedLevel,
+    tempNativeSelectedLanguage: tempNativeSelectedLanguage,
+    tempTargetSelectedLanguage: null,
+    tempTargetSelectedLanguageLevel: '',
+    setTempTargetSelectedLanguage: function (language: Language | null, level?: string | null): void {
+      throw new Error('Function not implemented.');
+    },
+    tempNativeSelectedLanguageLevel: '',
+    setTempNativeSelectedLanguage: function (language: Language | null, level?: string | null): void {
+      throw new Error('Function not implemented.');
+    }
   };
 
   return (
@@ -347,10 +365,10 @@ export const setReferralSourceCookie = (source: ReferralSource): void => {
 // Helper function to get visitor analytics data
 export const getVisitorAnalytics = (context: VisitorContextType) => {
   return {
-    selectedLanguageCode: context.selectedLanguage?.code || 'none',
-    selectedLanguageLevel: context.selectedLanguageLevel || 'none',
+    selectedLanguageCode: context.targetSelectedLanguage?.code || 'none',
+    selectedLanguageLevel: context.targetSelectedLanguageLevel || 'none',
     nativeLanguageCode: context.nativeLanguage?.code || 'unknown',
     referralSource: context.referralSource,
-    languageMatch: context.selectedLanguage?.code === context.nativeLanguage?.code,
+    languageMatch: context.targetSelectedLanguage?.code === context.nativeLanguage?.code,
   };
 };

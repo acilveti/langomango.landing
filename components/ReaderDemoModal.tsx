@@ -1,13 +1,19 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { Language } from 'contexts/VisitorContext';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
 import ReaderDemoWidget from './ReaderDemoWidget';
 
+interface ReaderDemoModalProps {
+  onClose: () => void;
+  isOauthReturn?: boolean;
+  selectedLanguage?: Language | null;
+}
 // Reader Demo Modal component
-export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false }) {
+export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false } : ReaderDemoModalProps) {
   const [showSignup, setShowSignup] = useState(false);
   
   useEscClose({ onClose });
