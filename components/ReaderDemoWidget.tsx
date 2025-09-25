@@ -102,7 +102,6 @@ export default function ReaderDemoWidget({
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
   const [showSignupExpanded, setShowSignupExpanded] = useState(false);
-
   const [wordsRead, setWordsRead] = useState(0);
   const [, setHasClicked] = useState(false);
   const [showWordCounts, setShowWordCounts] = useState(false);
@@ -111,12 +110,9 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('');
-
   const [, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
-
-
   const [, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
@@ -124,10 +120,8 @@ export default function ReaderDemoWidget({
   const [autoScrollPerformed, setAutoScrollPerformed] = useState(false);
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
   const [, setHasStartedInitialAnimation] = useState(false);
-
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
-
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
   const [showSignup,] = useState(false);
   const [showEducationalMessage, setShowEducationalMessage] = useState(false);
@@ -147,8 +141,7 @@ export default function ReaderDemoWidget({
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   const [, setShowPricingPage] = useState(false);
   const [demoLevel, setDemoLevel] = useState<string>('A1'); // Default demo level is A1
-
-
+  const {setIsModalOpened} = useSignupModalContext();
 
   // Sync demo level with context level only if user has selected it
   useEffect(() => {
@@ -353,7 +346,6 @@ export default function ReaderDemoWidget({
   const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
   const readerContainerRef = useRef<HTMLDivElement>(null);
   const readerWrapperRef = useRef<HTMLDivElement>(null);
-  const { setIsModalOpened } = useSignupModalContext();
   const [popup, setPopup] = useState({
     visible: false,
     text: '',
@@ -1477,13 +1469,10 @@ export default function ReaderDemoWidget({
             </PageNavigation>
 
             {/* Start Learning Button - Right Side */}
-            {!showSignupExpanded && (
+            {(
               <button
                 onClick={() => {
-                  setShowSignupExpanded(true);
-                  if (onSignupVisibilityChange) {
-                    onSignupVisibilityChange(true);
-                  }
+                  setIsModalOpened(true)
                 }}
                 style={{
                   padding: '8px 24px',
