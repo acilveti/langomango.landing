@@ -23,8 +23,6 @@ interface LanguageSelectorRef {
   resetStates: () => void;
 }
 
-
-
 const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(({
   languages = DEFAULT_LANGUAGES,
   onLanguageSelect,
@@ -39,7 +37,12 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   isDark = false,
   requireLevel = false
 }, ref) => {
-  const { targetSelectedLanguage: contextLanguage, targetSelectedLanguageLevel: contextLanguageLevel, setTargetSelectedLanguage: setContextLanguage, hasTargetSelectedLanguage: hasSelectedLanguage, setHasSelectedLanguage, setHasSelectedLevel } = useVisitor();
+  const { targetSelectedLanguage: contextLanguage, 
+    targetSelectedLanguageLevel: contextLanguageLevel, 
+    setTargetSelectedLanguage: setContextLanguage, 
+    hasTargetSelectedLanguage: hasSelectedLanguage, 
+    setHasTargetSelectedLanguage, 
+    setHasSelectedLevel } = useVisitor();
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
   const [selectedLevel, setSelectedLevel] = useState<string | undefined>(contextLanguageLevel || undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +59,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     setSelectedLanguage(language);
     setSelectedLevel(level);
     setContextLanguage(language, level); // Update context with both language and level
-    setHasSelectedLanguage(true); // Mark that user has selected a language
+    setHasTargetSelectedLanguage(true); // Mark that user has selected a language
     if (level) {
       setHasSelectedLevel(true); // Mark that user has selected a level
     }
@@ -128,7 +131,10 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       {/* Language Selection Modal */}
       <LanguageSelectorModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => 
+          setIsModalOpen(false)
+          
+        }
         languages={languages}
         selectedLanguage={selectedLanguage}
         selectedLevel={selectedLevel}

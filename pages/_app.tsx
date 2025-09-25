@@ -20,6 +20,8 @@ import Navbar from 'components/Navbar';
 import NavigationDrawer from 'components/NavigationDrawer';
 import SignupModal from 'components/SignupModal';
 import WaveCta from 'components/WaveCta';
+import { LanguageSelectorModalContextProvider } from 'contexts/LanguageSelectorModalContext';
+import { ReaderDemoModalContextProvider } from 'contexts/ReaderDemoModalContext';
 import { SignupModalContextProvider, useSignupModalContext } from 'contexts/SignupModalContext';
 import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
@@ -42,11 +44,11 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 const CLARITY_ID = 'rm0v2kcv7l';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  useEffect(() => { 
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       // ContentSquare Script
       console.log('Initializing ContentSquare script');
-      
+
       try {
         injectContentsquareScript({
           siteId: "6407230",
@@ -59,7 +61,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     }
   }, []);
-  
+
   return (
     <>
       {/* Google Tag Manager Script */}
@@ -76,7 +78,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Reddit Pixel Base Code */}
       <Script
         id="reddit-pixel"
@@ -87,7 +89,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Microsoft Clarity Code */}
       <Script
         id="clarity-script"
@@ -102,7 +104,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Umami Analytics */}
       <Script
         id="umami-analytics"
@@ -110,13 +112,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"
         strategy="afterInteractive"
       />
-      
+
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      
+
       <ColorModeScript />
       <GlobalStyle />
 
@@ -137,7 +139,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <WaveCta />
         <Footer />
       </Providers>
-      <Analytics/>
+      <Analytics />
     </>
   );
 }
@@ -156,9 +158,9 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
   // Create navigation items with the onClick handler
   const navItems: NavItemWithHandler[] = [
-    { 
-      title: 'USE DEMO', 
-      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
+    {
+      title: 'USE DEMO',
+      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'),
       outlined: true,
       onClick: handleButtonClick,
     },
@@ -192,9 +194,13 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
     <SignupModalContextProvider>
-      <VisitorProvider>
-        {children}
-      </VisitorProvider>
+      <ReaderDemoModalContextProvider>
+        <LanguageSelectorModalContextProvider>
+          <VisitorProvider>
+            {children}
+          </VisitorProvider>
+        </LanguageSelectorModalContextProvider>
+      </ReaderDemoModalContextProvider>
     </SignupModalContextProvider>
   );
 }

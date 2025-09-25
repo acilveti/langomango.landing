@@ -71,20 +71,15 @@ export type ReferralSource = 'reddit' | 'instagram' | 'facebook' | 'twitter' | '
 interface VisitorContextType {
   targetSelectedLanguage: Language | null;
   targetSelectedLanguageLevel: string | null;
-  setTargetSelectedLanguage: (language: Language | null, level?: string | null) => void;
   availableLanguages: Language[];
   nativeLanguage: Language | null;
   referralSource: ReferralSource;
   hasTargetSelectedLanguage: boolean;
-  setHasTargetSelectedLanguage: (value: boolean) => void;
   hasTargetSelectedLevel: boolean;
+  setTargetSelectedLanguage: (language: Language | null, level?: string | null) => void;
+  setNativeSelectedLanguage: (language: Language | null, level?: string | null) => void;
+  setHasTargetSelectedLanguage: (value: boolean) => void;
   setHasSelectedLevel: (value: boolean) => void;
-  tempTargetSelectedLanguage: Language | null;
-  tempTargetSelectedLanguageLevel: string;
-  setTempTargetSelectedLanguage: (language: Language | null, level?: string | null) => void;
-  tempNativeSelectedLanguage: Language | null;
-  tempNativeSelectedLanguageLevel: string;
-  setTempNativeSelectedLanguage: (language: Language | null, level?: string | null) => void;
 }
 
 // Create the context
@@ -155,8 +150,6 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [selectedLanguage, setSelectedLanguageState] = useState<Language | null>(defaultLanguage);
   const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<string | null>(null);
   const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
-  const [tempNativeSelectedLanguage, setTempNativeSelectedLanguage] = useState<Language>(availableLanguages.find(lang => lang.code === `en`)!);
-  const [tempTargetLanguage, setTempTargetLanguage] = useState<Language>();
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
   const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
   const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
@@ -226,7 +219,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   }, []);
 
   // Custom setSelectedLanguage that also persists to localStorage
-  const setSelectedLanguage = (language: Language | null, level?: string | null) => {
+  const setTargetSelectedLanguage = (language: Language | null, level?: string | null) => {
     setSelectedLanguageState(language);
     setSelectedLanguageLevelState(level || null);
     
@@ -251,6 +244,31 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
       data.selectedLanguage = language?.code || null;
       data.selectedLanguageLevel = level || null;
       data.hasSelectedLevel = level ? true : data.hasSelectedLevel || false;
+      if (nativeLanguage) {
+        data.nativeLanguage = nativeLanguage.code;
+      }
+      
+      localStorage.setItem('languagePreferences', JSON.stringify(data));
+      console.log('Persisted language preferences:', data);
+    }
+  };
+
+  const setNativeSelectedLanguage = (language: Language | null, level?: string | null) => {
+    setNativeLanguage(language);
+    
+    // Persist to localStorage
+    if (typeof window !== 'undefined') {
+      const currentData = localStorage.getItem('languagePreferences');
+      let data: any = {};
+      
+      try {
+        if (currentData) {
+          data = JSON.parse(currentData);
+        }
+      } catch (e) {
+        console.error('Failed to parse existing preferences:', e);
+      }
+
       if (nativeLanguage) {
         data.nativeLanguage = nativeLanguage.code;
       }
@@ -307,24 +325,15 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const value: VisitorContextType = {
     targetSelectedLanguage: selectedLanguage,
     targetSelectedLanguageLevel: selectedLanguageLevel,
-    setTargetSelectedLanguage: setSelectedLanguage,
     availableLanguages,
     nativeLanguage,
     referralSource,
     hasTargetSelectedLanguage: hasSelectedTargetLanguage,
-    setHasTargetSelectedLanguage,
     hasTargetSelectedLevel: hasSelectedLevel,
+    setTargetSelectedLanguage: setTargetSelectedLanguage,
+    setNativeSelectedLanguage,
+    setHasTargetSelectedLanguage,
     setHasSelectedLevel,
-    tempNativeSelectedLanguage: tempNativeSelectedLanguage,
-    tempTargetSelectedLanguage: null,
-    tempTargetSelectedLanguageLevel: '',
-    setTempTargetSelectedLanguage: function (language: Language | null, level?: string | null): void {
-      throw new Error('Function not implemented.');
-    },
-    tempNativeSelectedLanguageLevel: '',
-    setTempNativeSelectedLanguage: function (language: Language | null, level?: string | null): void {
-      throw new Error('Function not implemented.');
-    }
   };
 
   return (

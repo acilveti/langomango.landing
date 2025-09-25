@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
@@ -66,25 +67,22 @@ import {
 import SignupModal from './SignupModal';
 
 
+
 // Type definitions
 interface ReaderDemoWidgetProps {
-  selectedLanguage?: Language | null;
   onInteraction?: () => void;
   onLanguageChange?: (language: Language) => void;
   useInlineSignup?: boolean;
   signupMode?: 'panel' | 'fullscreen';
-  onSignupVisibilityChange?: (isVisible: boolean) => void;
   isFullRegister?: boolean;
   openSignupDirectly?: boolean; // New prop to open signup immediately
 }
 
 export default function ReaderDemoWidget({
-  selectedLanguage: propSelectedLanguage,
   onInteraction,
   onLanguageChange,
   useInlineSignup = false,
   signupMode = 'panel',
-  onSignupVisibilityChange,
   isFullRegister = true,
   openSignupDirectly = false // New prop with default value
 }: ReaderDemoWidgetProps) {
@@ -98,6 +96,7 @@ export default function ReaderDemoWidget({
     hasTargetSelectedLevel: hasSelectedLevel,
     setHasSelectedLevel
   } = useVisitor();
+
   const [currentPage, setCurrentPage] = useState(8);
   const [totalPages] = useState(511);
   const [pageInput, setPageInput] = useState('8');
@@ -141,7 +140,9 @@ export default function ReaderDemoWidget({
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   const [, setShowPricingPage] = useState(false);
   const [demoLevel, setDemoLevel] = useState<string>('A1'); // Default demo level is A1
-  const {setIsModalOpened} = useSignupModalContext();
+  const { setIsModalOpened: setIsSignupModalOpened } = useSignupModalContext();
+  const {setIsReaderDemoModalOpened} = useReaderDemoModalContext();
+
 
   // Sync demo level with context level only if user has selected it
   useEffect(() => {
@@ -207,19 +208,12 @@ export default function ReaderDemoWidget({
           setHasRegistered(true);
           setShowSignupExpanded(true);
           setShowPricingPage(true);
-
-          if (onSignupVisibilityChange) {
-            onSignupVisibilityChange(true);
-          }
         }
       }).catch(error => {
         console.error('Failed to update profile after OAuth:', error);
         setSignupError('Failed to complete setup. Please try again.');
         // Still show signup form so user can see the error
         setShowSignupExpanded(true);
-        if (onSignupVisibilityChange) {
-          onSignupVisibilityChange(true);
-        }
       });
 
       return; // Exit early to prevent normal flow
@@ -273,12 +267,12 @@ export default function ReaderDemoWidget({
       setTimeout(() => {
         console.log('Setting showSignupExpanded to true');
         setShowSignupExpanded(true);
-        if (onSignupVisibilityChange) {
-          onSignupVisibilityChange(true);
-        }
       }, 300); // Increased delay
     }
-  }, [openSignupDirectly, useInlineSignup, onSignupVisibilityChange, contextLanguage, contextLanguageLevel, hasSelectedLanguage, setHasTargetSelectedLanguage, hasSelectedLevel, nativeLanguage?.name, setContextLanguage, setHasSelectedLevel, signupMode, isFullRegister]);
+  }, [openSignupDirectly, useInlineSignup,
+    contextLanguage, contextLanguageLevel, hasSelectedLanguage,
+    setHasTargetSelectedLanguage, hasSelectedLevel, nativeLanguage?.name, setContextLanguage,
+    setHasSelectedLevel, signupMode, isFullRegister]);
 
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
@@ -290,8 +284,8 @@ export default function ReaderDemoWidget({
 
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = React.useMemo(() => {
-    return contextLanguage || propSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
-  }, [contextLanguage, propSelectedLanguage]);
+    return contextLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
+  }, [contextLanguage]);
 
   // Initialize temp language states after currentLanguage is defined
   const [, setTempNativeLanguage] = useState(nativeLanguage);
@@ -649,12 +643,9 @@ export default function ReaderDemoWidget({
           if (!showSignupExpanded && useInlineSignup) {
             setTimeout(() => {
               setShowSignupExpanded(true);
-              if (onSignupVisibilityChange) {
-                onSignupVisibilityChange(true);
-              }
             }, 1500);
           } else if (!useInlineSignup) {
-            setIsModalOpened(true);
+            setIsSignupModalOpened(true);
           }
         }, 500);
       }, 4500);
@@ -668,11 +659,8 @@ export default function ReaderDemoWidget({
       // Show signup immediately
       if (!showSignupExpanded && useInlineSignup) {
         setShowSignupExpanded(true);
-        if (onSignupVisibilityChange) {
-          onSignupVisibilityChange(true);
-        }
       } else if (!useInlineSignup) {
-        setIsModalOpened(true);
+        setIsSignupModalOpened(true);
       }
 
       return; // Don't advance page
@@ -825,14 +813,11 @@ export default function ReaderDemoWidget({
             if (!showSignupExpanded && useInlineSignup) {
               setTimeout(() => {
                 setShowSignupExpanded(true);
-                if (onSignupVisibilityChange) {
-                  onSignupVisibilityChange(true);
-                }
               }, 1500); // Show signup 1.5 seconds after message disappears
             } else if (!useInlineSignup) {
               // For newsletter modal mode
               setTimeout(() => {
-                setIsModalOpened(true);
+                setIsSignupModalOpened(true);
               }, 1500);
             }
           }, 500); // 0.5 seconds for fade-out
@@ -863,7 +848,12 @@ export default function ReaderDemoWidget({
         }, 100); // Reduced delay for faster response
       }
     }
-  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, wordsRead, showSignupExpanded, useInlineSignup, onSignupVisibilityChange, setIsModalOpened, isInitialAnimationComplete, activeLetters, showEducationalMessage, isHidingEducationalMessage, showSecondEducationalMessage, isHidingSecondEducationalMessage, showThirdEducationalMessage, isHidingThirdEducationalMessage, getRandomLetters, hidePopup, showWordCounts]);
+  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, 
+    wordsRead, showSignupExpanded, useInlineSignup, setIsSignupModalOpened, 
+    isInitialAnimationComplete, activeLetters, showEducationalMessage, 
+    isHidingEducationalMessage, showSecondEducationalMessage, 
+    isHidingSecondEducationalMessage, showThirdEducationalMessage, 
+    isHidingThirdEducationalMessage, getRandomLetters, hidePopup, showWordCounts]);
 
   const handlePageInputChange = useCallback((text: string) => {
     setPageInput(text);
@@ -1472,7 +1462,8 @@ export default function ReaderDemoWidget({
             {(
               <button
                 onClick={() => {
-                  setIsModalOpened(true)
+                  setIsSignupModalOpened(true)
+                  setIsReaderDemoModalOpened(false)
                 }}
                 style={{
                   padding: '8px 24px',

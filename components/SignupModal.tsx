@@ -40,24 +40,19 @@ import {
 
 interface SignupModalProps {
     showSignup: boolean;
-    onSignupVisibilityChange?: (isVisible: boolean) => void;
 }
 
 // Reader Demo Modal component
-export default function SignupModal({ showSignup, onSignupVisibilityChange }: SignupModalProps) {
+export default function SignupModal({ showSignup }: SignupModalProps) {
     const {
-        // targetSelectedLanguage: contextLanguage,
-        // targetSelectedLanguageLevel: contextLanguageLevel,
-        setTargetSelectedLanguage: setContextLanguage,
+        targetSelectedLanguage,
+        setNativeSelectedLanguage,
+        setTargetSelectedLanguage,
         nativeLanguage,
         hasTargetSelectedLanguage: hasSelectedLanguage,
         setHasTargetSelectedLanguage,
         hasTargetSelectedLevel: hasSelectedLevel,
-        setHasSelectedLevel,
-        tempTargetSelectedLanguage,
-        tempNativeSelectedLanguage,
-        setTempNativeSelectedLanguage,
-        setTempTargetSelectedLanguage
+        setHasSelectedLevel
     } = useVisitor();
 
     const emailInputRef = useRef<HTMLInputElement>(null);
@@ -260,8 +255,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                 >
                                     <LanguageBoxLabel>Your native language</LanguageBoxLabel>
                                     <LanguageDisplay>
-                                        <LanguageFlag>{tempNativeSelectedLanguage?.flag || nativeLanguage?.flag || '🌐'}</LanguageFlag>
-                                        <LanguageName>{tempNativeSelectedLanguage?.name || nativeLanguage?.name || 'English'}</LanguageName>
+                                        <LanguageFlag>{nativeLanguage?.flag || '🌐'}</LanguageFlag>
+                                        <LanguageName>{nativeLanguage?.name || 'English'}</LanguageName>
                                     </LanguageDisplay>
                                     <LanguageNote>
                                         {isEditingNative ? 'Select a language below' : 'Auto-detected from browser'}
@@ -276,8 +271,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                 >
                                     <LanguageBoxLabel>You&apos;re learning</LanguageBoxLabel>
                                     <LanguageDisplay>
-                                        <LanguageFlag>{hasSelectedTarget ? tempTargetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
-                                        <LanguageName>{hasSelectedTarget ? tempTargetSelectedLanguage?.name : 'Select language'}</LanguageName>
+                                        <LanguageFlag>{hasSelectedTarget ? targetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
+                                        <LanguageName>{hasSelectedTarget ? targetSelectedLanguage?.name : 'Select language'}</LanguageName>
                                     </LanguageDisplay>
                                     <LanguageNote>
                                         {isEditingTarget ? 'Select a language below' : ''}
@@ -293,11 +288,10 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                                 key={language.code}
                                                 onClick={() => {
                                                     if (isEditingNative) {
-                                                        setTempNativeSelectedLanguage(language);
+                                                        setNativeSelectedLanguage(language);
                                                         setIsEditingNative(false);
                                                     } else if (isEditingTarget) {
-                                                        setTempTargetSelectedLanguage(language);
-                                                        setContextLanguage(language); // Don't pass level here, keep existing level
+                                                        setTargetSelectedLanguage(language); // Don't pass level here, keep existing level
                                                         setIsEditingTarget(false);
                                                         setHasSelectedTarget(true);
                                                         setHasTargetSelectedLanguage(true);
@@ -305,8 +299,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                                 }}
                                                 $isSelected={
                                                     isEditingNative
-                                                        ? tempNativeSelectedLanguage?.code === language.code
-                                                        : tempTargetSelectedLanguage?.code === language.code
+                                                        ? nativeLanguage?.code === language.code
+                                                        : nativeLanguage?.code === language.code
                                                 }
                                             >
                                                 <span>{language.flag}</span>
@@ -319,7 +313,7 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
 
                             {/* Level selector - comes AFTER language selection and BEFORE registration */}
                             <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
-                                <LevelLabel>Select your {tempTargetSelectedLanguage?.name} level:</LevelLabel>
+                                <LevelLabel>Select your {targetSelectedLanguage?.name} level:</LevelLabel>
                                 {/* If user has selected a level, show only that level */}
                                 {hasSelectedLevel && selectedLevel ? (
                                     <div style={{
@@ -600,8 +594,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                                             // Create account immediately with email
                                                             const response = await apiService.signupWithEmail({
                                                                 email: registrationEmail,
-                                                                nativeLanguage: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-                                                                targetLanguage: tempTargetSelectedLanguage?.code!,
+                                                                nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                                targetLanguage: targetSelectedLanguage?.code!,
                                                                 level: selectedLevel
                                                             });
 
@@ -616,8 +610,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                                                 // Track signup event
                                                                 trackRedditConversion(RedditEventTypes.SIGNUP, {
                                                                     signup_type: 'email',
-                                                                    native_language: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-                                                                    target_language: tempTargetSelectedLanguage?.code,
+                                                                    native_language: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                                    target_language: targetSelectedLanguage?.code,
                                                                     level: selectedLevel,
                                                                     source: 'reader_widget'
                                                                 });
@@ -660,8 +654,8 @@ export default function SignupModal({ showSignup, onSignupVisibilityChange }: Si
                                                     setIsLoadingSignup(true);
                                                     // For Google OAuth, store preferences and redirect
                                                     localStorage.setItem('pendingLanguagePrefs', JSON.stringify({
-                                                        nativeLanguage: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-                                                        targetLanguage: tempTargetSelectedLanguage?.code,
+                                                        nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                        targetLanguage: targetSelectedLanguage?.code,
                                                         level: selectedLevel
                                                     }));
 

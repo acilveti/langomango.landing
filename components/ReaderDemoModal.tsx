@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Language } from 'contexts/VisitorContext';
-import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
@@ -13,30 +12,17 @@ interface ReaderDemoModalProps {
   selectedLanguage?: Language | null;
 }
 // Reader Demo Modal component
-export default function ReaderDemoModal({ onClose, selectedLanguage, isOauthReturn = false } : ReaderDemoModalProps) {
-  const [showSignup, setShowSignup] = useState(false);
-  
-  useEscClose({ onClose });
-
-  const handleSignupShow = useCallback((isShowing) => {
-    setShowSignup(isShowing);
-  }, []);
-
+export default function ReaderDemoModal({ onClose, isOauthReturn = false }: ReaderDemoModalProps) {
   return (
     <Overlay>
       <ModalContainer>
         <ReaderCard>
-          {!showSignup && (
-            <CloseIconContainer>
-              <CloseIcon onClick={onClose} />
-            </CloseIconContainer>
-          )}
-
-          <ReaderDemoWidget 
-            selectedLanguage={selectedLanguage} 
+          <CloseIconContainer>
+            <CloseIcon onClick={onClose} />
+          </CloseIconContainer>
+          <ReaderDemoWidget
             useInlineSignup={true}
             signupMode="fullscreen"
-            onSignupVisibilityChange={handleSignupShow}
             isFullRegister={true}
             openSignupDirectly={isOauthReturn}
           />

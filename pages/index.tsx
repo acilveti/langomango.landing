@@ -10,6 +10,7 @@ import Container from 'components/Container';
 import ReaderDemoModal from 'components/ReaderDemoModal';
 import SimpleCta from 'components/SimpleCta2';
 import YoutubeVideo from 'components/YoutubeVideo';
+import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
 import { useVisitor } from 'contexts/VisitorContext';
 import { media } from 'utils/media';
 import { getAllPosts } from 'utils/postsFetcher';
@@ -39,10 +40,11 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
   const [timeSpent, setTimeSpent] = useState(0);
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [showReaderDemo, setShowReaderDemo] = useState(false);
+  const [, setShowReaderDemo] = useState(false);
   const languageSelectorRef = useRef<any>(null);
   const [darkenAmount, setDarkenAmount] = useState(0);
   const [oauthReturnData, setOauthReturnData] = useState<{registered: boolean} | null>(null);
+  const {isReaderDemoModalOpened, setIsReaderDemoModalOpened} = useReaderDemoModalContext()
 
   // Check for OAuth return on mount
   useEffect(() => {
@@ -350,11 +352,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       </HomepageWrapper>
 
       {/* Reader Demo Modal */}
-      {showReaderDemo && (
+      {isReaderDemoModalOpened && (
         <ReaderDemoModal 
           onClose={() => {
             setShowReaderDemo(false);
             setOauthReturnData(null);
+            setIsReaderDemoModalOpened(false)
             // Reset language selector after closing modal
             if (languageSelectorRef.current) {
               languageSelectorRef.current.resetStates();
