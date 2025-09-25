@@ -2,6 +2,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
 import Container from './Container';
@@ -11,13 +12,14 @@ import Logo from './Logo2Lines';
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
-type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero: boolean; isDarkened: boolean };
+type NavbarContainerProps = { isOverHero: boolean; isDarkened: boolean };
 
 export default function Navbar({ items }: NavbarProps) {
   const router = useRouter();
   const [, setScrollingDirection] = useState<ScrollingDirections>('none');
   const [isOverHero, setIsOverHero] = useState(true);
   const [isDarkened, setIsDarkened] = useState(false);
+  const { isModalOpened } = useSignupModalContext(); 
 
   let lastScrollY = useRef(0);
   const lastRoute = useRef('');
@@ -121,6 +123,10 @@ export default function Navbar({ items }: NavbarProps) {
     };
   }, [router.pathname]);
 
+  useEffect(() => {
+    console.log("darkened")
+    setIsDarkened(isModalOpened);
+  }, [isModalOpened])
   // Modified scroll position callback to prevent hiding the navbar
   function scrollPositionCallback({ currPos }: ScrollPositionEffectProps) {
     const routerPath = router.asPath;
@@ -140,12 +146,8 @@ export default function Navbar({ items }: NavbarProps) {
   // Use the scrollPosition hook with the modified callback
   useScrollPosition(scrollPositionCallback, [router.asPath], undefined, undefined, 50);
 
-  // We're always showing the navbar, so isNavbarHidden is always false
-  const isNavbarHidden = false;
-  const isTransparent = true; // We'll control transparency via isOverHero instead
-
   return (
-    <NavbarContainer hidden={isNavbarHidden} transparent={isTransparent} isOverHero={isOverHero} isDarkened={isDarkened}>
+    <NavbarContainer isOverHero={isOverHero} isDarkened={isDarkened || isModalOpened}>
       <Content>
         <NextLink href="/" passHref>
           <LogoWrapper isOverHero={isOverHero}>

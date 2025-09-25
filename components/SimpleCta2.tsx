@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
 import VibratingButton from 'components/VibratingButton';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 interface SimpleCtaProps {
@@ -20,7 +20,7 @@ export default function SimpleCta({
   className 
 }: SimpleCtaProps) {
   const { t } = useTranslation(['common']);
-  const { setIsModalOpened } = useNewsletterModalContext(); 
+  const { setIsModalOpened } = useSignupModalContext(); 
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();

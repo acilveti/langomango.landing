@@ -7,15 +7,14 @@ import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import VibratingButton from 'components/VibratingButton';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
-import { media } from 'utils/media';
-import { addReferralToUrl } from 'utils/referral';
 import { useTranslation } from 'next-i18next';
 import ReaderDemoWidget from 'components/ReaderDemoWidget';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
+import { media } from 'utils/media';
 
 export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
   const [isMobile, setIsMobile] = useState(false);
   const [darkenAmount, setDarkenAmount] = useState(0);
   const demoContainerRef = useRef<HTMLDivElement>(null);

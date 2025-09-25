@@ -2,7 +2,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import Button from 'components/Button';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 // JumpingButton component props
@@ -24,7 +24,7 @@ export default function JumpingButton({
   location = 'jumping button',
   ...props 
 }: JumpingButtonProps) {
-    const { setIsModalOpened } = useNewsletterModalContext(); 
+    const { setIsModalOpened } = useSignupModalContext(); 
   
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
     e.preventDefault();

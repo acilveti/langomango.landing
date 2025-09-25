@@ -13,7 +13,7 @@ import { useTranslation } from 'next-i18next';
 import { addReferralToUrl } from 'utils/referral';
 // Import Reddit Pixel tracking
 import { RedditEventTypes,trackRedditConversion } from 'utils/redditPixel';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 
 // Add onCtaClick prop for external tracking
 interface CtaProps {
@@ -24,7 +24,7 @@ interface CtaProps {
 
 export default function Cta({ onCtaClick, imageSrc, imageAlt = "CTA Image" }: CtaProps) {
   const { t } = useTranslation(['common', 'home']);
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();

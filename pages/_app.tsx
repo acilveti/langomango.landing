@@ -18,9 +18,9 @@ import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
 import Navbar from 'components/Navbar';
 import NavigationDrawer from 'components/NavigationDrawer';
-import NewsletterModal from 'components/NewsletterModal';
+import SignupModal from 'components/SignupModal';
 import WaveCta from 'components/WaveCta';
-import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { SignupModalContextProvider, useSignupModalContext } from 'contexts/SignupModalContext';
 import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
 import { addReferralToUrl } from 'utils/referral';
@@ -143,7 +143,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 function AppContent({ Component, pageProps }: { Component: any; pageProps: any }) {
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -191,20 +191,17 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
-    <NewsletterModalContextProvider>
+    <SignupModalContextProvider>
       <VisitorProvider>
         {children}
       </VisitorProvider>
-    </NewsletterModalContextProvider>
+    </SignupModalContextProvider>
   );
 }
 
 function Modals() {
-  const { isModalOpened, setIsModalOpened } = useNewsletterModalContext();
-  if (!isModalOpened) {
-    return null;
-  }
-  return <NewsletterModal onClose={() => setIsModalOpened(false)} />;
+  const { isModalOpened } = useSignupModalContext();
+  return <SignupModal showSignup={isModalOpened} />;
 }
 
 export default appWithTranslation(MyApp);

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
-import { apiService,} from 'services/apiService';
+import { apiService, } from 'services/apiService';
 
 import { bookContentSentences, bookContentWords } from './ReaderDemoWidget.content';
 import {
@@ -11,27 +11,27 @@ import {
   ArrowIndicator,
   AutoAdvanceNote,
   BookContent,
-  
+
   BottomBar,
-  
+
   ChevronIcon,
-  
+
   ContentArea,
-  
+
   EducationalContent,
-  
+
   HintText,
   InlineTranslation,
-  
+
   LanguageDropdown,
   LanguageFlag,
   LanguageList,
   LanguageName,
-  
+
   LanguageOption,
-  
+
   LanguageSelectorContainer,
-  
+
   MessageText,
   NavButtonLeft,
   NavButtonRight,
@@ -43,16 +43,16 @@ import {
   ParagraphContainer,
   PopupArrow,
   PopupText,
-  
+
   ProgressHint,
   ProgressMessage,
-  
+
   PulseRing,
   ReaderContainer,
   ReaderWrapper,
-  
+
   SelectedLanguage,
-  
+
   SuccessParticle,
   TranslatableText,
   TranslationPopup,
@@ -115,8 +115,8 @@ export default function ReaderDemoWidget({
   const [, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
-  
-  
+
+
   const [, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
@@ -124,11 +124,12 @@ export default function ReaderDemoWidget({
   const [autoScrollPerformed, setAutoScrollPerformed] = useState(false);
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
   const [, setHasStartedInitialAnimation] = useState(false);
-  
+
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
-  
+
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
+  const [showSignup,] = useState(false);
   const [showEducationalMessage, setShowEducationalMessage] = useState(false);
   const [showSecondEducationalMessage, setShowSecondEducationalMessage] = useState(false);
   const [showThirdEducationalMessage, setShowThirdEducationalMessage] = useState(false);
@@ -146,7 +147,7 @@ export default function ReaderDemoWidget({
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   const [, setShowPricingPage] = useState(false);
   const [demoLevel, setDemoLevel] = useState<string>('A1'); // Default demo level is A1
-  
+
 
 
   // Sync demo level with context level only if user has selected it
@@ -352,7 +353,7 @@ export default function ReaderDemoWidget({
   const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
   const readerContainerRef = useRef<HTMLDivElement>(null);
   const readerWrapperRef = useRef<HTMLDivElement>(null);
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
   const [popup, setPopup] = useState({
     visible: false,
     text: '',
@@ -887,7 +888,7 @@ export default function ReaderDemoWidget({
   }, [pageInput, totalPages, currentPage, hidePopup]);
 
 
-  
+
   // Ensure scroll is unlocked on mount and cleanup
   useEffect(() => {
     // Unlock any lingering scroll locks on mount
@@ -1516,7 +1517,7 @@ export default function ReaderDemoWidget({
       </ReaderWrapper>
 
       {/* Inline Signup Section */}
-      <SignupModal showSignup={false} />
+      <SignupModal showSignup={showSignup} />
     </WidgetWrapper>
   );
 }

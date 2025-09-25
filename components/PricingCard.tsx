@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
 import Button from './Button';
 import RichText from './RichText';
@@ -14,7 +14,7 @@ interface PricingCardProps {
 
 export default function PricingCard({ title, description, benefits, isOutlined, children }: PropsWithChildren<PricingCardProps>) {
   const isAnyBenefitPresent = benefits?.length;
-  const { setIsModalOpened } = useNewsletterModalContext(); 
+  const { setIsModalOpened } = useSignupModalContext();
   
   // Function to handle button click with proper type annotation for anchor elements
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

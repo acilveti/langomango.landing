@@ -8,8 +8,7 @@ import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
-import ExpandingButton from 'components/ExpandingButton';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import LanguageRegistrationModal from 'components/LanguageRegistrationModal';
 import LanguageSelector from 'components/LanguageSelector'; // Import the new component
 import { Language } from 'contexts/VisitorContext';
@@ -29,7 +28,6 @@ interface TabItem {
 
 export default function FeaturesGallery() {
   const { t } = useTranslation();
-  const { setIsModalOpened } = useNewsletterModalContext();
 
   // Language modal states
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);

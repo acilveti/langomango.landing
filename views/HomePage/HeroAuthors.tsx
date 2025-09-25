@@ -6,12 +6,11 @@ import Container from 'components/Container';
 import HeroIllustration from 'components/HeroIllustation';
 import NextImage from 'next/image';
 import OverTitle from 'components/OverTitle';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 
 export default function HeroAuthors() {
-  const { setIsModalOpened } = useNewsletterModalContext();
   const { t } = useTranslation(['common']);
 
   return (

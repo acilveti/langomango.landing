@@ -6,12 +6,12 @@ import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import ExpandingButton from 'components/ExpandingButton';
 import SectionTitle from 'components/SectionTitle';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
 
 export default function WaveCta() {
   const { t } = useTranslation(['common', 'home']);
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
 
   // Function to handle button click with proper type annotation for anchor elements
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
