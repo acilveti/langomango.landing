@@ -33,7 +33,6 @@ import {
     SignupExpanded,
     SignupExpandedWrapper,
     SignupSection,
-    SignupSubtitle,
     SignupTitle
 } from './ReaderDemoWidget.styles';
 
