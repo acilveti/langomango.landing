@@ -8,8 +8,6 @@ import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
-import { useSignupModalContext } from 'contexts/SignupModalContext';
-import LanguageRegistrationModal from 'components/LanguageRegistrationModal';
 import LanguageSelector from 'components/LanguageSelector'; // Import the new component
 import { Language } from 'contexts/VisitorContext';
 
@@ -164,15 +162,6 @@ export default function FeaturesGallery() {
         <SectionTitle>{t('features.title')}</SectionTitle>
       </Content>
       <FeaturesContainer>{featuresMarkup}</FeaturesContainer>
-      
-      {/* Language Registration Modal */}
-      {isLanguageModalOpen && selectedLanguageForModal && (
-        <LanguageRegistrationModal
-          selectedLanguage={selectedLanguageForModal}
-          onClose={handleModalClose}
-          onSuccess={handleModalSuccess}
-        />
-      )}
     </FeaturesGalleryWrapper>
   );
 }
