@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Language, useVisitor } from 'contexts/VisitorContext';
 import useEscClose from 'hooks/useEscKey';
@@ -49,7 +49,7 @@ export default function LanguageSelectorModal({
     if (language.code === selectedLanguage?.code && initialSelectedLevel) {
       setSelectedLevel(initialSelectedLevel);
     }
-  }, [onLanguageSelect, onClose, selectedLanguage, initialSelectedLevel]);
+  }, [selectedLanguage, initialSelectedLevel, setContextLanguage, setHasTargetSelectedLanguage]);
 
   const handleLevelSelect = useCallback((level: string) => {
     if (contextLanguage) {
@@ -60,7 +60,7 @@ export default function LanguageSelectorModal({
       // Reset state
       setShowLevelSelection(false);
     }
-  }, [onLanguageSelect, onClose]);
+  }, [onLanguageSelect, onClose, contextLanguage, setHasSelectedLevel]);
 
   if (!isOpen) return null;
 
