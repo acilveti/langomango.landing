@@ -327,7 +327,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                         $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
                                         style={{ width: '120px' }}
                                     >
-                                        <LevelEmoji> 
+                                        <LevelEmoji>
                                             {targetSelectedLanguageLevel.emoji}
                                         </LevelEmoji>
                                         <LevelName>{targetSelectedLanguageLevel.code}</LevelName>
@@ -411,10 +411,10 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                               }
                               
                               .email-input-wrapper {
-                                display: flex;
+                                display:flex;
+                                flex: 1;
                                 gap: 8px;
                                 align-items: center;
-                                width: 10%;
                                 animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'shake 0.5s ease-in-out' : 'none'};
                                 animation-delay: 0.5s;
                               }
@@ -497,10 +497,11 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                 }
                                             }}
                                             style={{
+                                                minWidth: '0px',
                                                 color: '#1f2937',
                                                 backgroundColor: 'white',
                                                 WebkitTextFillColor: '#1f2937',
-                                                WebkitAppearance: 'none'
+                                                // WebkitAppearance: 'none'
                                             }}
                                             autoComplete="email"
                                             autoCapitalize="off"
@@ -520,7 +521,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                             email: registrationEmail,
                                                             nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
                                                             targetLanguage: targetSelectedLanguage?.code!,
-                                                            level: targetSelectedLanguageLevel
+                                                            level: targetSelectedLanguageLevel.code
                                                         });
 
                                                         if (response.success && response.token) {
