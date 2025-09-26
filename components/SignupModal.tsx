@@ -240,8 +240,8 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
             </CloseButton>
             <SignupExpandedWrapper>
                 <SignupExpanded>
-                    <SignupTitle>Let&apos;s continue with a more customized reading for you</SignupTitle>
-                    <SignupSubtitle>We&apos;ll personalize your learning experience based on your language preferences</SignupSubtitle>
+                    <SignupTitle>Let&apos;s customize your reading</SignupTitle>
+                    {/* <SignupSubtitle>We&apos;ll personalize your learning experience based on your language preferences</SignupSubtitle> */}
 
                     <LanguageSetupContainer>
                         <LanguageSetupRow>

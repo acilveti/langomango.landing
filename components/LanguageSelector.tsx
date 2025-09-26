@@ -121,7 +121,7 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         <ConfirmationMessage>
           <ConfirmationIcon>🎉</ConfirmationIcon>
           <ConfirmationText>
-            Great choice! <strong>{targetSelectedLanguage.name}</strong>{targetSelectedLanguage ? ` (${targetSelectedLanguageLevel.code})` : ''} is available for your learning journey.
+            Great choice! <strong>{targetSelectedLanguage.name}</strong>{targetSelectedLanguageLevel ? ` (${targetSelectedLanguageLevel.code})` : ''} is available for your learning journey.
           </ConfirmationText>
         </ConfirmationMessage>
       )}
