@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { Language, useVisitor } from 'contexts/VisitorContext';
+import { DEFAULT_LEVELS, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import useEscClose from 'hooks/useEscKey';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
@@ -12,8 +12,8 @@ interface LanguageSelectorModalProps {
   onClose: () => void;
   languages: Language[];
   selectedLanguage: Language | null;
-  selectedLevel?: string;
-  onLanguageSelect: (language: Language, level?: string) => void;
+  selectedLevel: Levels;
+  onLanguageSelect: (language: Language, level?: Levels) => void;
   isDark?: boolean;
   hasUserSelected?: boolean;
   requireLevel?: boolean;
@@ -24,43 +24,42 @@ export default function LanguageSelectorModal({
   onClose,
   languages,
   selectedLanguage,
-  selectedLevel: initialSelectedLevel,
+  selectedLevel,
   onLanguageSelect,
   isDark = false,
   hasUserSelected = false,
 }: LanguageSelectorModalProps) {
   const [showLevelSelection, setShowLevelSelection] = useState(false);
   const {
-    targetSelectedLanguage: contextLanguage,
-    setTargetSelectedLanguage: setContextLanguage,
+    targetSelectedLanguage,
+    targetSelectedLanguageLevel,
+    setTargetSelectedLanguage,
     setHasTargetSelectedLanguage,
     setHasSelectedLevel
   } = useVisitor();
 
-  const [selectedLevel, setSelectedLevel] = useState<string>(initialSelectedLevel || '');
-
   useEscClose({ onClose: isOpen ? onClose : () => { } });
 
   const handleLanguageSelect = useCallback((language: Language) => {
-    setContextLanguage(language);
+    setTargetSelectedLanguage(language);
     setHasTargetSelectedLanguage(true)
     setShowLevelSelection(true);
     // If selecting the same language that's already selected, preserve the level
-    if (language.code === selectedLanguage?.code && initialSelectedLevel) {
+    if (language.code === selectedLanguage?.code && selectedLevel) {
       setSelectedLevel(initialSelectedLevel);
     }
-  }, [selectedLanguage, initialSelectedLevel, setContextLanguage, setHasTargetSelectedLanguage]);
+  }, [selectedLanguage, selectedLevel, setTargetSelectedLanguage, setHasTargetSelectedLanguage]);
 
-  const handleLevelSelect = useCallback((level: string) => {
-    if (contextLanguage) {
-      setSelectedLevel(level);
-      onLanguageSelect(contextLanguage, level);
+  const handleLevelSelect = useCallback((level: Levels) => {
+    if (targetSelectedLanguage) {
+      setTargetSelectedLanguage(targetSelectedLanguage, level)
+      onLanguageSelect(targetSelectedLanguage, level);
       setHasSelectedLevel(true)
       onClose();
       // Reset state
       setShowLevelSelection(false);
     }
-  }, [onLanguageSelect, onClose, contextLanguage, setHasSelectedLevel]);
+  }, [onLanguageSelect, onClose, targetSelectedLanguage, setHasSelectedLevel, setTargetSelectedLanguage]);
 
   if (!isOpen) return null;
 
@@ -74,7 +73,7 @@ export default function LanguageSelectorModal({
           </CloseIconContainer>
           <ModalHeader>
             <ModalTitle isDark={isDark}>
-              {showLevelSelection && contextLanguage ? `Select Your ${contextLanguage.name} Level` : 'Select Your Language'}
+              {showLevelSelection && targetSelectedLanguage ? `Select Your ${targetSelectedLanguage.name} Level` : 'Select Your Language'}
             </ModalTitle>
             <ModalSubtitle isDark={isDark}>
               {showLevelSelection ? 'Choose your proficiency level' : 'Choose the language you want to learn'}
@@ -82,27 +81,20 @@ export default function LanguageSelectorModal({
           </ModalHeader>
           {showLevelSelection ? (
             <LevelGrid>
-              {[
-                { code: 'A1', emoji: '🌱', desc: 'Beginner' },
-                { code: 'A2', emoji: '🌿', desc: 'Elementary' },
-                { code: 'B1', emoji: '🍀', desc: 'Intermediate' },
-                { code: 'B2', emoji: '🌳', desc: 'Upper Intermediate' },
-                { code: 'C1', emoji: '🌲', desc: 'Advanced' },
-                { code: 'C2', emoji: '🎯', desc: 'Mastery' }
-              ].map(level => (
+              {DEFAULT_LEVELS.map(level => (
                 <LevelOption
                   key={level.code}
-                  onClick={() => handleLevelSelect(level.code)}
+                  onClick={() => handleLevelSelect(level)}
                   isSelected={
-                    selectedLevel === level.code ||
-                    (contextLanguage?.code === selectedLanguage?.code &&
-                      initialSelectedLevel === level.code)
+                    targetSelectedLanguageLevel === level ||
+                    (targetSelectedLanguage?.code === selectedLanguage?.code &&
+                      selectedLevel === level)
                   }
                   isDark={isDark}
                 >
                   <LevelEmoji>{level.emoji}</LevelEmoji>
                   <LevelName isDark={isDark}>{level.code}</LevelName>
-                  <LevelDesc isDark={isDark}>{level.desc}</LevelDesc>
+                  <LevelDesc isDark={isDark}>{level.name}</LevelDesc>
                 </LevelOption>
               ))}
             </LevelGrid>
@@ -119,7 +111,7 @@ export default function LanguageSelectorModal({
                 <LanguageName isDark={isDark}>{language.name}</LanguageName>
                 {hasUserSelected && selectedLanguage?.code === language.code && (
                   <SelectedBadge isDark={isDark}>
-                    Selected{initialSelectedLevel ? ` (${initialSelectedLevel})` : ''}
+                    Selected
                   </SelectedBadge>
                 )}
               </LanguageOption>

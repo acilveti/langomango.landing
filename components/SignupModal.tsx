@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
-import { DEFAULT_LANGUAGES, useVisitor } from 'contexts/VisitorContext';
+import { DEFAULT_LANGUAGES, DEFAULT_LEVELS, useVisitor } from 'contexts/VisitorContext';
 import { apiService, } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
@@ -37,7 +37,6 @@ import {
     SignupTitle
 } from './ReaderDemoWidget.styles';
 
-
 interface SignupModalProps {
     showSignup: boolean;
 }
@@ -46,19 +45,18 @@ interface SignupModalProps {
 export default function SignupModal({ showSignup }: SignupModalProps) {
     const {
         targetSelectedLanguage,
+        nativeLanguage,
+        targetSelectedLanguageLevel,
+        hasTargetSelectedLanguage: hasSelectedLanguage,
+        hasTargetSelectedLevel: hasTargetSelectedLanguageLevel,
         setNativeSelectedLanguage,
         setTargetSelectedLanguage,
-        nativeLanguage,
-        hasTargetSelectedLanguage: hasSelectedLanguage,
         setHasTargetSelectedLanguage,
-        hasTargetSelectedLevel: hasSelectedLevel,
-        setHasSelectedLevel
     } = useVisitor();
 
     const emailInputRef = useRef<HTMLInputElement>(null);
     const [isEditingNative, setIsEditingNative] = useState(false);
     const [isEditingTarget, setIsEditingTarget] = useState(false);
-    const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
     const [hasValidEmail, setHasValidEmail] = useState(false);
     const [signupError, setSignupError] = useState('');
     const [registrationEmail, setRegistrationEmail] = useState('');
@@ -67,7 +65,6 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
     const router = useRouter();
 
     //temporal, delete
-    const [selectedLevel, setSelectedLevel] = useState('');
     const [isLoadingSignup, setIsLoadingSignup] = useState(false);
     const [hasRegistered, setHasRegistered] = useState(false);
     const { setIsModalOpened } = useSignupModalContext()
@@ -113,9 +110,9 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
     //         return;
     //     }
 
-    //     setSelectedLevel(level);
-    //     setHasSelectedLevel(true); // Mark level as selected by user
-    //     sessionStorage.setItem('selectedLevel', level);
+    //     settargetSelectedLanguageLevel(level);
+    //     setHastargetSelectedLanguageLevel(true); // Mark level as selected by user
+    //     sessionStorage.setItem('targetSelectedLanguageLevel', level);
     //     setSignupError('');
     //     setIsLoadingSignup(true);
 
@@ -203,9 +200,9 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
     //         console.error('Signup error:', error);
     //         setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
     //         setIsLoadingSignup(false);
-    //         setSelectedLevel('');
+    //         settargetSelectedLanguageLevel('');
     //     }
-    // }, [hasSelectedTarget, isEditingTarget, hasRegistered, hasValidEmail, tempNativeSelectedLanguage, nativeLanguage, tempTargetSelectedLanguage, registrationEmail, setHasSelectedLevel]);
+    // }, [hasSelectedTarget, isEditingTarget, hasRegistered, hasValidEmail, tempNativeSelectedLanguage, nativeLanguage, tempTargetSelectedLanguage, registrationEmail, setHastargetSelectedLanguageLevel]);
 
     // Update valid email state when email changes
     useEffect(() => {
@@ -230,232 +227,159 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
         }
     }, [registrationEmail, validateEmail]);
 
+    if (!showSignup) return null
     return (
-        showSignup ?
-            <SignupSection>
-                <CloseButton
-                    onClick={() => {
-                        setIsModalOpened(false)
-                    }}
-                    aria-label="Close signup"
-                >
-                    ×
-                </CloseButton>
-                <SignupExpandedWrapper>
-                    <SignupExpanded>
-                        <SignupTitle>Let&apos;s continue with a more customized reading for you</SignupTitle>
-                        <SignupSubtitle>We&apos;ll personalize your learning experience based on your language preferences</SignupSubtitle>
+        <SignupSection>
+            <CloseButton
+                onClick={() => {
+                    setIsModalOpened(false)
+                }}
+                aria-label="Close signup"
+            >
+                ×
+            </CloseButton>
+            <SignupExpandedWrapper>
+                <SignupExpanded>
+                    <SignupTitle>Let&apos;s continue with a more customized reading for you</SignupTitle>
+                    <SignupSubtitle>We&apos;ll personalize your learning experience based on your language preferences</SignupSubtitle>
 
-                        <LanguageSetupContainer>
-                            <LanguageSetupRow>
-                                <LanguageBox
-                                    className="language-box"
-                                    onClick={() => setIsEditingNative(true)}
-                                    $isEditing={isEditingNative}
-                                >
-                                    <LanguageBoxLabel>Your native language</LanguageBoxLabel>
-                                    <LanguageDisplay>
-                                        <LanguageFlag>{nativeLanguage?.flag || '🌐'}</LanguageFlag>
-                                        <LanguageName>{nativeLanguage?.name || 'English'}</LanguageName>
-                                    </LanguageDisplay>
-                                    <LanguageNote>
-                                        {isEditingNative ? 'Select a language below' : 'Auto-detected from browser'}
-                                    </LanguageNote>
-                                </LanguageBox>
+                    <LanguageSetupContainer>
+                        <LanguageSetupRow>
+                            <LanguageBox
+                                className="language-box"
+                                onClick={() => setIsEditingNative(true)}
+                                $isEditing={isEditingNative}
+                            >
+                                <LanguageBoxLabel>Your native language</LanguageBoxLabel>
+                                <LanguageDisplay>
+                                    <LanguageFlag>{nativeLanguage?.flag || '🌐'}</LanguageFlag>
+                                    <LanguageName>{nativeLanguage?.name || 'English'}</LanguageName>
+                                </LanguageDisplay>
+                                <LanguageNote>
+                                    {isEditingNative ? 'Select a language below' : 'Auto-detected from browser'}
+                                </LanguageNote>
+                            </LanguageBox>
 
-                                <LanguageBox
-                                    className="language-box"
-                                    onClick={() => setIsEditingTarget(true)}
-                                    $isEditing={isEditingTarget}
-                                    $isPulsing={!hasSelectedTarget}
-                                >
-                                    <LanguageBoxLabel>You&apos;re learning</LanguageBoxLabel>
-                                    <LanguageDisplay>
-                                        <LanguageFlag>{hasSelectedTarget ? targetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
-                                        <LanguageName>{hasSelectedTarget ? targetSelectedLanguage?.name : 'Select language'}</LanguageName>
-                                    </LanguageDisplay>
-                                    <LanguageNote>
-                                        {isEditingTarget ? 'Select a language below' : ''}
-                                    </LanguageNote>
-                                </LanguageBox>
-                            </LanguageSetupRow>
+                            <LanguageBox
+                                className="language-box"
+                                onClick={() => setIsEditingTarget(true)}
+                                $isEditing={isEditingTarget}
+                                $isPulsing={!hasSelectedLanguage}
+                            >
+                                <LanguageBoxLabel>You&apos;re learning</LanguageBoxLabel>
+                                <LanguageDisplay>
+                                    <LanguageFlag>{hasSelectedLanguage ? targetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
+                                    <LanguageName>{hasSelectedLanguage ? targetSelectedLanguage?.name : 'Select language'}</LanguageName>
+                                </LanguageDisplay>
+                                <LanguageNote>
+                                    {isEditingTarget ? 'Select a language below' : ''}
+                                </LanguageNote>
+                            </LanguageBox>
+                        </LanguageSetupRow>
 
-                            {(isEditingNative || isEditingTarget) && (
-                                <LanguagePickerContainer className="language-picker-container">
-                                    <LanguagePickerGrid>
-                                        {DEFAULT_LANGUAGES.map((language) => (
-                                            <LanguagePickerOption
-                                                key={language.code}
-                                                onClick={() => {
-                                                    if (isEditingNative) {
-                                                        setNativeSelectedLanguage(language);
-                                                        setIsEditingNative(false);
-                                                    } else if (isEditingTarget) {
-                                                        setTargetSelectedLanguage(language); // Don't pass level here, keep existing level
-                                                        setIsEditingTarget(false);
-                                                        setHasSelectedTarget(true);
-                                                        setHasTargetSelectedLanguage(true);
-                                                    }
-                                                }}
-                                                $isSelected={
-                                                    isEditingNative
-                                                        ? nativeLanguage?.code === language.code
-                                                        : nativeLanguage?.code === language.code
+                        {(isEditingNative || isEditingTarget) && (
+                            <LanguagePickerContainer className="language-picker-container">
+                                <LanguagePickerGrid>
+                                    {DEFAULT_LANGUAGES.map((language) => (
+                                        <LanguagePickerOption
+                                            key={language.code}
+                                            onClick={() => {
+                                                if (isEditingNative) {
+                                                    setNativeSelectedLanguage(language);
+                                                    setIsEditingNative(false);
+                                                } else if (isEditingTarget) {
+                                                    setTargetSelectedLanguage(language); // Don't pass level here, keep existing level
+                                                    setIsEditingTarget(false);
+                                                    setHasTargetSelectedLanguage(true);
                                                 }
-                                            >
-                                                <span>{language.flag}</span>
-                                                <span>{language.name}</span>
-                                            </LanguagePickerOption>
-                                        ))}
-                                    </LanguagePickerGrid>
-                                </LanguagePickerContainer>
+                                            }}
+                                            $isSelected={
+                                                isEditingNative
+                                                    ? nativeLanguage?.code === language.code
+                                                    : nativeLanguage?.code === language.code
+                                            }
+                                        >
+                                            <span>{language.flag}</span>
+                                            <span>{language.name}</span>
+                                        </LanguagePickerOption>
+                                    ))}
+                                </LanguagePickerGrid>
+                            </LanguagePickerContainer>
+                        )}
+
+                        {/* Level selector - comes AFTER language selection and BEFORE registration */}
+                        <LevelSelectorContainer $isDisabled={!hasSelectedLanguage || isEditingTarget}>
+                            <LevelLabel>Select your {targetSelectedLanguage?.name} level:</LevelLabel>
+
+                            {/* If user has selected a level, show only that level */}
+                            {hasTargetSelectedLanguageLevel && targetSelectedLanguageLevel ? (
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    marginTop: '1.5rem'
+                                }}>
+                                    <LevelButton
+                                        $isActive={true}
+                                        onClick={() => {
+                                            // Don't do anything yet, just visual selection
+                                            setTargetSelectedLanguage(targetSelectedLanguage, targetSelectedLanguageLevel);
+                                        }}
+                                        $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
+                                        style={{ width: '120px' }}
+                                    >
+                                        <LevelEmoji> 
+                                            {DEFAULT_LEVELS.find(l => l === targetSelectedLanguageLevel)?.emoji}
+                                        </LevelEmoji>
+                                        <LevelName>{targetSelectedLanguageLevel.code}</LevelName>
+                                        <LevelDesc>
+                                            {DEFAULT_LEVELS.find(l => l === targetSelectedLanguageLevel)?.name}
+                                        </LevelDesc>
+                                    </LevelButton>
+                                </div>
+                            ) : (
+                                /* Show full grid if no level is selected */
+                                <LevelButtons>
+                                    {DEFAULT_LEVELS.map(level => (
+                                        <LevelButton
+                                            key={level.code}
+                                            $isActive={targetSelectedLanguageLevel === level}
+                                            onClick={() => {
+                                                setTargetSelectedLanguage(targetSelectedLanguage, level);
+                                            }}
+                                            $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
+                                            $needsSelection={hasSelectedLanguage && !targetSelectedLanguageLevel}
+                                        >
+                                            <LevelEmoji>{level.emoji}</LevelEmoji>
+                                            <LevelName>{level.code}</LevelName>
+                                            <LevelDesc>{level.name}</LevelDesc>
+                                        </LevelButton>
+                                    ))}
+                                </LevelButtons>
                             )}
+                        </LevelSelectorContainer>
 
-                            {/* Level selector - comes AFTER language selection and BEFORE registration */}
-                            <LevelSelectorContainer $isDisabled={!hasSelectedTarget || isEditingTarget}>
-                                <LevelLabel>Select your {targetSelectedLanguage?.name} level:</LevelLabel>
-                                {/* If user has selected a level, show only that level */}
-                                {hasSelectedLevel && selectedLevel ? (
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        marginTop: '1.5rem'
-                                    }}>
-                                        <LevelButton
-                                            $isActive={true}
-                                            onClick={() => {
-                                                // Don't do anything yet, just visual selection
-                                                setSelectedLevel(selectedLevel);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            style={{ width: '120px' }}
-                                        >
-                                            <LevelEmoji>
-                                                {selectedLevel === 'A1' && '🌱'}
-                                                {selectedLevel === 'A2' && '🌿'}
-                                                {selectedLevel === 'B1' && '🍀'}
-                                                {selectedLevel === 'B2' && '🌳'}
-                                                {selectedLevel === 'C1' && '🌲'}
-                                                {selectedLevel === 'C2' && '🎯'}
-                                            </LevelEmoji>
-                                            <LevelName>{selectedLevel}</LevelName>
-                                            <LevelDesc>
-                                                {selectedLevel === 'A1' && 'Beginner'}
-                                                {selectedLevel === 'A2' && 'Elementary'}
-                                                {selectedLevel === 'B1' && 'Intermediate'}
-                                                {selectedLevel === 'B2' && 'Upper Int.'}
-                                                {selectedLevel === 'C1' && 'Advanced'}
-                                                {selectedLevel === 'C2' && 'Mastery'}
-                                            </LevelDesc>
-                                        </LevelButton>
-                                    </div>
-                                ) : (
-                                    /* Show full grid if no level is selected */
-                                    <LevelButtons>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'A1'}
-                                            onClick={() => {
-                                                setSelectedLevel('A1');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🌱</LevelEmoji>
-                                            <LevelName>A1</LevelName>
-                                            <LevelDesc>Beginner</LevelDesc>
-                                        </LevelButton>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'A2'}
-                                            onClick={() => {
-                                                setSelectedLevel('A2');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🌿</LevelEmoji>
-                                            <LevelName>A2</LevelName>
-                                            <LevelDesc>Elementary</LevelDesc>
-                                        </LevelButton>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'B1'}
-                                            onClick={() => {
-                                                setSelectedLevel('B1');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🍀</LevelEmoji>
-                                            <LevelName>B1</LevelName>
-                                            <LevelDesc>Intermediate</LevelDesc>
-                                        </LevelButton>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'B2'}
-                                            onClick={() => {
-                                                setSelectedLevel('B2');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🌳</LevelEmoji>
-                                            <LevelName>B2</LevelName>
-                                            <LevelDesc>Upper Int.</LevelDesc>
-                                        </LevelButton>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'C1'}
-                                            onClick={() => {
-                                                setSelectedLevel('C1');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🌲</LevelEmoji>
-                                            <LevelName>C1</LevelName>
-                                            <LevelDesc>Advanced</LevelDesc>
-                                        </LevelButton>
-                                        <LevelButton
-                                            $isActive={selectedLevel === 'C2'}
-                                            onClick={() => {
-                                                setSelectedLevel('C2');
-                                                setHasSelectedLevel(true);
-                                            }}
-                                            $isDisabled={!hasSelectedTarget || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedTarget && !selectedLevel}
-                                        >
-                                            <LevelEmoji>🎯</LevelEmoji>
-                                            <LevelName>C2</LevelName>
-                                            <LevelDesc>Mastery</LevelDesc>
-                                        </LevelButton>
-                                    </LevelButtons>
-                                )}
-                            </LevelSelectorContainer>
-
-                            {/* Registration section - shown AFTER level selection */}
-                            {hasSelectedTarget && !isEditingTarget && !hasRegistered && (
-                                <>
+                        {/* Registration section - shown AFTER level selection */}
+                        {hasSelectedLanguage && !isEditingTarget && !hasRegistered && (
+                            <>
 
 
-                                    <div style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '1rem',
-                                        width: '100%',
-                                        maxWidth: '400px',
-                                        margin: '0 auto',
-                                        padding: '1rem',
-                                        animation: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
-                                        borderRadius: '12px',
-                                        position: 'relative',
-                                        background: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
-                                        border: (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '2px dashed rgba(255, 152, 0, 0.3)' : '2px dashed transparent',
-                                        transition: 'all 0.3s ease'
-                                    }}>
-                                        <style>
-                                            {`
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1rem',
+                                    width: '100%',
+                                    maxWidth: '400px',
+                                    margin: '0 auto',
+                                    padding: '1rem',
+                                    animation: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
+                                    borderRadius: '12px',
+                                    position: 'relative',
+                                    background: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
+                                    border: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '2px dashed rgba(255, 152, 0, 0.3)' : '2px dashed transparent',
+                                    transition: 'all 0.3s ease'
+                                }}>
+                                    <style>
+                                        {`
                               @keyframes pulseGlow {
                                 0% {
                                   box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
@@ -491,7 +415,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 gap: 8px;
                                 align-items: center;
                                 width: 10%;
-                                animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'shake 0.5s ease-in-out' : 'none'};
+                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'shake 0.5s ease-in-out' : 'none'};
                                 animation-delay: 0.5s;
                               }
                               
@@ -499,7 +423,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 flex: 1;
                                 padding: 12px 16px;
                                 font-size: 14px;
-                                border: 2px solid ${showValidEmailIndicator ? '#22c55e' : (hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '#ff9800' : '#e5e7eb'};
+                                border: 2px solid ${showValidEmailIndicator ? '#22c55e' : (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e5e7eb'};
                                 border-radius: 8px;
                                 outline: none;
                                 background-color: white !important;
@@ -507,7 +431,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 -webkit-text-fill-color: #1f2937 !important;
                                 opacity: 1 !important;
                                 transition: all 0.3s ease;
-                                animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'borderPulse 2s ease-in-out infinite' : 'none'};
+                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'borderPulse 2s ease-in-out infinite' : 'none'};
                               }
                               
                               @keyframes borderPulse {
@@ -541,7 +465,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                               }
                               
                               .google-button {
-                                animation: ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? 'subtle-pulse 2s ease-in-out infinite' : 'none'};
+                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'subtle-pulse 2s ease-in-out infinite' : 'none'};
                                 animation-delay: 0.5s;
                               }
                               
@@ -554,219 +478,219 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 }
                               }
                             `}
-                                        </style>
+                                    </style>
 
-                                        <div className="email-input-wrapper">
-                                            <input
-                                                ref={emailInputRef}
-                                                className="email-input"
-                                                type="email"
-                                                placeholder="Email"
-                                                value={registrationEmail}
-                                                onChange={(e) => {
-                                                    console.log('Email typed:', e.target.value);
-                                                    setRegistrationEmail(e.target.value);
-                                                }}
-                                                onKeyPress={(e) => {
-                                                    if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
-                                                        document.querySelector<HTMLButtonElement>('.submit-button')?.click();
-                                                    }
-                                                }}
-                                                style={{
-                                                    color: '#1f2937',
-                                                    backgroundColor: 'white',
-                                                    WebkitTextFillColor: '#1f2937',
-                                                    WebkitAppearance: 'none'
-                                                }}
-                                                autoComplete="email"
-                                                autoCapitalize="off"
-                                                autoCorrect="off"
-                                                spellCheck={false}
-                                            />
-                                            <button
-                                                className="submit-button"
-                                                onClick={async () => {
-                                                    console.log('Button clicked with email:', registrationEmail);
-                                                    if (registrationEmail && validateEmail(registrationEmail) && selectedLevel) {
-                                                        setIsLoadingSignup(true);
-                                                        setSignupError('');
-                                                        try {
-                                                            // Create account immediately with email
-                                                            const response = await apiService.signupWithEmail({
-                                                                email: registrationEmail,
-                                                                nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
-                                                                targetLanguage: targetSelectedLanguage?.code!,
-                                                                level: selectedLevel
-                                                            });
-
-                                                            if (response.success && response.token) {
-                                                                // Store token - user is now authenticated
-                                                                localStorage.setItem('token', response.token);
-                                                                localStorage.setItem('userEmail', registrationEmail);
-
-                                                                // Mark as registered
-                                                                setHasRegistered(true);
-
-                                                                // Track signup event
-                                                                trackRedditConversion(RedditEventTypes.SIGNUP, {
-                                                                    signup_type: 'email',
-                                                                    native_language: nativeLanguage?.code || nativeLanguage?.code || 'en',
-                                                                    target_language: targetSelectedLanguage?.code,
-                                                                    level: selectedLevel,
-                                                                    source: 'reader_widget'
-                                                                });
-                                                                // Show pricing page - user is already authenticated
-                                                                router.replace('/checkout')
-                                                            } else {
-                                                                throw new Error('Failed to create account');
-                                                            }
-                                                        } catch (error) {
-                                                            console.error('Signup error:', error);
-                                                            setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
-                                                        } finally {
-                                                            setIsLoadingSignup(false);
-                                                        }
-                                                    }
-                                                }}
-                                                disabled={!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup}
-                                                style={{
-                                                    padding: '12px 20px',
-                                                    backgroundColor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup) ? '#ccc' : '#ff9800',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '8px',
-                                                    cursor: (!registrationEmail || !validateEmail(registrationEmail) || !selectedLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
-                                                    fontSize: '14px',
-                                                    fontWeight: 'bold',
-                                                    transition: 'all 0.3s ease'
-                                                }}
-                                            >
-                                                {isLoadingSignup ? '...' : '→'}
-                                            </button>
-                                        </div>
-
-                                        <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>or</div>
-
-                                        <button
-                                            className="google-button"
-                                            onClick={() => {
-                                                if (selectedLevel) {
-                                                    setIsLoadingSignup(true);
-                                                    // For Google OAuth, store preferences and redirect
-                                                    localStorage.setItem('pendingLanguagePrefs', JSON.stringify({
-                                                        nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
-                                                        targetLanguage: targetSelectedLanguage?.code,
-                                                        level: selectedLevel
-                                                    }));
-
-                                                    // Set flag to show pricing after OAuth return
-                                                    localStorage.setItem('showPricingAfterAuth', 'true');
-                                                    localStorage.setItem('returnToWidget', 'true');
-
-                                                    // Redirect to Google OAuth
-                                                    const baseUrl = 'https://staging.langomango.com';
-                                                    const returnUrl = encodeURIComponent('/sign-up');
-                                                    const frontendRedirectUrl = encodeURIComponent(window.location.origin);
-                                                    const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
-
-                                                    window.location.href = googleAuthUrl;
+                                    <div className="email-input-wrapper">
+                                        <input
+                                            ref={emailInputRef}
+                                            className="email-input"
+                                            type="email"
+                                            placeholder="Email"
+                                            value={registrationEmail}
+                                            onChange={(e) => {
+                                                console.log('Email typed:', e.target.value);
+                                                setRegistrationEmail(e.target.value);
+                                            }}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter' && registrationEmail && validateEmail(registrationEmail) && targetSelectedLanguageLevel) {
+                                                    document.querySelector<HTMLButtonElement>('.submit-button')?.click();
                                                 }
                                             }}
-                                            disabled={!selectedLevel || isLoadingSignup}
                                             style={{
-                                                width: '100%',
-                                                padding: '12px 20px',
+                                                color: '#1f2937',
                                                 backgroundColor: 'white',
-                                                color: '#374151',
-                                                border: `2px solid ${(hasSelectedTarget && !hasValidEmail && !hasRegistered && !!selectedLevel) ? '#ff9800' : '#e1e5e9'}`,
+                                                WebkitTextFillColor: '#1f2937',
+                                                WebkitAppearance: 'none'
+                                            }}
+                                            autoComplete="email"
+                                            autoCapitalize="off"
+                                            autoCorrect="off"
+                                            spellCheck={false}
+                                        />
+                                        <button
+                                            className="submit-button"
+                                            onClick={async () => {
+                                                console.log('Button clicked with email:', registrationEmail);
+                                                if (registrationEmail && validateEmail(registrationEmail) && targetSelectedLanguageLevel) {
+                                                    setIsLoadingSignup(true);
+                                                    setSignupError('');
+                                                    try {
+                                                        // Create account immediately with email
+                                                        const response = await apiService.signupWithEmail({
+                                                            email: registrationEmail,
+                                                            nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                            targetLanguage: targetSelectedLanguage?.code!,
+                                                            level: targetSelectedLanguageLevel
+                                                        });
+
+                                                        if (response.success && response.token) {
+                                                            // Store token - user is now authenticated
+                                                            localStorage.setItem('token', response.token);
+                                                            localStorage.setItem('userEmail', registrationEmail);
+
+                                                            // Mark as registered
+                                                            setHasRegistered(true);
+
+                                                            // Track signup event
+                                                            trackRedditConversion(RedditEventTypes.SIGNUP, {
+                                                                signup_type: 'email',
+                                                                native_language: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                                target_language: targetSelectedLanguage?.code,
+                                                                level: targetSelectedLanguageLevel,
+                                                                source: 'reader_widget'
+                                                            });
+                                                            // Show pricing page - user is already authenticated
+                                                            router.replace('/checkout')
+                                                        } else {
+                                                            throw new Error('Failed to create account');
+                                                        }
+                                                    } catch (error) {
+                                                        console.error('Signup error:', error);
+                                                        setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
+                                                    } finally {
+                                                        setIsLoadingSignup(false);
+                                                    }
+                                                }
+                                            }}
+                                            disabled={!registrationEmail || !validateEmail(registrationEmail) || !targetSelectedLanguageLevel || isLoadingSignup}
+                                            style={{
+                                                padding: '12px 20px',
+                                                backgroundColor: (!registrationEmail || !validateEmail(registrationEmail) || !targetSelectedLanguageLevel || isLoadingSignup) ? '#ccc' : '#ff9800',
+                                                color: 'white',
+                                                border: 'none',
                                                 borderRadius: '8px',
-                                                cursor: (!selectedLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
+                                                cursor: (!registrationEmail || !validateEmail(registrationEmail) || !targetSelectedLanguageLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
                                                 fontSize: '14px',
-                                                fontWeight: '500',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px',
-                                                opacity: (!selectedLevel || isLoadingSignup) ? 0.5 : 1,
+                                                fontWeight: 'bold',
                                                 transition: 'all 0.3s ease'
                                             }}
                                         >
-                                            <svg viewBox="0 0 24 24" width="16" height="16">
-                                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                                            </svg>
-                                            <span>Google</span>
+                                            {isLoadingSignup ? '...' : '→'}
                                         </button>
+                                    </div>
 
-                                        {hasValidEmail && (
-                                            <div style={{
-                                                textAlign: 'center',
-                                                color: '#22c55e',
-                                                fontSize: '12px',
-                                                marginTop: '-8px',
-                                                animation: 'fadeIn 0.3s ease-in'
-                                            }}>
-                                                <style>
-                                                    {`
+                                    <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>or</div>
+
+                                    <button
+                                        className="google-button"
+                                        onClick={() => {
+                                            if (targetSelectedLanguageLevel) {
+                                                setIsLoadingSignup(true);
+                                                // For Google OAuth, store preferences and redirect
+                                                localStorage.setItem('pendingLanguagePrefs', JSON.stringify({
+                                                    nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
+                                                    targetLanguage: targetSelectedLanguage?.code,
+                                                    level: targetSelectedLanguageLevel
+                                                }));
+
+                                                // Set flag to show pricing after OAuth return
+                                                localStorage.setItem('showPricingAfterAuth', 'true');
+                                                localStorage.setItem('returnToWidget', 'true');
+
+                                                // Redirect to Google OAuth
+                                                const baseUrl = 'https://staging.langomango.com';
+                                                const returnUrl = encodeURIComponent('/sign-up');
+                                                const frontendRedirectUrl = encodeURIComponent(window.location.origin);
+                                                const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
+
+                                                window.location.href = googleAuthUrl;
+                                            }
+                                        }}
+                                        disabled={!targetSelectedLanguageLevel || isLoadingSignup}
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px 20px',
+                                            backgroundColor: 'white',
+                                            color: '#374151',
+                                            border: `2px solid ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e1e5e9'}`,
+                                            borderRadius: '8px',
+                                            cursor: (!targetSelectedLanguageLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: '500',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '8px',
+                                            opacity: (!targetSelectedLanguageLevel || isLoadingSignup) ? 0.5 : 1,
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                        </svg>
+                                        <span>Google</span>
+                                    </button>
+
+                                    {hasValidEmail && (
+                                        <div style={{
+                                            textAlign: 'center',
+                                            color: '#22c55e',
+                                            fontSize: '12px',
+                                            marginTop: '-8px',
+                                            animation: 'fadeIn 0.3s ease-in'
+                                        }}>
+                                            <style>
+                                                {`
                                 @keyframes fadeIn {
                                   from { opacity: 0; transform: translateY(-5px); }
                                   to { opacity: 1; transform: translateY(0); }
                                 }
                               `}
-                                                </style>
-                                                ✓ Valid email entered
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-
-                            {hasSelectedTarget && !isEditingTarget && hasRegistered && (
-                                <CompactRegistrationSection $isCompleted={true}>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        color: '#22c55e',
-                                        fontSize: '14px',
-                                        fontWeight: '500'
-                                    }}>
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                        </svg>
-                                        <span>Signed in with Google</span>
-                                    </div>
-                                </CompactRegistrationSection>
-                            )}
-                        </LanguageSetupContainer>
-
-                        {(!hasSelectedTarget || isEditingTarget) ? (
-                            <PromptMessage>
-                                <PromptIcon>👆</PromptIcon>
-                                Please select your target language to continue
-                            </PromptMessage>
-                        ) : (!selectedLevel && hasSelectedTarget) ? (
-                            <PromptMessage>
-                                <PromptIcon>🎯</PromptIcon>
-                                Now select your level
-                            </PromptMessage>
-                        ) : (!hasRegistered && !hasValidEmail && selectedLevel) ? (
-                            <PromptMessage>
-                                <PromptIcon>📧</PromptIcon>
-                                Please enter your email or sign in with Google
-                            </PromptMessage>
-                        ) : null}
-
-                        {signupError && (
-                            <ErrorMessage>
-                                <ErrorIcon>⚠️</ErrorIcon>
-                                {signupError}
-                            </ErrorMessage>
+                                            </style>
+                                            ✓ Valid email entered
+                                        </div>
+                                    )}
+                                </div>
+                            </>
                         )}
-                    </SignupExpanded>
-                </SignupExpandedWrapper>
-            </SignupSection> : <div></div>
+
+                        {hasSelectedLanguage && !isEditingTarget && hasRegistered && (
+                            <CompactRegistrationSection $isCompleted={true}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: '#22c55e',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }}>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    <span>Signed in with Google</span>
+                                </div>
+                            </CompactRegistrationSection>
+                        )}
+                    </LanguageSetupContainer>
+
+                    {(!hasSelectedLanguage || isEditingTarget) ? (
+                        <PromptMessage>
+                            <PromptIcon>👆</PromptIcon>
+                            Please select your target language to continue
+                        </PromptMessage>
+                    ) : (!targetSelectedLanguageLevel && hasSelectedLanguage) ? (
+                        <PromptMessage>
+                            <PromptIcon>🎯</PromptIcon>
+                            Now select your level
+                        </PromptMessage>
+                    ) : (!hasRegistered && !hasValidEmail && targetSelectedLanguageLevel) ? (
+                        <PromptMessage>
+                            <PromptIcon>📧</PromptIcon>
+                            Please enter your email or sign in with Google
+                        </PromptMessage>
+                    ) : null}
+
+                    {signupError && (
+                        <ErrorMessage>
+                            <ErrorIcon>⚠️</ErrorIcon>
+                            {signupError}
+                        </ErrorMessage>
+                    )}
+                </SignupExpanded>
+            </SignupExpandedWrapper>
+        </SignupSection>
     );
 }
