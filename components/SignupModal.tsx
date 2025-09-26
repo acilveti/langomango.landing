@@ -322,17 +322,17 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                         $isActive={true}
                                         onClick={() => {
                                             // Don't do anything yet, just visual selection
-                                            setTargetSelectedLanguage(targetSelectedLanguage, targetSelectedLanguageLevel);
+                                            setTargetSelectedLanguage(targetSelectedLanguage, null);
                                         }}
                                         $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
                                         style={{ width: '120px' }}
                                     >
                                         <LevelEmoji> 
-                                            {DEFAULT_LEVELS.find(l => l === targetSelectedLanguageLevel)?.emoji}
+                                            {targetSelectedLanguageLevel.emoji}
                                         </LevelEmoji>
                                         <LevelName>{targetSelectedLanguageLevel.code}</LevelName>
                                         <LevelDesc>
-                                            {DEFAULT_LEVELS.find(l => l === targetSelectedLanguageLevel)?.name}
+                                            {targetSelectedLanguageLevel.name}
                                         </LevelDesc>
                                     </LevelButton>
                                 </div>
