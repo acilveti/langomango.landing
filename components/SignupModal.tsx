@@ -46,8 +46,8 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
         targetSelectedLanguage,
         nativeLanguage,
         targetSelectedLanguageLevel,
-        hasTargetSelectedLanguage: hasSelectedLanguage,
-        hasTargetSelectedLevel: hasTargetSelectedLanguageLevel,
+        hasTargetSelectedLanguage,
+        hasTargetSelectedLevel,
         setNativeSelectedLanguage,
         setTargetSelectedLanguage,
         setHasTargetSelectedLanguage,
@@ -263,12 +263,12 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 className="language-box"
                                 onClick={() => setIsEditingTarget(true)}
                                 $isEditing={isEditingTarget}
-                                $isPulsing={!hasSelectedLanguage}
+                                $isPulsing={!hasTargetSelectedLanguage}
                             >
                                 <LanguageBoxLabel>You&apos;re learning</LanguageBoxLabel>
                                 <LanguageDisplay>
-                                    <LanguageFlag>{hasSelectedLanguage ? targetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
-                                    <LanguageName>{hasSelectedLanguage ? targetSelectedLanguage?.name : 'Select language'}</LanguageName>
+                                    <LanguageFlag>{hasTargetSelectedLanguage ? targetSelectedLanguage?.flag : '🌐'}</LanguageFlag>
+                                    <LanguageName>{hasTargetSelectedLanguage ? targetSelectedLanguage?.name : 'Select language'}</LanguageName>
                                 </LanguageDisplay>
                                 <LanguageNote>
                                     {isEditingTarget ? 'Select a language below' : ''}
@@ -307,11 +307,11 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                         )}
 
                         {/* Level selector - comes AFTER language selection and BEFORE registration */}
-                        <LevelSelectorContainer $isDisabled={!hasSelectedLanguage || isEditingTarget}>
+                        <LevelSelectorContainer $isDisabled={!hasTargetSelectedLanguage || isEditingTarget}>
                             <LevelLabel>Select your {targetSelectedLanguage?.name} level:</LevelLabel>
 
                             {/* If user has selected a level, show only that level */}
-                            {hasTargetSelectedLanguageLevel && targetSelectedLanguageLevel ? (
+                            {hasTargetSelectedLevel && targetSelectedLanguageLevel ? (
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -323,7 +323,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                             // Don't do anything yet, just visual selection
                                             setTargetSelectedLanguage(targetSelectedLanguage, null);
                                         }}
-                                        $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
+                                        $isDisabled={!hasTargetSelectedLanguage || isEditingTarget || isLoadingSignup}
                                         style={{ width: '120px' }}
                                     >
                                         <LevelEmoji>
@@ -341,12 +341,12 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                     {DEFAULT_LEVELS.map(level => (
                                         <LevelButton
                                             key={level.code}
-                                            $isActive={targetSelectedLanguageLevel === level}
+                                            $isActive={hasTargetSelectedLevel && targetSelectedLanguageLevel === level}
                                             onClick={() => {
                                                 setTargetSelectedLanguage(targetSelectedLanguage, level);
                                             }}
-                                            $isDisabled={!hasSelectedLanguage || isEditingTarget || isLoadingSignup}
-                                            $needsSelection={hasSelectedLanguage && !targetSelectedLanguageLevel}
+                                            $isDisabled={!hasTargetSelectedLanguage || isEditingTarget || isLoadingSignup}
+                                            $needsSelection={hasTargetSelectedLanguage && !targetSelectedLanguageLevel || !hasTargetSelectedLevel}
                                         >
                                             <LevelEmoji>{level.emoji}</LevelEmoji>
                                             <LevelName>{level.code}</LevelName>
@@ -358,7 +358,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                         </LevelSelectorContainer>
 
                         {/* Registration section - shown AFTER level selection */}
-                        {hasSelectedLanguage && !isEditingTarget && !hasRegistered && (
+                        {hasTargetSelectedLanguage && !isEditingTarget && !hasRegistered && hasTargetSelectedLevel && (
                             <>
 
 
@@ -370,11 +370,11 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                     maxWidth: '400px',
                                     margin: '0 auto',
                                     padding: '1rem',
-                                    animation: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
+                                    animation: (hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'pulseGlow 2s ease-in-out infinite' : 'none',
                                     borderRadius: '12px',
                                     position: 'relative',
-                                    background: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
-                                    border: (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '2px dashed rgba(255, 152, 0, 0.3)' : '2px dashed transparent',
+                                    background: (hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'rgba(255, 152, 0, 0.05)' : 'transparent',
+                                    border: (hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '2px dashed rgba(255, 152, 0, 0.3)' : '2px dashed transparent',
                                     transition: 'all 0.3s ease'
                                 }}>
                                     <style>
@@ -414,7 +414,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 flex: 1;
                                 gap: 8px;
                                 align-items: center;
-                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'shake 0.5s ease-in-out' : 'none'};
+                                animation: ${(hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'shake 0.5s ease-in-out' : 'none'};
                                 animation-delay: 0.5s;
                               }
                               
@@ -422,7 +422,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 flex: 1;
                                 padding: 12px 16px;
                                 font-size: 14px;
-                                border: 2px solid ${showValidEmailIndicator ? '#22c55e' : (hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e5e7eb'};
+                                border: 2px solid ${showValidEmailIndicator ? '#22c55e' : (hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e5e7eb'};
                                 border-radius: 8px;
                                 outline: none;
                                 background-color: white !important;
@@ -430,7 +430,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                 -webkit-text-fill-color: #1f2937 !important;
                                 opacity: 1 !important;
                                 transition: all 0.3s ease;
-                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'borderPulse 2s ease-in-out infinite' : 'none'};
+                                animation: ${(hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'borderPulse 2s ease-in-out infinite' : 'none'};
                               }
                               
                               @keyframes borderPulse {
@@ -464,7 +464,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                               }
                               
                               .google-button {
-                                animation: ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'subtle-pulse 2s ease-in-out infinite' : 'none'};
+                                animation: ${(hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? 'subtle-pulse 2s ease-in-out infinite' : 'none'};
                                 animation-delay: 0.5s;
                               }
                               
@@ -602,7 +602,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                             padding: '12px 20px',
                                             backgroundColor: 'white',
                                             color: '#374151',
-                                            border: `2px solid ${(hasSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e1e5e9'}`,
+                                            border: `2px solid ${(hasTargetSelectedLanguage && !hasValidEmail && !hasRegistered && !!targetSelectedLanguageLevel) ? '#ff9800' : '#e1e5e9'}`,
                                             borderRadius: '8px',
                                             cursor: (!targetSelectedLanguageLevel || isLoadingSignup) ? 'not-allowed' : 'pointer',
                                             fontSize: '14px',
@@ -647,7 +647,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                             </>
                         )}
 
-                        {hasSelectedLanguage && !isEditingTarget && hasRegistered && (
+                        {hasTargetSelectedLanguage && !isEditingTarget && hasRegistered && (
                             <CompactRegistrationSection $isCompleted={true}>
                                 <div style={{
                                     display: 'flex',
@@ -666,12 +666,12 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                         )}
                     </LanguageSetupContainer>
 
-                    {(!hasSelectedLanguage || isEditingTarget) ? (
+                    {(!hasTargetSelectedLanguage || isEditingTarget) ? (
                         <PromptMessage>
                             <PromptIcon>👆</PromptIcon>
                             Please select your target language to continue
                         </PromptMessage>
-                    ) : (!targetSelectedLanguageLevel && hasSelectedLanguage) ? (
+                    ) : (!targetSelectedLanguageLevel && hasTargetSelectedLanguage) ? (
                         <PromptMessage>
                             <PromptIcon>🎯</PromptIcon>
                             Now select your level

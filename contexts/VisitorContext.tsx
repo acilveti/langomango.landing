@@ -165,6 +165,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [nativeLanguage, setNativeLanguage] = useState<Language>(DEFAULT_LANGUAGES.find(l => l.code === 'en')!);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
   const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
+  const [hasDetectedNativeLanguage, setHasDetectedNativeLanguage] = useState<boolean>(false);
   const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
 
   // Load persisted data from localStorage on mount
@@ -210,9 +211,10 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     }
 
     // If no persisted native language, detect it
-    if (!nativeLanguage) {
+    if (!hasDetectedNativeLanguage) {
       const detectedLang = detectBrowserLanguage();
       setNativeLanguage(detectedLang);
+      setHasDetectedNativeLanguage(true)
     }
 
     // If no selected language, use German as default
@@ -236,6 +238,8 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     setSelectedLanguageState(language);
     if(level){
       setSelectedLanguageLevelState(level);
+    } else{
+      setHasSelectedLevelState(false)
     }
 
     // If level is explicitly provided, mark it as selected
