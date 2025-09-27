@@ -25,9 +25,6 @@ interface PricingPageProps {
 
 const PricingPage: React.FC<PricingPageProps> = ({ 
   onSelectPlan, 
-  isLoading: externalLoading, 
-  userToken,
-  isAuthenticated = false 
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
