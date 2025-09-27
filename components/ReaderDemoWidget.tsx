@@ -3,7 +3,6 @@ import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { DEFAULT_LANGUAGES, DEFAULT_LEVELS, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
-import { apiService, } from 'services/apiService';
 
 import { bookContentSentences, bookContentWords } from './ReaderDemoWidget.content';
 import {
@@ -109,7 +108,6 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
-  const [, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
@@ -117,7 +115,7 @@ export default function ReaderDemoWidget({
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
   const [, setHasStartedInitialAnimation] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const [hasRegistered, setHasRegistered] = useState(openSignupDirectly || false);
+  const [hasRegistered, ] = useState(openSignupDirectly || false);
   const [hasAutoOpenedLanguage, setHasAutoOpenedLanguage] = useState(false);
   const [showSignup,] = useState(false);
   const [showEducationalMessage, setShowEducationalMessage] = useState(false);
@@ -135,10 +133,8 @@ export default function ReaderDemoWidget({
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
-  const [, setShowPricingPage] = useState(false);
   const { setIsModalOpened: setIsSignupModalOpened } = useSignupModalContext();
   const { setIsReaderDemoModalOpened } = useReaderDemoModalContext();
-
 
   // Sync demo level with context level only if user has selected it
   useEffect(() => {
@@ -146,114 +142,6 @@ export default function ReaderDemoWidget({
       sessionStorage.setItem('selectedLevel', targetSelectedLanguageLevel.code);
     }
   }, [targetSelectedLanguageLevel, hasTargetSelectedLevel]);
-
-  // Handle opening signup directly if prop is set OR if returning from OAuth
-  useEffect(() => {
-    console.log('ReaderDemoWidget mounted with props:', {
-      openSignupDirectly,
-      useInlineSignup,
-      signupMode,
-      isFullRegister
-    });
-
-    // Check for OAuth return with pricing flow
-    const showPricingAfterAuth = localStorage.getItem('showPricingAfterAuth');
-    const authToken = localStorage.getItem('token');
-    const pendingPrefs = localStorage.getItem('pendingLanguagePrefs');
-
-    if (showPricingAfterAuth === 'true' && authToken && pendingPrefs) {
-      console.log('OAuth return detected, updating profile and showing pricing');
-
-      // Parse stored preferences
-      const prefs = JSON.parse(pendingPrefs);
-
-      // Restore language selections in UI immediately
-      setHasSelectedLevel(true); // User had selected this level before OAuth
-      sessionStorage.setItem('selectedLevel', prefs.level);
-
-      if (prefs.targetLanguage) {
-        const targetLang = DEFAULT_LANGUAGES.find(l => l.code === prefs.targetLanguage);
-        if (targetLang) {
-          setTempTargetLanguage(targetLang);
-          setTargetSelectedLanguage(targetLang, prefs.level);
-          setHasTargetSelectedLanguage(true);
-        }
-      }
-
-      // Update user profile with language preferences
-      apiService.updateUserProfile({
-        nativeLanguage: prefs.nativeLanguage,
-        targetLanguage: prefs.targetLanguage,
-        level: prefs.level
-      }, authToken).then(response => {
-        if (response.success) {
-          // Clean up localStorage
-          localStorage.removeItem('showPricingAfterAuth');
-          localStorage.removeItem('pendingLanguagePrefs');
-          localStorage.removeItem('returnToWidget');
-
-          // Mark as registered and show pricing
-          setHasRegistered(true);
-          setShowSignupExpanded(true);
-          setShowPricingPage(true);
-        }
-      }).catch(error => {
-        console.error('Failed to update profile after OAuth:', error);
-        setSignupError('Failed to complete setup. Please try again.');
-        // Still show signup form so user can see the error
-        setShowSignupExpanded(true);
-      });
-
-      return; // Exit early to prevent normal flow
-    }
-
-    // Check sessionStorage for OAuth return (old flow)
-    const returnToWidget = sessionStorage.getItem('returnToWidget');
-    const registrationFlow = sessionStorage.getItem('registrationFlow');
-
-    console.log('OAuth return check:', {
-      returnToWidget,
-      registrationFlow,
-      openSignupDirectly
-    });
-
-    const shouldOpenSignup = openSignupDirectly || returnToWidget === 'true' || registrationFlow === 'google';
-
-    if (shouldOpenSignup && useInlineSignup) {
-      console.log('ReaderDemoWidget: Opening signup (prop or OAuth return)');
-      console.log('Current language from context:', {
-        nativeLanguage: nativeLanguage?.name,
-        selectedLanguage: targetSelectedLanguage?.name,
-        hasSelectedLanguage: hasTargetSelectedLanguage
-      });
-
-      // If OAuth return, handle the data
-      if (openSignupDirectly || returnToWidget === 'true' || registrationFlow === 'google') {
-        console.log('Setting hasRegistered to true');
-        // Clear the flags
-        sessionStorage.removeItem('returnToWidget');
-        sessionStorage.removeItem('registrationFlow');
-
-        // Mark as registered
-        setHasRegistered(true);
-
-        // Language preferences are already restored from localStorage by VisitorContext
-        // Just ensure we have the selected language marked as selected
-        if (targetSelectedLanguage && !hasTargetSelectedLanguage) {
-          setHasTargetSelectedLanguage(true);
-        }
-      }
-
-      // Add a small delay to ensure component is fully mounted
-      setTimeout(() => {
-        console.log('Setting showSignupExpanded to true');
-        setShowSignupExpanded(true);
-      }, 300); // Increased delay
-    }
-  }, [openSignupDirectly, useInlineSignup,
-    targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage,
-    setHasTargetSelectedLanguage, hasTargetSelectedLevel, nativeLanguage?.name, setTargetSelectedLanguage,
-    setHasSelectedLevel, signupMode, isFullRegister]);
 
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
@@ -270,7 +158,6 @@ export default function ReaderDemoWidget({
 
   // Initialize temp language states after currentLanguage is defined
   const [, setTempNativeLanguage] = useState(nativeLanguage);
-  const [, setTempTargetLanguage] = useState(currentLanguage);
 
   // Reset animation states when language changes
   useEffect(() => {
