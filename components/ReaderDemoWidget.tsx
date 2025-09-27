@@ -65,7 +65,6 @@ import {
   WordsReadCounter
 } from './ReaderDemoWidget.styles';
 import SignupModal from './SignupModal';
-import { language } from 'gray-matter';
 
 
 
@@ -110,7 +109,6 @@ export default function ReaderDemoWidget({
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
-  const [hasSelectedTarget, setHasSelectedTarget] = useState();
   const [, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
@@ -990,7 +988,7 @@ export default function ReaderDemoWidget({
 
   // Auto-focus email input when level is selected
   useEffect(() => {
-    if (targetSelectedLanguageLevel && hasSelectedTarget && !isEditingTarget && !hasRegistered && isFullRegister) {
+    if (targetSelectedLanguageLevel && hasTargetSelectedLanguage && !isEditingTarget && !hasRegistered && isFullRegister) {
       // Focus the email input after a short delay to ensure it's rendered
       setTimeout(() => {
         if (emailInputRef.current) {
@@ -1005,7 +1003,7 @@ export default function ReaderDemoWidget({
         }
       }, 300);
     }
-  }, [targetSelectedLanguageLevel, hasSelectedTarget, isEditingTarget, hasRegistered, isFullRegister]);
+  }, [targetSelectedLanguageLevel, hasTargetSelectedLanguage, isEditingTarget, hasRegistered, isFullRegister]);
 
 
   const setBookContentRef = useCallback((el: HTMLDivElement | null) => {
