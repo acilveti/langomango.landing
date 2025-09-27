@@ -5,14 +5,31 @@ import { CreateCheckoutSessionRequest, getRegisterEmail } from "services/apiServ
 import { createEnhancedCheckoutSession } from "services/apiService";
 import { trackRedditConversion } from "utils/redditPixel";
 import { RedditEventTypes } from "utils/redditPixel";
-import { useRouter } from "next/router";
 
 export default function Checkout() {
-    const router = useRouter()
     const { token, email, signupChannel } = useVisitor();
     const [isPricingLoading, setIsPricingLoading] = useState(false);
 
     useEffect(() => {
+        // Channel-specific handlers
+        const handleGoogleSignupCompletion = async () => {
+            // Google-specific actions
+            console.log('Completing Google signup flow');
+            // Redirect to dashboard or onboarding
+            window.location.href = '/thank-you';
+        };
+
+        const handleEmailSignupCompletion = async () => {
+            // Email-specific actions
+            console.log('Completing email signup flow');
+
+            if (token && email) {
+                await getRegisterEmail(token, email)
+            }
+            // Redirect to email verification or onboarding
+            window.location.href = '/verify-email';
+        }; 
+
         const handleStripeReturn = async () => {
             // Check if returning from Stripe
             const urlParams = new URLSearchParams(window.location.search);
@@ -34,31 +51,13 @@ export default function Checkout() {
 
                 // Clean up
                 localStorage.removeItem('signup-channel');
-                localStorage.removeItem('stripe-session-id');
             }
         };
         console.log("check stripe return")
         handleStripeReturn();
-    }, [signupChannel]);
+    }, [signupChannel,token, email]);
 
-    // Channel-specific handlers
-    const handleGoogleSignupCompletion = async () => {
-        // Google-specific actions
-        console.log('Completing Google signup flow');
-        // Redirect to dashboard or onboarding
-        window.location.href = '/thank-you';
-    };
-    
-    const handleEmailSignupCompletion = async () => {
-        // Email-specific actions
-        console.log('Completing email signup flow');
 
-        if(token && email){
-            await getRegisterEmail(token, email) 
-        }
-        // Redirect to email verification or onboarding
-        window.location.href = '/verify-email';
-    };
     // Handle pricing plan selection
     const handlePricingPlanSelect = useCallback(async (planId: string) => {
         console.log('Selected pricing plan:', planId);
