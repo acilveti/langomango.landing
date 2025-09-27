@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import PricingPage from "components/PricingPage/PricingPage";
+import { useVisitor } from "contexts/VisitorContext";
 import { CreateCheckoutSessionRequest } from "services/apiService";
 import { createEnhancedCheckoutSession } from "services/apiService";
 import { trackRedditConversion } from "utils/redditPixel";
@@ -7,7 +8,9 @@ import { RedditEventTypes } from "utils/redditPixel";
 
 export default function Checkout() {
 
+    const {token} = useVisitor();
     const [isPricingLoading, setIsPricingLoading] = useState(false);
+
     // Handle pricing plan selection
     const handlePricingPlanSelect = useCallback(async (planId: string) => {
         console.log('Selected pricing plan:', planId);
@@ -15,8 +18,8 @@ export default function Checkout() {
 
         try {
             // User is already authenticated at this point
-            const authToken = localStorage.getItem('token');
-            if (!authToken) {
+            
+            if (!token) {
                 throw new Error('No authentication token found. Please sign in again.');
             }
 
@@ -35,7 +38,7 @@ export default function Checkout() {
                 returnUrl: 'https://beta-app.langomango.com/payment-room'
             };
 
-            const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, authToken);
+            const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, token);
 
             if (!checkoutData || !checkoutData.url) {
                 throw new Error('Failed to create checkout session');
@@ -60,13 +63,13 @@ export default function Checkout() {
             alert(error instanceof Error ? error.message : 'Failed to process payment. Please try again.');
             setIsPricingLoading(false);
         }
-    }, []);
+    }, [token]);
     return (
         <PricingPage
             onSelectPlan={handlePricingPlanSelect}
             isLoading={isPricingLoading}
-            userToken={localStorage.getItem('token') || undefined}
-            isAuthenticated={true}
+            userToken={token}
+            isAuthenticated={token != null}
         />
     )
 }

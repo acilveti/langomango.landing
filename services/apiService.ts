@@ -293,7 +293,7 @@ export interface UserSubscriptionStatus {
 // Add these methods to the ApiService class
 export async function createEnhancedCheckoutSession(
   request: CreateCheckoutSessionRequest,
-  token?: string
+  token: string | null
 ): Promise<CreateCheckoutSessionResponse> {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

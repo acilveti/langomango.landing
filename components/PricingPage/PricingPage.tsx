@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
-import { CreateCheckoutSessionRequest, createEnhancedCheckoutSession, getUserSubscriptionStatus } from '../../services/apiService';
 
 interface PricingPlan {
   id: string;
@@ -20,7 +19,7 @@ interface PricingPlan {
 interface PricingPageProps {
   onSelectPlan?: (planId: string) => void;
   isLoading?: boolean;
-  userToken?: string; // JWT token if user is authenticated
+  userToken: string | null; // JWT token if user is authenticated
   isAuthenticated?: boolean;
 }
 
@@ -31,8 +30,6 @@ const PricingPage: React.FC<PricingPageProps> = ({
   isAuthenticated = false 
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [hasTrialed, setHasTrialed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
@@ -92,26 +89,6 @@ const PricingPage: React.FC<PricingPageProps> = ({
     }
   ];
 
-  // Check if user has already trialed
-  useEffect(() => {
-    const checkTrialStatus = async () => {
-      if (isAuthenticated && userToken) {
-        try {
-          const status = await getUserSubscriptionStatus(userToken);
-          setHasTrialed(
-            status.isTrialing === true ||
-            status.isActive === true ||
-            status.hasTrialed === true ||
-            status.status !== 'None'
-          );
-        } catch (error) {
-          console.error('Error checking trial status:', error);
-        }
-      }
-    };
-    checkTrialStatus();
-  }, [isAuthenticated, userToken]);
-
   const handlePlanSelect = async (planId: string) => {
     setSelectedPlan(planId);
     setError(null);
@@ -120,59 +97,7 @@ const PricingPage: React.FC<PricingPageProps> = ({
     if (onSelectPlan) {
       onSelectPlan(planId);
     }
-
-    // Find the selected plan
-    const selectedPlanData = plans.find(plan => plan.id === planId);
-    if (!selectedPlanData) {
-      setError('Invalid plan selected');
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-
-      // If user is not authenticated, redirect to sign up
-      if (!isAuthenticated) {
-        // Store the selected plan for after login
-        localStorage.setItem('selectedPlan', planId);
-        localStorage.setItem('returnToCheckout', 'true');
-        
-        // Redirect to your app's sign-up page
-        window.location.href = 'https://beta-app.langomango.com/sign-up';
-        return;
-      }
-
-      // Create checkout session
-      const checkoutRequest: CreateCheckoutSessionRequest = {
-        priceLookupKey: selectedPlanData.stripeLookupKey,
-        planType: planId === '1month' ? 'monthly' : planId === 'yearly' ? 'yearly' : '3year',
-        includeTrial: !hasTrialed,
-        returnUrl: window.location.origin + '/payment-success' // Adjust this to your success page
-      };
-
-      const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, userToken);
-
-      if (!checkoutData || !checkoutData.url) {
-        throw new Error('Failed to create checkout session');
-      }
-
-      // Store session ID if needed
-      if (checkoutData.sessionId) {
-        localStorage.setItem('stripe-session-id', checkoutData.sessionId);
-      }
-
-      // Redirect to Stripe Checkout
-      window.location.href = checkoutData.url;
-
-    } catch (error: any) {
-      console.error('Error initiating checkout:', error);
-      setError(error.message || 'Failed to start checkout. Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
   };
-
-  const isLoading = externalLoading || isProcessing;
 
   return (
     <PricingWrapper>
@@ -196,7 +121,7 @@ const PricingPage: React.FC<PricingPageProps> = ({
               $recommended={plan.recommended}
               $isLifetime={plan.id === '3year'}
               $isSelected={selectedPlan === plan.id}
-              onClick={() => !isLoading && handlePlanSelect(plan.id)}
+              onClick={() => handlePlanSelect(plan.id)}
             >
               {plan.recommended && <RecommendedBadge>MOST POPULAR</RecommendedBadge>}
               
@@ -231,9 +156,8 @@ const PricingPage: React.FC<PricingPageProps> = ({
               <SelectButton
                 $recommended={plan.recommended}
                 $isLifetime={plan.id === '3year'}
-                disabled={isLoading}
               >
-                {isLoading && selectedPlan === plan.id ? (
+                {selectedPlan === plan.id ? (
                   <LoadingSpinner />
                 ) : (
                   plan.buttonText
@@ -260,9 +184,9 @@ const PricingPage: React.FC<PricingPageProps> = ({
 
         <CTAButton 
           onClick={() => handlePlanSelect(selectedPlan)} 
-          disabled={!selectedPlan || isLoading}
+          disabled={!selectedPlan}
         >
-          {isLoading ? 'Processing...' : selectedPlan === '3year' ? 'Get 3 Year Access' : 'Start Your Free Trial'}
+          {selectedPlan === '3year' ? 'Get 3 Year Access' : 'Start Your Free Trial'}
         </CTAButton>
       </PricingContent>
     </PricingWrapper>

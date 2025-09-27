@@ -80,6 +80,7 @@ export const DEFAULT_LANGUAGES: Language[] = [
 
 // Referral source type
 export type ReferralSource = 'reddit' | 'instagram' | 'facebook' | 'twitter' | 'google' | 'direct' | 'other';
+export type SignupChannel = 'Google' | 'email' ;
 
 // Context type definition
 interface VisitorContextType {
@@ -90,10 +91,14 @@ interface VisitorContextType {
   referralSource: ReferralSource;
   hasTargetSelectedLanguage: boolean;
   hasTargetSelectedLevel: boolean;
+  token: string | null;
+  signupChannel: SignupChannel | null;
   setTargetSelectedLanguage: (language: Language, level?: Levels | null) => void;
   setNativeSelectedLanguage: (language: Language, level?: string | null) => void;
   setHasTargetSelectedLanguage: (value: boolean) => void;
   setHasSelectedLevel: (value: boolean) => void;
+  setToken: (value: string) => void;
+  setSignupChannel: (value: SignupChannel) => void;
 }
 
 // Create the context
@@ -116,7 +121,7 @@ const detectBrowserLanguage = (): Language => {
 
   // Find matching language in our list, default to English if not found
   return DEFAULT_LANGUAGES.find(lang => lang.code === langCode) ||
-    DEFAULT_LANGUAGES.find(lang => lang.code === 'en')! 
+    DEFAULT_LANGUAGES.find(lang => lang.code === 'en')!
 };
 
 // Helper function to get referral source from URL parameters or document referrer
@@ -167,11 +172,22 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
   const [hasDetectedNativeLanguage, setHasDetectedNativeLanguage] = useState<boolean>(false);
   const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [signupChannel, setSignupChannel] = useState<SignupChannel | null>(null);
+
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('token', token)
+      console.log("token is - " + token)
+    }
+  }, [token]);
 
   // Load persisted data from localStorage on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const persistedTokenData = localStorage.getItem('token');
+    setToken(persistedTokenData)
     // Load persisted language preferences
     const persistedData = localStorage.getItem('languagePreferences');
     if (persistedData) {
@@ -236,9 +252,9 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   // Custom setSelectedLanguage that also persists to localStorage
   const setTargetSelectedLanguage = (language: Language, level?: Levels | null) => {
     setSelectedLanguageState(language);
-    if(level){
+    if (level) {
       setSelectedLanguageLevelState(level);
-    } else{
+    } else {
       setHasSelectedLevelState(false)
     }
 
@@ -349,10 +365,14 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     referralSource,
     hasTargetSelectedLanguage: hasSelectedTargetLanguage,
     hasTargetSelectedLevel: hasSelectedLevel,
+    token,
+    signupChannel,
     setTargetSelectedLanguage,
     setNativeSelectedLanguage,
     setHasTargetSelectedLanguage,
     setHasSelectedLevel,
+    setToken,
+    setSignupChannel
   };
 
   return (

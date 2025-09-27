@@ -51,6 +51,8 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
         setNativeSelectedLanguage,
         setTargetSelectedLanguage,
         setHasTargetSelectedLanguage,
+        setToken,
+        setSignupChannel,
     } = useVisitor();
 
     const emailInputRef = useRef<HTMLInputElement>(null);
@@ -518,16 +520,16 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                         // Create account immediately with email
                                                         const response = await apiService.signupWithEmail({
                                                             email: registrationEmail,
-                                                            nativeLanguage: nativeLanguage?.code || nativeLanguage?.code || 'en',
-                                                            targetLanguage: targetSelectedLanguage?.code!,
+                                                            nativeLanguage: nativeLanguage?.code,
+                                                            targetLanguage: targetSelectedLanguage?.code,
                                                             level: targetSelectedLanguageLevel.code
                                                         });
 
                                                         if (response.success && response.token) {
                                                             // Store token - user is now authenticated
-                                                            localStorage.setItem('token', response.token);
+                                                            setToken(response.token)
+                                                            setSignupChannel('email')
                                                             localStorage.setItem('userEmail', registrationEmail);
-
                                                             // Mark as registered
                                                             setHasRegistered(true);
 
@@ -586,7 +588,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                 // Set flag to show pricing after OAuth return
                                                 localStorage.setItem('showPricingAfterAuth', 'true');
                                                 localStorage.setItem('returnToWidget', 'true');
-
+                                                setSignupChannel('Google')
                                                 // Redirect to Google OAuth
                                                 const baseUrl = 'https://staging.langomango.com';
                                                 const returnUrl = encodeURIComponent('/sign-up');
