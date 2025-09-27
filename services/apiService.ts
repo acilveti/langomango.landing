@@ -331,3 +331,18 @@ export async function getUserSubscriptionStatus(token: string): Promise<UserSubs
 
   return response.json();
 }
+
+export async function getRegisterEmail(token: string, email: string): Promise<boolean> {
+  const response = await fetch(`${API_URL}/auth/get-register-email`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get subscription status');
+  }
+
+  return response.ok;
+}

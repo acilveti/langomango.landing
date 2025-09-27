@@ -93,11 +93,13 @@ interface VisitorContextType {
   hasTargetSelectedLevel: boolean;
   token: string | null;
   signupChannel: SignupChannel | null;
+  email: string | null;
   setTargetSelectedLanguage: (language: Language, level?: Levels | null) => void;
   setNativeSelectedLanguage: (language: Language, level?: string | null) => void;
   setHasTargetSelectedLanguage: (value: boolean) => void;
   setHasSelectedLevel: (value: boolean) => void;
   setToken: (value: string) => void;
+  setEmail: (value: string) => void;
   setSignupChannel: (value: SignupChannel) => void;
 }
 
@@ -166,21 +168,28 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   availableLanguages = DEFAULT_LANGUAGES
 }) => {
   const [targetSelectedLanguage, setSelectedLanguageState] = useState<Language>(defaultLanguage);
-  const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<Levels>(DEFAULT_LEVELS.find(l => l.code === 'A1')!);
+  const [targetSelectedLanguageLevel, setSelectedLanguageLevelState] = useState<Levels>(DEFAULT_LEVELS.find(l => l.code === 'A1')!);
   const [nativeLanguage, setNativeLanguage] = useState<Language>(DEFAULT_LANGUAGES.find(l => l.code === 'en')!);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
-  const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
+  const [hasTargetSelectedLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
   const [hasDetectedNativeLanguage, setHasDetectedNativeLanguage] = useState<boolean>(false);
-  const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
+  const [hasTargetSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [signupChannel, setSignupChannel] = useState<SignupChannel | null>(null);
 
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token)
-      console.log("token is - " + token)
     }
-  }, [token]);
+    if (signupChannel) {
+      localStorage.setItem('signupChannel', signupChannel)
+    }
+    if (email) {
+      localStorage.setItem('email', email)
+    }
+    
+  }, [token, signupChannel, email]);
 
   // Load persisted data from localStorage on mount
   useEffect(() => {
@@ -188,6 +197,10 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
 
     const persistedTokenData = localStorage.getItem('token');
     setToken(persistedTokenData)
+    const persistedSignupChannelData = localStorage.getItem('signupChannel');
+    setSignupChannel(persistedSignupChannelData as SignupChannel)
+    const persistedEmailData = localStorage.getItem('email');
+    setEmail(persistedEmailData)
     // Load persisted language preferences
     const persistedData = localStorage.getItem('languagePreferences');
     if (persistedData) {
@@ -358,21 +371,23 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   };
 
   const value: VisitorContextType = {
-    targetSelectedLanguage: targetSelectedLanguage,
-    targetSelectedLanguageLevel: selectedLanguageLevel,
+    targetSelectedLanguage,
+    targetSelectedLanguageLevel,
     availableLanguages,
     nativeLanguage,
     referralSource,
-    hasTargetSelectedLanguage: hasSelectedTargetLanguage,
-    hasTargetSelectedLevel: hasSelectedLevel,
+    hasTargetSelectedLanguage,
+    hasTargetSelectedLevel,
     token,
     signupChannel,
+    email, 
     setTargetSelectedLanguage,
     setNativeSelectedLanguage,
     setHasTargetSelectedLanguage,
     setHasSelectedLevel,
     setToken,
-    setSignupChannel
+    setSignupChannel,
+    setEmail,
   };
 
   return (

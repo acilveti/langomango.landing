@@ -1,25 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import PricingPage from "components/PricingPage/PricingPage";
 import { useVisitor } from "contexts/VisitorContext";
-import { CreateCheckoutSessionRequest } from "services/apiService";
+import { CreateCheckoutSessionRequest, getRegisterEmail } from "services/apiService";
 import { createEnhancedCheckoutSession } from "services/apiService";
 import { trackRedditConversion } from "utils/redditPixel";
 import { RedditEventTypes } from "utils/redditPixel";
+import { useRouter } from "next/router";
 
 export default function Checkout() {
-
-    const { token, signupChannel } = useVisitor();
+    const router = useRouter()
+    const { token, email, signupChannel } = useVisitor();
     const [isPricingLoading, setIsPricingLoading] = useState(false);
 
     useEffect(() => {
         const handleStripeReturn = async () => {
             // Check if returning from Stripe
             const urlParams = new URLSearchParams(window.location.search);
+            console.log(urlParams)
             const sessionId = urlParams.get('session_id');
             const success = urlParams.get('success');
 
             if (sessionId && success === 'true') {
-
+                console.log("stripe success detected " + signupChannel)
                 // Perform channel-specific actions
                 switch (signupChannel) {
                     case 'Google':
@@ -35,7 +37,7 @@ export default function Checkout() {
                 localStorage.removeItem('stripe-session-id');
             }
         };
-
+        console.log("check stripe return")
         handleStripeReturn();
     }, [signupChannel]);
 
@@ -43,15 +45,17 @@ export default function Checkout() {
     const handleGoogleSignupCompletion = async () => {
         // Google-specific actions
         console.log('Completing Google signup flow');
-
         // Redirect to dashboard or onboarding
-        window.location.href = '/dashboard';
+        window.location.href = '/thank-you';
     };
-
+    
     const handleEmailSignupCompletion = async () => {
         // Email-specific actions
         console.log('Completing email signup flow');
 
+        if(token && email){
+            await getRegisterEmail(token, email) 
+        }
         // Redirect to email verification or onboarding
         window.location.href = '/verify-email';
     };
@@ -79,7 +83,7 @@ export default function Checkout() {
                 priceLookupKey: priceLookupKey,
                 planType: planId === '1month' ? 'monthly' : planId === 'yearly' ? 'yearly' : '3year',
                 includeTrial: true, // New users always get trial
-                returnUrl: '/checkout'
+                returnUrl: window.location.href,
             };
 
             const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, token);

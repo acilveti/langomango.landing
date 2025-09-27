@@ -53,6 +53,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
         setHasTargetSelectedLanguage,
         setToken,
         setSignupChannel,
+        setEmail,
     } = useVisitor();
 
     const emailInputRef = useRef<HTMLInputElement>(null);
@@ -529,6 +530,9 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                             // Store token - user is now authenticated
                                                             setToken(response.token)
                                                             setSignupChannel('email')
+                                                            setEmail(registrationEmail)
+                                                            console.log("set the email channel")
+                                                            
                                                             localStorage.setItem('userEmail', registrationEmail);
                                                             // Mark as registered
                                                             setHasRegistered(true);
