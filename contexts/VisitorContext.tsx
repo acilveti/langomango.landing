@@ -90,8 +90,8 @@ interface VisitorContextType {
   referralSource: ReferralSource;
   hasTargetSelectedLanguage: boolean;
   hasTargetSelectedLevel: boolean;
-  setTargetSelectedLanguage: (language: Language | null, level?: Levels | null) => void;
-  setNativeSelectedLanguage: (language: Language | null, level?: string | null) => void;
+  setTargetSelectedLanguage: (language: Language, level?: Levels | null) => void;
+  setNativeSelectedLanguage: (language: Language, level?: string | null) => void;
   setHasTargetSelectedLanguage: (value: boolean) => void;
   setHasSelectedLevel: (value: boolean) => void;
 }
@@ -102,13 +102,13 @@ const VisitorContext = createContext<VisitorContextType | undefined>(undefined);
 // Provider props
 interface VisitorProviderProps {
   children: ReactNode;
-  defaultLanguage?: Language | null;
+  defaultLanguage: Language;
   availableLanguages?: Language[];
 }
 
 // Helper function to detect browser language
-const detectBrowserLanguage = (): Language | null => {
-  if (typeof window === 'undefined') return null;
+const detectBrowserLanguage = (): Language => {
+  if (typeof window === 'undefined') return DEFAULT_LANGUAGES.find(lang => lang.code === 'en')!;
 
   // Get browser language
   const browserLang = navigator.language || (navigator as any).userLanguage || 'en';
@@ -116,8 +116,7 @@ const detectBrowserLanguage = (): Language | null => {
 
   // Find matching language in our list, default to English if not found
   return DEFAULT_LANGUAGES.find(lang => lang.code === langCode) ||
-    DEFAULT_LANGUAGES.find(lang => lang.code === 'en') ||
-    null;
+    DEFAULT_LANGUAGES.find(lang => lang.code === 'en')! 
 };
 
 // Helper function to get referral source from URL parameters or document referrer
@@ -158,12 +157,12 @@ const detectReferralSource = (): ReferralSource => {
 // Provider component
 export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   children,
-  defaultLanguage = null,
+  defaultLanguage,
   availableLanguages = DEFAULT_LANGUAGES
 }) => {
-  const [selectedLanguage, setSelectedLanguageState] = useState<Language | null>(defaultLanguage);
-  const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<string | null>(null);
-  const [nativeLanguage, setNativeLanguage] = useState<Language | null>(null);
+  const [targetSelectedLanguage, setSelectedLanguageState] = useState<Language>(defaultLanguage);
+  const [selectedLanguageLevel, setSelectedLanguageLevelState] = useState<Levels>(DEFAULT_LEVELS.find(l => l.code === 'A1')!);
+  const [nativeLanguage, setNativeLanguage] = useState<Language>(DEFAULT_LANGUAGES.find(l => l.code === 'en')!);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
   const [hasSelectedTargetLanguage, setHasSelectedTargetLanguageState] = useState<boolean>(false);
   const [hasSelectedLevel, setHasSelectedLevelState] = useState<boolean>(false);
@@ -217,7 +216,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     }
 
     // If no selected language, use German as default
-    if (!selectedLanguage && !persistedData) {
+    if (!targetSelectedLanguage && !persistedData) {
       const germanLang = DEFAULT_LANGUAGES.find(lang => lang.code === 'de');
       setSelectedLanguageState(germanLang || DEFAULT_LANGUAGES[0]);
     }
@@ -233,9 +232,11 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   }, []);
 
   // Custom setSelectedLanguage that also persists to localStorage
-  const setTargetSelectedLanguage = (language: Language | null, level?: string | null) => {
+  const setTargetSelectedLanguage = (language: Language, level?: Levels | null) => {
     setSelectedLanguageState(language);
-    setSelectedLanguageLevelState(level || null);
+    if(level){
+      setSelectedLanguageLevelState(level);
+    }
 
     // If level is explicitly provided, mark it as selected
     if (level) {
@@ -337,14 +338,14 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   };
 
   const value: VisitorContextType = {
-    targetSelectedLanguage: selectedLanguage,
+    targetSelectedLanguage: targetSelectedLanguage,
     targetSelectedLanguageLevel: selectedLanguageLevel,
     availableLanguages,
     nativeLanguage,
     referralSource,
     hasTargetSelectedLanguage: hasSelectedTargetLanguage,
     hasTargetSelectedLevel: hasSelectedLevel,
-    setTargetSelectedLanguage: setTargetSelectedLanguage,
+    setTargetSelectedLanguage,
     setNativeSelectedLanguage,
     setHasTargetSelectedLanguage,
     setHasSelectedLevel,
