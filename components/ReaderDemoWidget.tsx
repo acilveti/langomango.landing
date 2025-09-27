@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
-import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
+import { DEFAULT_LANGUAGES, DEFAULT_LEVELS, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import { getFallbackTranslation, readerTranslations } from 'data/readerTranslations';
 import { apiService, } from 'services/apiService';
 
@@ -65,6 +65,7 @@ import {
   WordsReadCounter
 } from './ReaderDemoWidget.styles';
 import SignupModal from './SignupModal';
+import { language } from 'gray-matter';
 
 
 
@@ -87,13 +88,13 @@ export default function ReaderDemoWidget({
   openSignupDirectly = false // New prop with default value
 }: ReaderDemoWidgetProps) {
   const {
-    targetSelectedLanguage: contextLanguage,
-    targetSelectedLanguageLevel: contextLanguageLevel,
-    setTargetSelectedLanguage: setContextLanguage,
+    targetSelectedLanguage,
+    targetSelectedLanguageLevel,
     nativeLanguage,
-    hasTargetSelectedLanguage: hasSelectedLanguage,
+    hasTargetSelectedLanguage,
+    hasTargetSelectedLevel,
+    setTargetSelectedLanguage,
     setHasTargetSelectedLanguage,
-    hasTargetSelectedLevel: hasSelectedLevel,
     setHasSelectedLevel
   } = useVisitor();
 
@@ -107,11 +108,9 @@ export default function ReaderDemoWidget({
   const [justUpdated, setJustUpdated] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
-  const [tempSelectedLanguage, setTempSelectedLanguage] = useState<Language | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState('');
   const [, setIsEditingNative] = useState(false);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
-  const [hasSelectedTarget, setHasSelectedTarget] = useState(hasSelectedLanguage);
+  const [hasSelectedTarget, setHasSelectedTarget] = useState();
   const [, setSignupError] = useState('');
   const [isCalculatingWords, setIsCalculatingWords] = useState(false);
   const [shouldAnimateButton, setShouldAnimateButton] = useState(false);
@@ -139,22 +138,16 @@ export default function ReaderDemoWidget({
   const alphabetArray = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const [alphabetStage, setAlphabetStage] = useState(0); // 0: initial, 1-3: after clicks
   const [, setShowPricingPage] = useState(false);
-  const [demoLevel, setDemoLevel] = useState<string>('A1'); // Default demo level is A1
   const { setIsModalOpened: setIsSignupModalOpened } = useSignupModalContext();
-  const {setIsReaderDemoModalOpened} = useReaderDemoModalContext();
+  const { setIsReaderDemoModalOpened } = useReaderDemoModalContext();
 
 
   // Sync demo level with context level only if user has selected it
   useEffect(() => {
-    if (contextLanguageLevel && hasSelectedLevel) {
-      setDemoLevel(contextLanguageLevel);
-      setSelectedLevel(contextLanguageLevel);
-      sessionStorage.setItem('selectedLevel', contextLanguageLevel);
-    } else if (contextLanguageLevel && !hasSelectedLevel) {
-      // If there's a level but user hasn't selected it, use it for demo but not for selection
-      setDemoLevel(contextLanguageLevel);
+    if (targetSelectedLanguageLevel && hasTargetSelectedLevel) {
+      sessionStorage.setItem('selectedLevel', targetSelectedLanguageLevel.code);
     }
-  }, [contextLanguageLevel, hasSelectedLevel]);
+  }, [targetSelectedLanguageLevel, hasTargetSelectedLevel]);
 
   // Handle opening signup directly if prop is set OR if returning from OAuth
   useEffect(() => {
@@ -177,8 +170,6 @@ export default function ReaderDemoWidget({
       const prefs = JSON.parse(pendingPrefs);
 
       // Restore language selections in UI immediately
-      setSelectedLevel(prefs.level);
-      setDemoLevel(prefs.level);
       setHasSelectedLevel(true); // User had selected this level before OAuth
       sessionStorage.setItem('selectedLevel', prefs.level);
 
@@ -186,8 +177,7 @@ export default function ReaderDemoWidget({
         const targetLang = DEFAULT_LANGUAGES.find(l => l.code === prefs.targetLanguage);
         if (targetLang) {
           setTempTargetLanguage(targetLang);
-          setContextLanguage(targetLang, prefs.level);
-          setHasSelectedTarget(true);
+          setTargetSelectedLanguage(targetLang, prefs.level);
           setHasTargetSelectedLanguage(true);
         }
       }
@@ -235,8 +225,8 @@ export default function ReaderDemoWidget({
       console.log('ReaderDemoWidget: Opening signup (prop or OAuth return)');
       console.log('Current language from context:', {
         nativeLanguage: nativeLanguage?.name,
-        selectedLanguage: contextLanguage?.name,
-        hasSelectedLanguage
+        selectedLanguage: targetSelectedLanguage?.name,
+        hasSelectedLanguage: hasTargetSelectedLanguage
       });
 
       // If OAuth return, handle the data
@@ -251,15 +241,8 @@ export default function ReaderDemoWidget({
 
         // Language preferences are already restored from localStorage by VisitorContext
         // Just ensure we have the selected language marked as selected
-        if (contextLanguage && !hasSelectedLanguage) {
+        if (targetSelectedLanguage && !hasTargetSelectedLanguage) {
           setHasTargetSelectedLanguage(true);
-          setHasSelectedTarget(true);
-        }
-
-        // Also ensure level is properly set from context if user has selected it
-        if (contextLanguageLevel && hasSelectedLevel) {
-          setSelectedLevel(contextLanguageLevel);
-          setDemoLevel(contextLanguageLevel);
         }
       }
 
@@ -270,22 +253,22 @@ export default function ReaderDemoWidget({
       }, 300); // Increased delay
     }
   }, [openSignupDirectly, useInlineSignup,
-    contextLanguage, contextLanguageLevel, hasSelectedLanguage,
-    setHasTargetSelectedLanguage, hasSelectedLevel, nativeLanguage?.name, setContextLanguage,
+    targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage,
+    setHasTargetSelectedLanguage, hasTargetSelectedLevel, nativeLanguage?.name, setTargetSelectedLanguage,
     setHasSelectedLevel, signupMode, isFullRegister]);
 
   // Auto-open target language picker immediately when signup is shown
   useEffect(() => {
-    if (showSignupExpanded && !hasSelectedTarget && !hasAutoOpenedLanguage) {
+    if (showSignupExpanded && !hasTargetSelectedLanguage && !hasAutoOpenedLanguage) {
       setIsEditingTarget(true);
       setHasAutoOpenedLanguage(true);
     }
-  }, [showSignupExpanded, hasSelectedTarget, hasAutoOpenedLanguage]);
+  }, [showSignupExpanded, hasTargetSelectedLanguage, hasAutoOpenedLanguage]);
 
   // Use context language as the source of truth, with fallback to prop or default
   const currentLanguage = React.useMemo(() => {
-    return contextLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
-  }, [contextLanguage]);
+    return targetSelectedLanguage || { code: 'de', name: 'German', flag: '🇩🇪' };
+  }, [targetSelectedLanguage]);
 
   // Initialize temp language states after currentLanguage is defined
   const [, setTempNativeLanguage] = useState(nativeLanguage);
@@ -306,35 +289,12 @@ export default function ReaderDemoWidget({
     hasStartedTimerRef.current = false;
   }, [currentLanguage.code]);
 
-
-
-
-
-  // Check if we should show the language as not selected (if it's still the default German and user hasn't actively selected)
-  useEffect(() => {
-    if (!hasSelectedLanguage && currentLanguage.code === 'de') {
-      setHasSelectedTarget(false);
-    } else if (hasSelectedLanguage || openSignupDirectly) {
-      setHasSelectedTarget(true);
-    }
-  }, [hasSelectedLanguage, currentLanguage.code, openSignupDirectly]);
-
   // Update temp languages when context changes
   useEffect(() => {
     if (nativeLanguage) {
       setTempNativeLanguage(nativeLanguage);
     }
   }, [nativeLanguage]);
-
-  useEffect(() => {
-    if (currentLanguage) {
-      setTempTargetLanguage(currentLanguage);
-      // If we have a selected language from context, ensure it's marked as selected
-      if (hasSelectedLanguage && currentLanguage.code !== 'de') {
-        setHasSelectedTarget(true);
-      }
-    }
-  }, [currentLanguage, hasSelectedLanguage]);
 
   const pageRef = useRef<HTMLDivElement>(null);
   const wordsTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -370,24 +330,21 @@ export default function ReaderDemoWidget({
   // Handle language selection
   const handleLanguageSelect = (language: Language) => {
     // Store the selected language temporarily
-    setTempSelectedLanguage(language);
+    setTargetSelectedLanguage(language);
     // Show level selection dropdown
     setShowLevelDropdown(true);
     setIsLanguageDropdownOpen(false);
   };
 
   // Handle level selection
-  const handleLevelSelectInDropdown = (level: string) => {
-    if (tempSelectedLanguage) {
+  const handleLevelSelectInDropdown = (level: Levels) => {
+    if (hasTargetSelectedLanguage || targetSelectedLanguage) {
       // Update context language with level
-      setContextLanguage(tempSelectedLanguage, level);
+      setTargetSelectedLanguage(targetSelectedLanguage, level);
       setHasTargetSelectedLanguage(true);
       setHasSelectedLevel(true); // Mark level as explicitly selected by user
 
-      // Store the selected level
-      setSelectedLevel(level);
-      setDemoLevel(level);
-      sessionStorage.setItem('selectedLevel', level);
+      sessionStorage.setItem('selectedLevel', level.code);
 
       // Close dropdowns
       setShowLevelDropdown(false);
@@ -414,13 +371,16 @@ export default function ReaderDemoWidget({
 
       // Call parent callback if provided
       if (onLanguageChange) {
-        onLanguageChange(tempSelectedLanguage);
+        onLanguageChange(targetSelectedLanguage);
       }
     }
   };
 
   // Determine if we should show words only or sentences based on level
-  const showWordsOnly = !demoLevel || demoLevel === 'A1' || demoLevel === 'A2';
+  const showWordsOnly =
+    !targetSelectedLanguageLevel ||
+    targetSelectedLanguageLevel.code === 'A1' ||
+    targetSelectedLanguageLevel.code === 'A2';
 
   // Function to get random letters that haven't been added yet
   const getRandomLetters = useCallback((count: number, existing: string[]): string[] => {
@@ -848,11 +808,11 @@ export default function ReaderDemoWidget({
         }, 100); // Reduced delay for faster response
       }
     }
-  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords, 
-    wordsRead, showSignupExpanded, useInlineSignup, setIsSignupModalOpened, 
-    isInitialAnimationComplete, activeLetters, showEducationalMessage, 
-    isHidingEducationalMessage, showSecondEducationalMessage, 
-    isHidingSecondEducationalMessage, showThirdEducationalMessage, 
+  }, [setHasClicked, currentPage, totalPages, handleInteraction, clickCount, calculatePageWords,
+    wordsRead, showSignupExpanded, useInlineSignup, setIsSignupModalOpened,
+    isInitialAnimationComplete, activeLetters, showEducationalMessage,
+    isHidingEducationalMessage, showSecondEducationalMessage,
+    isHidingSecondEducationalMessage, showThirdEducationalMessage,
     isHidingThirdEducationalMessage, getRandomLetters, hidePopup, showWordCounts]);
 
   const handlePageInputChange = useCallback((text: string) => {
@@ -1030,7 +990,7 @@ export default function ReaderDemoWidget({
 
   // Auto-focus email input when level is selected
   useEffect(() => {
-    if (selectedLevel && hasSelectedTarget && !isEditingTarget && !hasRegistered && isFullRegister) {
+    if (targetSelectedLanguageLevel && hasSelectedTarget && !isEditingTarget && !hasRegistered && isFullRegister) {
       // Focus the email input after a short delay to ensure it's rendered
       setTimeout(() => {
         if (emailInputRef.current) {
@@ -1045,7 +1005,7 @@ export default function ReaderDemoWidget({
         }
       }, 300);
     }
-  }, [selectedLevel, hasSelectedTarget, isEditingTarget, hasRegistered, isFullRegister]);
+  }, [targetSelectedLanguageLevel, hasSelectedTarget, isEditingTarget, hasRegistered, isFullRegister]);
 
 
   const setBookContentRef = useCallback((el: HTMLDivElement | null) => {
@@ -1162,55 +1122,23 @@ export default function ReaderDemoWidget({
                   $isOpen={true}
                 >
                   <SelectedLanguage>
-                    <LanguageFlag>{tempSelectedLanguage?.flag}</LanguageFlag>
-                    <LanguageName>Select {tempSelectedLanguage?.name} Level</LanguageName>
+                    <LanguageFlag>{targetSelectedLanguage?.flag}</LanguageFlag>
+                    <LanguageName>Select {targetSelectedLanguage?.name} Level</LanguageName>
                     <ChevronIcon $isOpen={true}>▼</ChevronIcon>
                   </SelectedLanguage>
                 </LanguageDropdown>
 
                 <LanguageList>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('A1')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🌱</span>
-                    <LanguageName>A1 - Beginner</LanguageName>
-                  </LanguageOption>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('A2')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🌿</span>
-                    <LanguageName>A2 - Elementary</LanguageName>
-                  </LanguageOption>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('B1')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🍀</span>
-                    <LanguageName>B1 - Intermediate</LanguageName>
-                  </LanguageOption>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('B2')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🌳</span>
-                    <LanguageName>B2 - Upper Int.</LanguageName>
-                  </LanguageOption>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('C1')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🌲</span>
-                    <LanguageName>C1 - Advanced</LanguageName>
-                  </LanguageOption>
-                  <LanguageOption
-                    onClick={() => handleLevelSelectInDropdown('C2')}
-                    $isSelected={false}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>🎯</span>
-                    <LanguageName>C2 - Mastery</LanguageName>
-                  </LanguageOption>
+                  {DEFAULT_LEVELS.map((level) => (
+                    <LanguageOption
+                      key={level.code}
+                      onClick={() => handleLevelSelectInDropdown(level)}
+                      $isSelected={false}
+                    >
+                      <span style={{ fontSize: '1.5rem' }}>{level.emoji}</span>
+                      <LanguageName>{level.code} - {level.name}</LanguageName>
+                    </LanguageOption>
+                  ))}
                 </LanguageList>
               </>
             )}
