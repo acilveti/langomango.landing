@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import PricingPage from "components/PricingPage/PricingPage";
 import { useVisitor } from "contexts/VisitorContext";
-import { CreateCheckoutSessionRequest, getRegisterEmail } from "services/apiService";
+import { CreateCheckoutSessionRequest, TriggerRegisterEmail } from "services/apiService";
 import { createEnhancedCheckoutSession } from "services/apiService";
 import { trackRedditConversion } from "utils/redditPixel";
 import { RedditEventTypes } from "utils/redditPixel";
@@ -24,7 +24,7 @@ export default function Checkout() {
             console.log('Completing email signup flow');
 
             if (token && email) {
-                await getRegisterEmail(token, email)
+                await TriggerRegisterEmail({email}, token)
             }
             // Redirect to email verification or onboarding
             window.location.href = '/verify-email';

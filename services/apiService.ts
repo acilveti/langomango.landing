@@ -99,6 +99,10 @@ export interface UpdateUserProfileResponse {
   redirectUrl: string;
 }
 
+export interface TriggerRegisterEmailRequest {
+  email: string;
+}
+
 // API service class
 class ApiService {
   private baseUrl: string;
@@ -112,7 +116,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const defaultHeaders = {
       'Content-Type': 'application/json',
     };
@@ -127,7 +131,7 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         // Try to parse error message from response
         let errorMessage = `HTTP error! status: ${response.status}`;
@@ -194,7 +198,7 @@ class ApiService {
     }
 
     const result = await response.json();
-    
+
     // The response includes a token for auto-login
     return {
       success: true,
@@ -232,7 +236,7 @@ class ApiService {
       frontendRedirectUrl: 'https://beta-app.langomango.com/',
       ...(params.referralCode && { referralCode: params.referralCode })
     });
-    
+
     // Store language preferences in session storage for after redirect
     if (params.nativeLanguage || params.targetLanguage || params.level) {
       sessionStorage.setItem('languagePreferences', JSON.stringify({
@@ -241,7 +245,7 @@ class ApiService {
         level: params.level
       }));
     }
-    
+
     return `${this.baseUrl}/auth/login-google?${queryParams.toString()}`;
   }
 }
@@ -298,7 +302,7 @@ export async function createEnhancedCheckoutSession(
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -332,16 +336,26 @@ export async function getUserSubscriptionStatus(token: string): Promise<UserSubs
   return response.json();
 }
 
-export async function getRegisterEmail(token: string, email: string): Promise<boolean> {
+// Add these methods to the ApiService class
+export async function TriggerRegisterEmail(
+  request: TriggerRegisterEmailRequest,
+  token: string
+): Promise<boolean> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${API_URL}/auth/get-register-email`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
+    method: 'POST',
+    headers,
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get subscription status');
+    const error = await response.text();
+    throw new Error(error || 'Failed to triger register');
   }
 
   return response.ok;
