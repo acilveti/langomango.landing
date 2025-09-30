@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { AppProps } from 'next/dist/shared/lib/router/router';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { appWithTranslation } from 'next-i18next';
 import { ColorModeScript } from 'nextjs-color-mode';
@@ -44,6 +45,9 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 const CLARITY_ID = 'rm0v2kcv7l';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const isStandalonePage = ['/verification', '/thank-you'].includes(router.pathname);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // ContentSquare Script
@@ -136,8 +140,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Providers>
         <Modals />
         <AppContent Component={Component} pageProps={pageProps} />
-        <WaveCta />
-        <Footer />
+        {!isStandalonePage && <WaveCta />}
+        {!isStandalonePage && <Footer />}
       </Providers>
       <Analytics />
     </>
@@ -168,7 +172,7 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
   return (
     <>
-      <Navbar items={navItems} />
+      {<Navbar items={navItems} />}
       <TinaEditProvider
         editMode={
           <TinaCMS
