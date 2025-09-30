@@ -27,7 +27,7 @@ export default function Checkout() {
                 await TriggerRegisterEmail({email}, token)
             }
             // Redirect to email verification or onboarding
-            window.location.href = '/verify-email';
+            window.location.href = '/verification';
         }; 
 
         const handleStripeReturn = async () => {
