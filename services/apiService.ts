@@ -76,9 +76,9 @@ export interface UpdateDemoProfileResponse {
 
 export interface SignupWithEmailRequest {
   email: string;
-  nativeLanguage: string;
-  targetLanguage: string;
-  level: string;
+  nativeLanguageId: string;
+  targetLanguageId: string;
+  languageLevel: string;
 }
 
 export interface SignupWithEmailResponse {
@@ -188,6 +188,9 @@ class ApiService {
       },
       body: JSON.stringify({
         email: data.email,
+        nativeLanguageId: data.nativeLanguageId,
+        targetLanguageId: data.targetLanguageId,
+        languageLevel: data.languageLevel,
         referralCode: '' // Add if you have referral functionality
       }),
     });
@@ -209,9 +212,9 @@ class ApiService {
         email: data.email,
         name: data.email.split('@')[0],
         profile: {
-          nativeLanguage: getLanguageDetails(data.nativeLanguage),
-          targetLanguage: getLanguageDetails(data.targetLanguage),
-          level: data.level
+          nativeLanguage: getLanguageDetails(data.nativeLanguageId),
+          targetLanguage: getLanguageDetails(data.targetLanguageId),
+          level: data.languageLevel
         }
       },
       redirectUrl: 'https://beta-app.langomango.com/reader'

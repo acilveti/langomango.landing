@@ -521,9 +521,9 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                         // Create account immediately with email
                                                         const response = await apiService.signupWithEmail({
                                                             email: registrationEmail,
-                                                            nativeLanguage: nativeLanguage?.code,
-                                                            targetLanguage: targetSelectedLanguage?.code,
-                                                            level: targetSelectedLanguageLevel.code
+                                                            nativeLanguageId: nativeLanguage?.code,
+                                                            targetLanguageId: targetSelectedLanguage?.code,
+                                                            languageLevel: targetSelectedLanguageLevel.code
                                                         });
 
                                                         if (response.success && response.token) {
