@@ -164,10 +164,9 @@ const detectReferralSource = (): ReferralSource => {
 // Provider component
 export const VisitorProvider: React.FC<VisitorProviderProps> = ({
   children,
-  defaultLanguage,
   availableLanguages = DEFAULT_LANGUAGES
 }) => {
-  const [targetSelectedLanguage, setSelectedLanguageState] = useState<Language>(defaultLanguage);
+  const [targetSelectedLanguage, setSelectedLanguageState] = useState<Language>({ code: 'de', name: 'German', flag: '🇩🇪' });
   const [targetSelectedLanguageLevel, setSelectedLanguageLevelState] = useState<Levels>(DEFAULT_LEVELS.find(l => l.code === 'A1')!);
   const [nativeLanguage, setNativeLanguage] = useState<Language>(DEFAULT_LANGUAGES.find(l => l.code === 'en')!);
   const [referralSource, setReferralSource] = useState<ReferralSource>('direct');
@@ -301,7 +300,7 @@ export const VisitorProvider: React.FC<VisitorProviderProps> = ({
     }
   };
 
-  const setNativeSelectedLanguage = (language: Language | null, level?: string | null) => {
+  const setNativeSelectedLanguage = (language: Language, level?: string | null) => {
     setNativeLanguage(language);
 
     // Persist to localStorage

@@ -44,11 +44,7 @@ export default function LanguageSelectorModal({
     setTargetSelectedLanguage(language);
     setHasTargetSelectedLanguage(true)
     setShowLevelSelection(true);
-    // If selecting the same language that's already selected, preserve the level
-    if (language.code === selectedLanguage?.code && selectedLevel) {
-      setSelectedLevel(initialSelectedLevel);
-    }
-  }, [selectedLanguage, selectedLevel, setTargetSelectedLanguage, setHasTargetSelectedLanguage]);
+  }, [setTargetSelectedLanguage, setHasTargetSelectedLanguage]);
 
   const handleLevelSelect = useCallback((level: Levels) => {
     if (targetSelectedLanguage) {
