@@ -1,6 +1,7 @@
 // API configuration
 //const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 //const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
 
 // Type definitions
@@ -88,10 +89,11 @@ export interface SignupWithEmailResponse {
   redirectUrl: string;
 }
 
-export interface UpdateUserProfileRequest {
-  nativeLanguage: string;
-  targetLanguage: string;
-  level: string;
+export interface createTemporalProfileRequest {
+  nativeLanguageId: string;
+  targetLanguageId: string;
+  languageLevel: string;
+  //email: string;
 }
 
 export interface UpdateUserProfileResponse {
@@ -222,8 +224,8 @@ class ApiService {
   }
 
   // Update user profile endpoint for authenticated users
-  async updateUserProfile(data: UpdateUserProfileRequest, token: string): Promise<UpdateUserProfileResponse> {
-    return this.request<UpdateUserProfileResponse>('/auth/update-demo-profile', {
+  async createTemporalProfile(data: createTemporalProfileRequest, token: string): Promise<boolean> {
+    return this.request<boolean>('/auth/create-temporal-profile', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {

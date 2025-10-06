@@ -1,61 +1,77 @@
 import { useCallback, useEffect, useState } from "react";
 import PricingPage from "components/PricingPage/PricingPage";
 import { useVisitor } from "contexts/VisitorContext";
-import { CreateCheckoutSessionRequest, TriggerRegisterEmail } from "services/apiService";
+import { apiService, APP_URL, CreateCheckoutSessionRequest, TriggerRegisterEmail } from "services/apiService";
 import { createEnhancedCheckoutSession } from "services/apiService";
 import { trackRedditConversion } from "utils/redditPixel";
 import { RedditEventTypes } from "utils/redditPixel";
 
 export default function Checkout() {
-    const { token, email, signupChannel } = useVisitor();
+    const visitor = useVisitor();
     const [isPricingLoading, setIsPricingLoading] = useState(false);
 
     useEffect(() => {
         // Channel-specific handlers
-        const handleGoogleSignupCompletion = async () => {
+        const handleStripeGoogleSignupCompletion = async () => {
             // Google-specific actions
             console.log('Completing Google signup flow');
+            console.log('/signup?token=' + visitor.token);
             // Redirect to dashboard or onboarding
-            window.location.href = '/thank-you';
+            window.location.href = APP_URL + '/google-bridge-sign-up?token=' + visitor.token;
         };
 
-        const handleEmailSignupCompletion = async () => {
+        const handleStripeEmailSignupCompletion = async () => {
             // Email-specific actions
             console.log('Completing email signup flow');
 
-            if (token && email) {
-                await TriggerRegisterEmail({email}, token)
+            if (visitor.token && visitor.email) {
+                await TriggerRegisterEmail({email: visitor.email}, visitor.token)
             }
             // Redirect to email verification or onboarding
             window.location.href = '/verification';
-        }; 
+        };
 
-        const handleStripeReturn = async () => {
+        const handleReturn = async () => {
             // Check if returning from Stripe
             const urlParams = new URLSearchParams(window.location.search);
             console.log(urlParams)
             const sessionId = urlParams.get('session_id');
             const success = urlParams.get('success');
-
+            console.log(window.location.href)
             if (sessionId && success === 'true') {
-                console.log("stripe success detected " + signupChannel)
+                console.log("stripe success detected " + visitor.signupChannel)
                 // Perform channel-specific actions
-                switch (signupChannel) {
+                switch (visitor.signupChannel) {
                     case 'Google':
-                        await handleGoogleSignupCompletion();
+                        await handleStripeGoogleSignupCompletion();
                         break;
                     case 'email':
-                        await handleEmailSignupCompletion();
+                        await handleStripeEmailSignupCompletion();
                         break;
                 }
-
-                // Clean up
-                localStorage.removeItem('signup-channel');
+            }
+            const hashParams = new URLSearchParams(window.location.hash.slice(1));
+            const googleToken = hashParams.get('token')
+            if (googleToken) {
+                if (googleToken) {
+                    visitor.setToken(googleToken)
+                    await apiService.createTemporalProfile({
+                        nativeLanguageId: visitor.nativeLanguage.code,
+                        targetLanguageId: visitor.targetSelectedLanguage.code,
+                        languageLevel: visitor.targetSelectedLanguageLevel.code
+                    },
+                        googleToken)
+                    console.log("set token")
+                    window.location.href = '/checkout';
+                }
+                else
+                    console.log("check stripe return")
             }
         };
+
         console.log("check stripe return")
-        handleStripeReturn();
-    }, [signupChannel,token, email]);
+        handleReturn();
+    }, [visitor]);
 
 
     // Handle pricing plan selection
@@ -66,7 +82,7 @@ export default function Checkout() {
         try {
             // User is already authenticated at this point
 
-            if (!token) {
+            if (!visitor.token) {
                 throw new Error('No authentication token found. Please sign in again.');
             }
 
@@ -85,7 +101,7 @@ export default function Checkout() {
                 returnUrl: window.location.href,
             };
 
-            const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, token);
+            const checkoutData = await createEnhancedCheckoutSession(checkoutRequest, visitor.token);
 
             if (!checkoutData || !checkoutData.url) {
                 throw new Error('Failed to create checkout session');
@@ -110,13 +126,14 @@ export default function Checkout() {
             alert(error instanceof Error ? error.message : 'Failed to process payment. Please try again.');
             setIsPricingLoading(false);
         }
-    }, [token]);
+    }, [visitor.token]);
+    
     return (
         <PricingPage
             onSelectPlan={handlePricingPlanSelect}
             isLoading={isPricingLoading}
-            userToken={token}
-            isAuthenticated={token != null}
+            userToken={visitor.token}
+            isAuthenticated={visitor.token != null}
         />
     )
 }

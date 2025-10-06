@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { DEFAULT_LANGUAGES, DEFAULT_LEVELS, useVisitor } from 'contexts/VisitorContext';
-import { apiService, } from 'services/apiService';
+import { API_URL, apiService, } from 'services/apiService';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
 
 import {
@@ -77,135 +77,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
     }, []);
-    // const handleSignup = useCallback(() => {
-    //     if (!email) {
-    //         setEmailError('Email is required');
-    //         return;
-    //     }
-    //     if (!validateEmail(email)) {
-    //         setEmailError('Invalid email format');
-    //         return;
-    //     }
-
-    //     setEmailError('');
-    //     // Redirect with email pre-filled
-    //     window.location.href = `https://beta-app.langomango.com/sign-up?email=${encodeURIComponent(email)}`;
-    // }, [email, validateEmail]);
-
-    // const handleGoogleSignup = useCallback(() => {
-    //     // For the secondary signup flow
-    //     const baseUrl = 'https://staging.langomango.com';
-    //     const returnUrl = encodeURIComponent('/sign-up');
-    //     const frontendRedirectUrl = encodeURIComponent('https://beta-app.langomango.com/');
-    //     const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
-
-    //     console.log('Redirecting to Google OAuth (secondary flow):', googleAuthUrl);
-    //     window.location.href = googleAuthUrl;
-    // }, []);
-
-    // Handle demo signup with level selection
-    // const handleLevelSelect = useCallback(async (level: string) => {
-    //     if (!hasSelectedTarget || isEditingTarget) return;
-
-    //     // For full register mode, ensure user has registered first
-    //     if (!hasRegistered && !hasValidEmail) {
-    //         return;
-    //     }
-
-    //     settargetSelectedLanguageLevel(level);
-    //     setHastargetSelectedLanguageLevel(true); // Mark level as selected by user
-    //     sessionStorage.setItem('targetSelectedLanguageLevel', level);
-    //     setSignupError('');
-    //     setIsLoadingSignup(true);
-
-    //     try {
-    //         // Full registration flow - user has email or Google auth
-    //         if ((hasRegistered || hasValidEmail)) {
-    //             // Track Reddit pixel signup event for full registration
-    //             trackRedditConversion(RedditEventTypes.SIGNUP, {
-    //                 signup_type: 'full',
-    //                 native_language: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-    //                 target_language: tempTargetSelectedLanguage?.code,
-    //                 level: level,
-    //                 source: 'reader_widget'
-    //             });
-
-    //             if (hasValidEmail && registrationEmail) {
-    //                 // Email registration flow
-    //                 const response = await apiService.signupWithEmail({
-    //                     email: registrationEmail,
-    //                     nativeLanguage: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-    //                     targetLanguage: tempTargetSelectedLanguage?.code!,
-    //                     level: level
-    //                 });
-
-    //                 if (response.success && response.token) {
-    //                     // Store token
-    //                     localStorage.setItem('token', response.token);
-
-    //                     // Redirect to app
-    //                     setTimeout(() => {
-    //                         window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
-    //                     }, 1500);
-    //                 } else {
-    //                     throw new Error('Failed to create account');
-    //                 }
-    //             } else if (hasRegistered) {
-    //                 // Google OAuth flow - update existing user profile
-    //                 const token = localStorage.getItem('token');
-
-    //                 if (token) {
-    //                     const response = await apiService.updateUserProfile({
-    //                         nativeLanguage: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-    //                         targetLanguage: tempTargetSelectedLanguage?.code!,
-    //                         level: level
-    //                     }, token);
-
-    //                     if (response.success) {
-    //                         setTimeout(() => {
-    //                             window.location.href = response.redirectUrl || 'https://beta-app.langomango.com/reader';
-    //                         }, 1500);
-    //                     } else {
-    //                         throw new Error('Failed to update profile');
-    //                     }
-    //                 } else {
-    //                     throw new Error('No authentication token found');
-    //                 }
-    //             }
-    //         } else {
-    //             // Demo flow (when isFullRegister is false)
-    //             // Track Reddit pixel signup event for demo
-    //             trackRedditConversion(RedditEventTypes.SIGNUP, {
-    //                 signup_type: 'demo',
-    //                 native_language: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-    //                 target_language: tempTargetSelectedLanguage?.code!,
-    //                 level: level,
-    //                 source: 'reader_widget'
-    //             });
-
-    //             const response = await apiService.demoSignup({
-    //                 nativeLanguage: tempNativeSelectedLanguage?.code || nativeLanguage?.code || 'en',
-    //                 targetLanguage: tempTargetSelectedLanguage?.code!,
-    //                 level: level
-    //             });
-
-    //             if (response.success && response.redirectUrl) {
-    //                 // Wait a bit for animation before redirecting
-    //                 setTimeout(() => {
-    //                     window.location.href = response.redirectUrl;
-    //                 }, 1500);
-    //             } else {
-    //                 throw new Error('Invalid response from server');
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error('Signup error:', error);
-    //         setSignupError(error instanceof Error ? error.message : 'Failed to create account. Please try again.');
-    //         setIsLoadingSignup(false);
-    //         settargetSelectedLanguageLevel('');
-    //     }
-    // }, [hasSelectedTarget, isEditingTarget, hasRegistered, hasValidEmail, tempNativeSelectedLanguage, nativeLanguage, tempTargetSelectedLanguage, registrationEmail, setHastargetSelectedLanguageLevel]);
-
+    
     // Update valid email state when email changes
     useEffect(() => {
         console.log('Registration email state updated:', registrationEmail);
@@ -594,10 +466,10 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                 localStorage.setItem('returnToWidget', 'true');
                                                 setSignupChannel('Google')
                                                 // Redirect to Google OAuth
-                                                const baseUrl = 'https://staging.langomango.com';
-                                                const returnUrl = encodeURIComponent('/sign-up');
+                                                
+                                                const returnUrl = encodeURIComponent('/checkout');
                                                 const frontendRedirectUrl = encodeURIComponent(window.location.origin);
-                                                const googleAuthUrl = `${baseUrl}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
+                                                const googleAuthUrl = `${API_URL}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
 
                                                 window.location.href = googleAuthUrl;
                                             }
