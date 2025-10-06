@@ -6,14 +6,12 @@ import 'swiper/css/autoplay';
 import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { Analytics } from '@vercel/analytics/react';
 import { AppProps } from 'next/dist/shared/lib/router/router';
-import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { appWithTranslation } from 'next-i18next';
 import { ColorModeScript } from 'nextjs-color-mode';
 import React, { PropsWithChildren, useEffect } from 'react';
-import { TinaEditProvider } from 'tinacms/dist/edit-state';
 
 import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
@@ -32,8 +30,6 @@ import { addReferralToUrl } from 'utils/referral';
 type NavItemWithHandler = NavItems[0] & {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
-
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 
 // Google Tag Manager ID
 const GTM_ID = 'GTM-PWND8SN6';
@@ -173,24 +169,8 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
   return (
     <>
       {<Navbar items={navItems} />}
-      <TinaEditProvider
-        editMode={
-          <TinaCMS
-            query={pageProps.query}
-            variables={pageProps.variables}
-            data={pageProps.data}
-            isLocalClient={!process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-            branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-            clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-            {...pageProps}
-          >
-            {(livePageProps: any) => <Component {...livePageProps} />}
-          </TinaCMS>
-        }
-      >
-        <Component {...pageProps} />
-      </TinaEditProvider>
       <NavigationDrawer items={navItems} />
+      <Component {...pageProps} />
     </>
   );
 }
