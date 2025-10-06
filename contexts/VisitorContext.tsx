@@ -109,7 +109,6 @@ const VisitorContext = createContext<VisitorContextType | undefined>(undefined);
 // Provider props
 interface VisitorProviderProps {
   children: ReactNode;
-  defaultLanguage: Language;
   availableLanguages?: Language[];
 }
 

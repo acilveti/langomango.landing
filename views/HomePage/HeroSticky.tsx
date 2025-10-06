@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { media } from 'utils/media';
 import LanguageSelector from 'components/LanguageSelector';
-import type { Language } from 'contexts/VisitorContext';
+import type { Language, Levels } from 'contexts/VisitorContext';
 import ReaderDemo from 'components/ReaderDemoModal';
 import Portal from 'components/Portal';
 import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
@@ -116,15 +116,15 @@ export default function HeroSticky({
         </Title>
         <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
-          onLanguageSelect={(language: Language, level?: string) => {
+          onLanguageSelect={(language: Language, level?: Levels) => {
             console.log('Language selected:', language, 'Level:', level);
             setSelectedLanguage(language);
             // Store the level if needed
             if (level) {
-              sessionStorage.setItem('selectedLevel', level);
+              sessionStorage.setItem('selectedLevel', level.code);
             }
           }}
-          onProcessingComplete={(language: Language, level?: string) => {
+          onProcessingComplete={(language: Language, level?: Levels) => {
             console.log('Processing complete for:', language, 'Level:', level);
             // Open the reader demo modal after processing
             setIsReaderDemoModalOpened(true);

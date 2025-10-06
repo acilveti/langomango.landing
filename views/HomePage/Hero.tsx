@@ -95,7 +95,7 @@ export default function Hero() {
             {t('home:hero.description')}
           </Description>
           <MobileDemoContainer ref={mobileDemoContainerRef} className="reader-demo-container">
-            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} isFullRegister={true} />
+            <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
           </MobileDemoContainer>
         </MobileContents>
 
@@ -161,7 +161,7 @@ export default function Hero() {
         
         <DemoColumn>
           <DemoContainer ref={demoContainerRef} className="reader-demo-container">
-            <ReaderDemoWidget selectedLanguage={{ code: 'es', name: 'Spanish', flag: '🇪🇸' }} useInlineSignup={true} isFullRegister={true} />
+            <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
           </DemoContainer>
         </DemoColumn>
       </TwoColumnLayout>
