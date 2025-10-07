@@ -1,15 +1,12 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef,useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { DEFAULT_LANGUAGES, Language, useVisitor } from 'contexts/VisitorContext';
+import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import LanguageSelectorModal from './LanguageSelectorModal';
-
-// Define the proper type for objectFit
-type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 
 interface LanguageSelectorProps {
   languages?: Language[];
-  onLanguageSelect: (language: Language, level?: string) => void;
-  onProcessingComplete?: (language: Language, level?: string) => void;
+  onLanguageSelect: (language: Language, level?: Levels) => void;
+  onProcessingComplete?: (language: Language, level?: Levels) => void;
   placeholder?: string;
   processingDuration?: number;
   confirmationDuration?: number;
@@ -26,11 +23,8 @@ interface LanguageSelectorRef {
   resetStates: () => void;
 }
 
-
-
 const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(({
   languages = DEFAULT_LANGUAGES,
-  onLanguageSelect,
   onProcessingComplete,
   placeholder = "Select a language",
   processingDuration = 1200,
@@ -39,36 +33,17 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
   showConfirmationMessage = true,
   className,
   maxWidth = "300px",
-  autoOpenModal = false,
   isDark = false,
   requireLevel = false
-}, ref) => {
-  const { selectedLanguage: contextLanguage, selectedLanguageLevel: contextLanguageLevel, setSelectedLanguage: setContextLanguage, hasSelectedLanguage, setHasSelectedLanguage, setHasSelectedLevel } = useVisitor();
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(contextLanguage);
-  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(contextLanguageLevel || undefined);
+}) => {
+  const { targetSelectedLanguage, 
+    targetSelectedLanguageLevel, 
+    hasTargetSelectedLanguage } = useVisitor();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  // Sync with context when it changes
-  useEffect(() => {
-    setSelectedLanguage(contextLanguage);
-    setSelectedLevel(contextLanguageLevel || undefined);
-  }, [contextLanguage, contextLanguageLevel]);
 
-  function handleLanguageSelect(language: Language, level?: string) {
-    setSelectedLanguage(language);
-    setSelectedLevel(level);
-    setContextLanguage(language, level); // Update context with both language and level
-    setHasSelectedLanguage(true); // Mark that user has selected a language
-    if (level) {
-      setHasSelectedLevel(true); // Mark that user has selected a level
-    }
-    setIsModalOpen(false);
-    
-    // Call the immediate callback
-    onLanguageSelect(language, level);
-    
+  function handleLanguageSelect(language: Language, level?: Levels) {
     // Start processing
     setIsProcessing(true);
     setShowConfirmation(false);
@@ -87,24 +62,10 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
     }, processingDuration);
   }
 
-  // Reset states (useful for external control)
-  const resetStates = () => {
-    setShowConfirmation(false);
-    setIsProcessing(false);
-    setSelectedLanguage(null);
-    setSelectedLevel(undefined);
-    setIsModalOpen(false);
-  };
-
-  // Expose reset function via ref
-  useImperativeHandle(ref, () => ({
-    resetStates
-  }));
-
   return (
     <LanguageSelectorContainer 
       className={`language-selector-container ${className || ''}`}
-      data-has-selection={hasSelectedLanguage}
+      data-has-selection={hasTargetSelectedLanguage}
       maxWidth={maxWidth}
     >
       <LanguageDropdown
@@ -112,12 +73,12 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
         isDark={isDark}
       >
         <SelectedLanguage>
-          {selectedLanguage && hasSelectedLanguage ? (
+          {targetSelectedLanguage && hasTargetSelectedLanguage ? (
             <>
-              <SelectedLanguageFlag>{selectedLanguage.flag}</SelectedLanguageFlag>
+              <SelectedLanguageFlag>{targetSelectedLanguage.flag}</SelectedLanguageFlag>
               <SelectedLanguageName isDark={isDark}>
-                {selectedLanguage.name}
-                {selectedLevel && ` (${selectedLevel})`}
+                {targetSelectedLanguage.name}
+                {targetSelectedLanguageLevel && ` (${targetSelectedLanguageLevel.code})`}
               </SelectedLanguageName>
               {isProcessing && <ProcessingSpinner />}
               {showConfirmation && !isProcessing && <CheckmarkIcon>✓</CheckmarkIcon>}
@@ -132,32 +93,35 @@ const LanguageSelector = forwardRef<LanguageSelectorRef, LanguageSelectorProps>(
       {/* Language Selection Modal */}
       <LanguageSelectorModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => 
+          setIsModalOpen(false)
+          
+        }
         languages={languages}
-        selectedLanguage={selectedLanguage}
-        selectedLevel={selectedLevel}
+        selectedLanguage={targetSelectedLanguage}
+        selectedLevel={targetSelectedLanguageLevel}
         onLanguageSelect={handleLanguageSelect}
         isDark={isDark}
-        hasUserSelected={hasSelectedLanguage}
+        hasUserSelected={hasTargetSelectedLanguage}
         requireLevel={requireLevel}
       />
 
       {/* Processing Message */}
-      {showProcessingMessage && isProcessing && selectedLanguage && hasSelectedLanguage && (
+      {showProcessingMessage && isProcessing && targetSelectedLanguage && hasTargetSelectedLanguage && (
         <ProcessingMessage>
           <ProcessingIcon>⏳</ProcessingIcon>
           <ProcessingText>
-            Verification of <strong>{selectedLanguage.name}</strong>{selectedLevel ? ` (${selectedLevel})` : ''} availability for you...
+            Verification of <strong>{targetSelectedLanguage.name}</strong>{targetSelectedLanguageLevel ? ` (${targetSelectedLanguageLevel.code})` : ''} availability for you...
           </ProcessingText>
         </ProcessingMessage>
       )}
 
       {/* Confirmation Message */}
-      {showConfirmationMessage && showConfirmation && !isProcessing && selectedLanguage && hasSelectedLanguage && (
+      {showConfirmationMessage && showConfirmation && !isProcessing && targetSelectedLanguage && hasTargetSelectedLanguage && (
         <ConfirmationMessage>
           <ConfirmationIcon>🎉</ConfirmationIcon>
           <ConfirmationText>
-            Great choice! <strong>{selectedLanguage.name}</strong>{selectedLevel ? ` (${selectedLevel})` : ''} is available for your learning journey.
+            Great choice! <strong>{targetSelectedLanguage.name}</strong>{targetSelectedLanguageLevel ? ` (${targetSelectedLanguageLevel.code})` : ''} is available for your learning journey.
           </ConfirmationText>
         </ConfirmationMessage>
       )}

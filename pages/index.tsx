@@ -1,34 +1,31 @@
-// pages/index.tsx - Updated with fixed video section and corrected styling
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Script from 'next/script';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import Container from 'components/Container';
+import ReaderDemoModal from 'components/ReaderDemoModal';
+import SimpleCta from 'components/SimpleCta2';
+import YoutubeVideo from 'components/YoutubeVideo';
+import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
+import { useVisitor } from 'contexts/VisitorContext';
+import { media } from 'utils/media';
+import { getAllPosts } from 'utils/postsFetcher';
+import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
+import { captureReferral } from 'utils/referral';
 import Cta from 'views/HomePage/Cta';
 import FeaturesGallery from 'views/HomePage/FeaturesGallery';
 import Hero from 'views/HomePage/Hero';
-import Testimonials from 'views/HomePage/Testimonials';
-import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { captureReferral } from 'utils/referral';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
-
-import AutofitGrid from 'components/AutofitGrid';
-import OverTitle from 'components/OverTitle';
-import Container from 'components/Container';
-import YoutubeVideo from 'components/YoutubeVideo';
-import { media } from 'utils/media';
-import FaqSection from 'views/PricingPage/FaqSection';
-import { injectContentsquareScript } from '@contentsquare/tag-sdk';
-// Import the updated Reddit Pixel utilities with visibility tracking
-import { getRedditPixelScript, RedditEventTypes, setupAllSectionTracking, trackPageVisit, trackRedditConversion } from 'utils/redditPixel';
 import HeroSticky from 'views/HomePage/HeroSticky';
 import SingleTestimonial from 'views/HomePage/SingleTestimonial';
-import SimpleCta from 'components/SimpleCta2';
-import { Language } from 'contexts/VisitorContext';
-import ReaderDemoModal from 'components/ReaderDemoModal';
-import { useVisitor } from 'contexts/VisitorContext';
-import { getAllPosts } from 'utils/postsFetcher';
+import Testimonials from 'views/HomePage/Testimonials';
+import FaqSection from 'views/PricingPage/FaqSection';
+import PricingTablesSection from 'views/PricingPage/PricingTablesSection';
+
+// Import the updated Reddit Pixel utilities with visibility tracking
 
 // Reddit Pixel ID
 const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
@@ -36,17 +33,18 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 export default function Homepage({ posts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t } = useTranslation(['common', 'home']);
   const sectionsInitialized = useRef(false);
-  const { selectedLanguage, setSelectedLanguage } = useVisitor();
+  const { targetSelectedLanguage: selectedLanguage } = useVisitor();
 
   // New state variables to track our conditions
   const [hasScrolled, setHasScrolled] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   const [pageVisitTracked, setPageVisitTracked] = useState(false);
   const timeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [showReaderDemo, setShowReaderDemo] = useState(false);
+  const [, setShowReaderDemo] = useState(false);
   const languageSelectorRef = useRef<any>(null);
   const [darkenAmount, setDarkenAmount] = useState(0);
   const [oauthReturnData, setOauthReturnData] = useState<{registered: boolean} | null>(null);
+  const {isReaderDemoModalOpened, setIsReaderDemoModalOpened} = useReaderDemoModalContext()
 
   // Check for OAuth return on mount
   useEffect(() => {
@@ -94,20 +92,6 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       // Open the modal immediately
       setShowReaderDemo(true);
     }
-  }, []);
-
-  const handleLanguageSelect = useCallback((language: Language, level?: string) => {
-    console.log('Language selected:', language, 'Level:', level);
-    setSelectedLanguage(language);
-    // Store level in sessionStorage if needed
-    if (level) {
-      sessionStorage.setItem('selectedLevel', level);
-    }
-  }, []);
-
-  const handleLanguageProcessingComplete = useCallback((language: Language, level?: string) => {
-    console.log('Processing complete for language:', language, 'Level:', level);
-    setShowReaderDemo(true);
   }, []);
 
   useEffect(() => {
@@ -368,11 +352,12 @@ export default function Homepage({ posts }: InferGetStaticPropsType<typeof getSt
       </HomepageWrapper>
 
       {/* Reader Demo Modal */}
-      {showReaderDemo && (
+      {isReaderDemoModalOpened && (
         <ReaderDemoModal 
           onClose={() => {
             setShowReaderDemo(false);
             setOauthReturnData(null);
+            setIsReaderDemoModalOpened(false)
             // Reset language selector after closing modal
             if (languageSelectorRef.current) {
               languageSelectorRef.current.resetStates();
@@ -505,10 +490,6 @@ const HeaderContainer = styled.div`
   }
 `;
 
-const CustomOverTitle = styled(OverTitle)`
-  margin-bottom: 2rem;
-`;
-
 const VideoTitle = styled.h1`
   font-size: 5.2rem;
   font-weight: bold;
@@ -523,103 +504,6 @@ const VideoTitle = styled.h1`
     margin-bottom: 2rem;
   }
 `;
-
-const LanguageSelectorSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4rem 2rem;
-  background: rgb(var(--secondBackground));
-  gap: 2rem;
-  
-  ${media('<=tablet')} {
-    padding: 3rem 1.5rem;
-  }
-`;
-
-const SelectorTitle = styled.h2`
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: rgb(var(--text));
-  text-align: center;
-  margin: 0;
-  line-height: 1.2;
-  
-  ${media('<=tablet')} {
-    font-size: 2.2rem;
-  }
-  
-  ${media('<=phone')} {
-    font-size: 1.8rem;
-  }
-`;
-
-const ReaderDemoButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 3rem 0;
-  background: rgb(var(--secondBackground));
-`;
-
-const ReaderDemoButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1.8rem 3.6rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-  border-radius: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-
-  ${media('<=tablet')} {
-    font-size: 1.6rem;
-    padding: 1.4rem 2.8rem;
-  }
-`;
-
-/* Example: How to use LanguageSelector with level selection:
-   
-   <LanguageSelectorSection>
-     <SelectorTitle>Choose your learning language and level</SelectorTitle>
-     <LanguageSelector
-       ref={languageSelectorRef}
-       languages={DEFAULT_LANGUAGES}
-       onLanguageSelect={handleLanguageSelect}
-       onProcessingComplete={handleLanguageProcessingComplete}
-       placeholder="Select language"
-       maxWidth="400px"
-       isDark={false}
-       requireLevel={true}  // This enables level selection after language
-     />
-   </LanguageSelectorSection>
-*/
-
-const CustomAutofitGrid = styled(AutofitGrid)`
-  --autofit-grid-item-size: 40rem;
-
-  ${media('<=tablet')} {
-    --autofit-grid-item-size: 30rem;
-  }
-
-  ${media('<=phone')} {
-    --autofit-grid-item-size: 100%;
-  }
-`;
-
 const PageDarkenOverlay = styled.div<{ opacity: number }>`
   position: fixed;
   top: 0;

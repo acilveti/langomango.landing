@@ -1,7 +1,8 @@
 // API configuration
 //const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
 
 // Type definitions
 export interface DemoSignupRequest {
@@ -76,9 +77,9 @@ export interface UpdateDemoProfileResponse {
 
 export interface SignupWithEmailRequest {
   email: string;
-  nativeLanguage: string;
-  targetLanguage: string;
-  level: string;
+  nativeLanguageId: string;
+  targetLanguageId: string;
+  languageLevel: string;
 }
 
 export interface SignupWithEmailResponse {
@@ -88,15 +89,20 @@ export interface SignupWithEmailResponse {
   redirectUrl: string;
 }
 
-export interface UpdateUserProfileRequest {
-  nativeLanguage: string;
-  targetLanguage: string;
-  level: string;
+export interface createTemporalProfileRequest {
+  nativeLanguageId: string;
+  targetLanguageId: string;
+  languageLevel: string;
+  //email: string;
 }
 
 export interface UpdateUserProfileResponse {
   success: boolean;
   redirectUrl: string;
+}
+
+export interface TriggerRegisterEmailRequest {
+  email: string;
 }
 
 // API service class
@@ -112,7 +118,7 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const defaultHeaders = {
       'Content-Type': 'application/json',
     };
@@ -127,7 +133,7 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         // Try to parse error message from response
         let errorMessage = `HTTP error! status: ${response.status}`;
@@ -184,6 +190,9 @@ class ApiService {
       },
       body: JSON.stringify({
         email: data.email,
+        nativeLanguageId: data.nativeLanguageId,
+        targetLanguageId: data.targetLanguageId,
+        languageLevel: data.languageLevel,
         referralCode: '' // Add if you have referral functionality
       }),
     });
@@ -194,7 +203,7 @@ class ApiService {
     }
 
     const result = await response.json();
-    
+
     // The response includes a token for auto-login
     return {
       success: true,
@@ -205,9 +214,9 @@ class ApiService {
         email: data.email,
         name: data.email.split('@')[0],
         profile: {
-          nativeLanguage: getLanguageDetails(data.nativeLanguage),
-          targetLanguage: getLanguageDetails(data.targetLanguage),
-          level: data.level
+          nativeLanguage: getLanguageDetails(data.nativeLanguageId),
+          targetLanguage: getLanguageDetails(data.targetLanguageId),
+          level: data.languageLevel
         }
       },
       redirectUrl: 'https://beta-app.langomango.com/reader'
@@ -215,8 +224,8 @@ class ApiService {
   }
 
   // Update user profile endpoint for authenticated users
-  async updateUserProfile(data: UpdateUserProfileRequest, token: string): Promise<UpdateUserProfileResponse> {
-    return this.request<UpdateUserProfileResponse>('/auth/update-demo-profile', {
+  async createTemporalProfile(data: createTemporalProfileRequest, token: string): Promise<boolean> {
+    return this.request<boolean>('/auth/create-temporal-profile', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
@@ -232,7 +241,7 @@ class ApiService {
       frontendRedirectUrl: 'https://beta-app.langomango.com/',
       ...(params.referralCode && { referralCode: params.referralCode })
     });
-    
+
     // Store language preferences in session storage for after redirect
     if (params.nativeLanguage || params.targetLanguage || params.level) {
       sessionStorage.setItem('languagePreferences', JSON.stringify({
@@ -241,7 +250,7 @@ class ApiService {
         level: params.level
       }));
     }
-    
+
     return `${this.baseUrl}/auth/login-google?${queryParams.toString()}`;
   }
 }
@@ -293,12 +302,12 @@ export interface UserSubscriptionStatus {
 // Add these methods to the ApiService class
 export async function createEnhancedCheckoutSession(
   request: CreateCheckoutSessionRequest,
-  token?: string
+  token: string | null
 ): Promise<CreateCheckoutSessionResponse> {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -330,4 +339,29 @@ export async function getUserSubscriptionStatus(token: string): Promise<UserSubs
   }
 
   return response.json();
+}
+
+// Add these methods to the ApiService class
+export async function TriggerRegisterEmail(
+  request: TriggerRegisterEmailRequest,
+  token: string
+): Promise<boolean> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(`${API_URL}/auth/get-register-email`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Failed to triger register');
+  }
+
+  return response.ok;
 }

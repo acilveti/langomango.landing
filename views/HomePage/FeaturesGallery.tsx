@@ -8,11 +8,9 @@ import SectionTitle from 'components/SectionTitle';
 import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
-import ExpandingButton from 'components/ExpandingButton';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
-import LanguageRegistrationModal from 'components/LanguageRegistrationModal';
 import LanguageSelector from 'components/LanguageSelector'; // Import the new component
 import { Language } from 'contexts/VisitorContext';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 
 // Define the proper type for objectFit
 type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
@@ -29,11 +27,7 @@ interface TabItem {
 
 export default function FeaturesGallery() {
   const { t } = useTranslation();
-  const { setIsModalOpened } = useNewsletterModalContext();
-
-  // Language modal states
-  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
-  const [selectedLanguageForModal, setSelectedLanguageForModal] = useState<Language | null>(null);
+  const {setIsModalOpened} = useSignupModalContext();
 
   // Define tabs with proper typing
   const TABS: TabItem[] = [
@@ -97,18 +91,7 @@ export default function FeaturesGallery() {
   }
 
   function handleLanguageProcessingComplete(language: Language) {
-    setSelectedLanguageForModal(language);
-    setIsLanguageModalOpen(true);
-  }
-
-  function handleModalClose() {
-    setIsLanguageModalOpen(false);
-    setSelectedLanguageForModal(null);
-  }
-
-  function handleModalSuccess() {
-    setIsLanguageModalOpen(false);
-    setSelectedLanguageForModal(null);
+    setIsModalOpened(true);
   }
 
   const featuresMarkup = translatedTabs.map((singleTab, idx) => {
@@ -166,15 +149,6 @@ export default function FeaturesGallery() {
         <SectionTitle>{t('features.title')}</SectionTitle>
       </Content>
       <FeaturesContainer>{featuresMarkup}</FeaturesContainer>
-      
-      {/* Language Registration Modal */}
-      {isLanguageModalOpen && selectedLanguageForModal && (
-        <LanguageRegistrationModal
-          selectedLanguage={selectedLanguageForModal}
-          onClose={handleModalClose}
-          onSuccess={handleModalSuccess}
-        />
-      )}
     </FeaturesGalleryWrapper>
   );
 }

@@ -1,10 +1,9 @@
 import { PropsWithChildren } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
 import Button from './Button';
 import RichText from './RichText';
-import { addReferralToUrl } from 'utils/referral';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 interface PricingCardProps {
   title: string;
@@ -15,7 +14,7 @@ interface PricingCardProps {
 
 export default function PricingCard({ title, description, benefits, isOutlined, children }: PropsWithChildren<PricingCardProps>) {
   const isAnyBenefitPresent = benefits?.length;
-  const { setIsModalOpened } = useNewsletterModalContext(); 
+  const { setIsModalOpened } = useSignupModalContext();
   
   // Function to handle button click with proper type annotation for anchor elements
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -82,19 +81,6 @@ const shimmer = keyframes`
   100% {
     background-position: 200% 0;
   }
-`;
-
-// Original animations (keeping for reference, but replaced with WaveCta animations)
-const inflate = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-`;
-
-const deflate = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
 `;
 
 const Wrapper = styled.div<{ isOutlined?: boolean }>`

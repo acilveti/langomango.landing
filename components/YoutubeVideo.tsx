@@ -3,8 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 // Import Reddit Pixel tracking
 
-import playIcon from '../public/play-icon.svg';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
+import playIcon from '../public/play-icon.svg';
 
 
 interface YoutubeVideoProps {
@@ -104,7 +104,7 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, []);
+  }, );
   
   // Set up intersection observer for visibility tracking
   useEffect(() => {

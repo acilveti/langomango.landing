@@ -1,0 +1,3 @@
+yarn lint
+yarn type
+yarn playwright test --project 'chromium' --project 'Mobile Chrome'

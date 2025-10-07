@@ -1,35 +1,28 @@
-import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { ScrollPositionEffectProps, useScrollPosition } from 'hooks/useScrollPosition';
 import { NavItems, SingleNavItem } from 'types';
-import { media } from 'utils/media';
-import Button from './Button';
 import Container from './Container';
-import Drawer from './Drawer';
-import { HamburgerIcon } from './HamburgerIcon';
+import ExpandingButton from './ExpandingButton'; 
 import Logo from './Logo2Lines';
-import ExpandingButton from './ExpandingButton';
-
-const ColorSwitcher = dynamic(() => import('../components/ColorSwitcher'), { ssr: false });
+ 
 
 type NavbarProps = { items: NavItems };
 type ScrollingDirections = 'up' | 'down' | 'none';
-type NavbarContainerProps = { hidden: boolean; transparent: boolean; isOverHero: boolean; isDarkened: boolean };
+type NavbarContainerProps = { isOverHero: boolean; isDarkened: boolean };
 
 export default function Navbar({ items }: NavbarProps) {
   const router = useRouter();
-  const { toggle } = Drawer.useDrawer();
-  const [scrollingDirection, setScrollingDirection] = useState<ScrollingDirections>('none');
+  const [, setScrollingDirection] = useState<ScrollingDirections>('none');
   const [isOverHero, setIsOverHero] = useState(true);
   const [isDarkened, setIsDarkened] = useState(false);
+  const { isModalOpened } = useSignupModalContext(); 
 
   let lastScrollY = useRef(0);
   const lastRoute = useRef('');
-  const stepSize = useRef(50);
 
   // Check if navbar is over the hero section
   useEffect(() => {
@@ -130,6 +123,10 @@ export default function Navbar({ items }: NavbarProps) {
     };
   }, [router.pathname]);
 
+  useEffect(() => {
+    console.log("darkened")
+    setIsDarkened(isModalOpened);
+  }, [isModalOpened])
   // Modified scroll position callback to prevent hiding the navbar
   function scrollPositionCallback({ currPos }: ScrollPositionEffectProps) {
     const routerPath = router.asPath;
@@ -149,12 +146,8 @@ export default function Navbar({ items }: NavbarProps) {
   // Use the scrollPosition hook with the modified callback
   useScrollPosition(scrollPositionCallback, [router.asPath], undefined, undefined, 50);
 
-  // We're always showing the navbar, so isNavbarHidden is always false
-  const isNavbarHidden = false;
-  const isTransparent = true; // We'll control transparency via isOverHero instead
-
   return (
-    <NavbarContainer hidden={isNavbarHidden} transparent={isTransparent} isOverHero={isOverHero} isDarkened={isDarkened}>
+    <NavbarContainer isOverHero={isOverHero} isDarkened={isDarkened || isModalOpened}>
       <Content>
         <NextLink href="/" passHref>
           <LogoWrapper isOverHero={isOverHero}>
@@ -171,12 +164,7 @@ export default function Navbar({ items }: NavbarProps) {
   );
 }
 
-function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem & { isOverHero?: boolean }) {
-  const { setIsModalOpened } = useNewsletterModalContext();
-
-  function showNewsletterModal() {
-    setIsModalOpened(true);
-  }
+function NavItem({ title, outlined, onClick, isOverHero }: SingleNavItem & { isOverHero?: boolean }) {
 
   // Handle the click event
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -190,9 +178,9 @@ function NavItem({ href, title, outlined, onClick, isOverHero }: SingleNavItem &
   return (
     <NavItemWrapper outlined={outlined} isOverHero={isOverHero}>
       <ExpandingButton style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }} data-umami-event="cta button" onClick={handleClick}>
-        <a data-umami-event="navbar button" onClick={handleClick}>
+        <p data-umami-event="navbar button">
           {title}
-        </a>
+        </p>
       </ExpandingButton>
     </NavItemWrapper>
   );
@@ -268,12 +256,4 @@ const Content = styled(Container)`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-`;
-
-const SmallButtonWrapper = styled.div`
-  button {
-    padding: 0.4rem 0.8rem !important;
-    font-size: 0.9rem !important;
-    transform: scale(0.8); /* Scale down the entire button */
-  }
 `;

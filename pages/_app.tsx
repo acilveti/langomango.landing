@@ -3,34 +3,33 @@ import 'swiper/css/bundle';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 
+import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 import { Analytics } from '@vercel/analytics/react';
 import { AppProps } from 'next/dist/shared/lib/router/router';
-import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import Script from 'next/script';
+import { appWithTranslation } from 'next-i18next';
 import { ColorModeScript } from 'nextjs-color-mode';
 import React, { PropsWithChildren, useEffect } from 'react';
-import { TinaEditProvider } from 'tinacms/dist/edit-state';
-import Script from 'next/script';
 
 import Footer from 'components/Footer';
 import { GlobalStyle } from 'components/GlobalStyles';
 import Navbar from 'components/Navbar';
 import NavigationDrawer from 'components/NavigationDrawer';
-import NewsletterModal from 'components/NewsletterModal';
+import SignupModal from 'components/SignupModal';
 import WaveCta from 'components/WaveCta';
-import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
+import { LanguageSelectorModalContextProvider } from 'contexts/LanguageSelectorModalContext';
+import { ReaderDemoModalContextProvider } from 'contexts/ReaderDemoModalContext';
+import { SignupModalContextProvider, useSignupModalContext } from 'contexts/SignupModalContext';
 import { VisitorProvider } from 'contexts/VisitorContext';
 import { NavItems } from 'types';
 import { addReferralToUrl } from 'utils/referral';
-import { appWithTranslation } from 'next-i18next';
-import { injectContentsquareScript } from '@contentsquare/tag-sdk';
 
 // Define a custom nav item type that includes the onClick handler
 type NavItemWithHandler = NavItems[0] & {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
-
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false });
 
 // Google Tag Manager ID
 const GTM_ID = 'GTM-PWND8SN6';
@@ -42,11 +41,14 @@ const REDDIT_PIXEL_ID = 'a2_gu5yg1ki8lp4';
 const CLARITY_ID = 'rm0v2kcv7l';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  useEffect(() => { 
+  const router = useRouter();
+  const isStandalonePage = ['/verification', '/thank-you'].includes(router.pathname);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       // ContentSquare Script
       console.log('Initializing ContentSquare script');
-      
+
       try {
         injectContentsquareScript({
           siteId: "6407230",
@@ -59,7 +61,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     }
   }, []);
-  
+
   return (
     <>
       {/* Google Tag Manager Script */}
@@ -76,7 +78,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Reddit Pixel Base Code */}
       <Script
         id="reddit-pixel"
@@ -87,7 +89,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Microsoft Clarity Code */}
       <Script
         id="clarity-script"
@@ -102,7 +104,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           `,
         }}
       />
-      
+
       {/* Umami Analytics */}
       <Script
         id="umami-analytics"
@@ -110,13 +112,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         data-website-id="793f8225-d6fb-4f40-86a3-cb29e594462d"
         strategy="afterInteractive"
       />
-      
+
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      
+
       <ColorModeScript />
       <GlobalStyle />
 
@@ -127,22 +129,23 @@ function MyApp({ Component, pageProps }: AppProps) {
           height="0"
           width="0"
           style={{ display: 'none', visibility: 'hidden' }}
+          title="Google Tag Manager"
         />
       </noscript>
 
       <Providers>
         <Modals />
         <AppContent Component={Component} pageProps={pageProps} />
-        <WaveCta />
-        <Footer />
+        {!isStandalonePage && <WaveCta />}
+        {!isStandalonePage && <Footer />}
       </Providers>
-      <Analytics/>
+      <Analytics />
     </>
   );
 }
 
 function AppContent({ Component, pageProps }: { Component: any; pageProps: any }) {
-  const { setIsModalOpened } = useNewsletterModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -155,9 +158,9 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
   // Create navigation items with the onClick handler
   const navItems: NavItemWithHandler[] = [
-    { 
-      title: 'USE DEMO', 
-      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'), 
+    {
+      title: 'USE DEMO',
+      href: addReferralToUrl('https://beta-app.langomango.com/sign-up'),
       outlined: true,
       onClick: handleButtonClick,
     },
@@ -165,45 +168,30 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
   return (
     <>
-      <Navbar items={navItems} />
-      <TinaEditProvider
-        editMode={
-          <TinaCMS
-            query={pageProps.query}
-            variables={pageProps.variables}
-            data={pageProps.data}
-            isLocalClient={!process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-            branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-            clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-            {...pageProps}
-          >
-            {(livePageProps: any) => <Component {...livePageProps} />}
-          </TinaCMS>
-        }
-      >
-        <Component {...pageProps} />
-      </TinaEditProvider>
+      {<Navbar items={navItems} />}
       <NavigationDrawer items={navItems} />
+      <Component {...pageProps} />
     </>
   );
 }
 
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
-    <NewsletterModalContextProvider>
-      <VisitorProvider>
-        {children}
-      </VisitorProvider>
-    </NewsletterModalContextProvider>
+    <SignupModalContextProvider>
+      <ReaderDemoModalContextProvider>
+        <LanguageSelectorModalContextProvider>
+          <VisitorProvider>
+            {children}
+          </VisitorProvider>
+        </LanguageSelectorModalContextProvider>
+      </ReaderDemoModalContextProvider>
+    </SignupModalContextProvider>
   );
 }
 
 function Modals() {
-  const { isModalOpened, setIsModalOpened } = useNewsletterModalContext();
-  if (!isModalOpened) {
-    return null;
-  }
-  return <NewsletterModal onClose={() => setIsModalOpened(false)} />;
+  const { isModalOpened } = useSignupModalContext();
+  return <SignupModal showSignup={isModalOpened} />;
 }
 
 export default appWithTranslation(MyApp);

@@ -126,17 +126,6 @@ const countUp = keyframes`
   }
 `;
 
-const slideInFade = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
 const bounceIn = keyframes`
   0% {
     opacity: 0;
@@ -402,8 +391,8 @@ const NavButtonRight = styled.button<{ $shouldAnimate?: boolean }>`
   top: 50%;
   transform: translateY(-50%);
   padding: 0;
-  background: ${props => props.$shouldAnimate 
-    ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' 
+  background: ${props => props.$shouldAnimate
+    ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)'
     : 'white'};
   border: ${props => props.$shouldAnimate ? '2px solid #ff9800' : '1px solid #e5e7eb'};
   border-radius: 50%;
@@ -445,12 +434,12 @@ const NavButtonRight = styled.button<{ $shouldAnimate?: boolean }>`
   &:hover:not(:disabled) {
     animation-play-state: ${props => props.$shouldAnimate ? 'paused, paused' : 'running, running'};
     transform: translateY(-50%) scale(1.15);
-    box-shadow: ${props => props.$shouldAnimate 
-      ? '0 8px 24px rgba(255, 152, 0, 0.4)' 
-      : '0 6px 16px rgba(0, 0, 0, 0.2)'};
-    background: ${props => props.$shouldAnimate 
-      ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' 
-      : '#f3f4f6'};
+    box-shadow: ${props => props.$shouldAnimate
+    ? '0 8px 24px rgba(255, 152, 0, 0.4)'
+    : '0 6px 16px rgba(0, 0, 0, 0.2)'};
+    background: ${props => props.$shouldAnimate
+    ? 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)'
+    : '#f3f4f6'};
     
     ${PulseRing} {
       animation-play-state: ${props => props.$shouldAnimate ? 'paused' : 'running'};
@@ -710,29 +699,6 @@ const fadeInUp = keyframes`
   100% {
     opacity: 1;
     transform: translateY(0);
-  }
-`;
-
-// Educational message animations
-const messageSlideIn = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  20% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.02);
-  }
-  30% {
-    transform: translate(-50%, -50%) scale(0.98);
-  }
-  40%, 90% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.95);
   }
 `;
 
@@ -1123,15 +1089,13 @@ const WordsLabel = styled.div`
 `;
 
 // Signup Section Styles
-const SignupSection = styled.div<{ $isFullscreen: boolean }>`
+const SignupSection = styled.div`
   position: fixed;
   z-index: 200;
   background: white;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  
-  ${props => props.$isFullscreen ? css`
     /* Fullscreen mode - for modal */
     top: 50%;
     left: 50%;
@@ -1159,29 +1123,7 @@ const SignupSection = styled.div<{ $isFullscreen: boolean }>`
       width: 95vw;
       height: 95vh;
     }
-  ` : css`
-    /* Panel mode - slides from bottom */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 85vh;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
-    border-radius: 2rem 2rem 0 0;
-    animation: slideUp 0.4s ease-out;
-    
-    @keyframes slideUp {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
-    }
-    
-    ${media('<=tablet')} {
-      height: 90vh;
-    }
-  `}
+  }
 `;
 
 const SignupCompact = styled.div`
@@ -2490,7 +2432,7 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean; $isCo
   padding: 1rem 0;
   margin: 0 auto;
   position: relative;
-  width: 100%;
+  width: 20%;
   max-width: 500px;
   pointer-events: auto !important;
   z-index: 100;
@@ -2519,12 +2461,7 @@ const CompactRegistrationSection = styled.div<{ $needsAttention?: boolean; $isCo
     gap: 0.8rem;
     padding: ${props => props.$isCompleted ? '1rem' : '1rem 0.5rem'};
     max-width: 400px;
-  }
-  
-  ${media('<=phone')} {
-    gap: 0.6rem;
-    max-width: 100%;
-  }
+  }  
 `;
 
 const EmailRegistrationInputCompact = styled.input.attrs({
@@ -2532,7 +2469,7 @@ const EmailRegistrationInputCompact = styled.input.attrs({
   autoCapitalize: 'off',
   autoCorrect: 'off',
   spellCheck: false
-})<{ $needsAttention?: boolean; $isValid?: boolean; $levelSelected?: boolean }>`
+}) <{ $needsAttention?: boolean; $isValid?: boolean; $levelSelected?: boolean }>`
   width: 140px;
   padding: 0.9rem 1.2rem;
   font-size: 1.3rem;

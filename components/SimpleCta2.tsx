@@ -1,11 +1,10 @@
 // components/SimpleCta.tsx - Simple CTA component with VibratingButton
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import styled from 'styled-components';
 import VibratingButton from 'components/VibratingButton';
-import { useTranslation } from 'next-i18next';
-import { addReferralToUrl } from 'utils/referral';
+import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { RedditEventTypes, trackRedditConversion } from 'utils/redditPixel';
-import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 
 interface SimpleCtaProps {
   buttonText?: string; // Optional custom button text
@@ -21,7 +20,7 @@ export default function SimpleCta({
   className 
 }: SimpleCtaProps) {
   const { t } = useTranslation(['common']);
-  const { setIsModalOpened } = useNewsletterModalContext(); 
+  const { setIsModalOpened } = useSignupModalContext(); 
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();

@@ -4,7 +4,7 @@ import { useVisitor } from 'contexts/VisitorContext';
 
 // Example component showing how to use the language context
 export default function LanguageDisplay() {
-  const { selectedLanguage, setSelectedLanguage, availableLanguages } = useVisitor();
+  const { targetSelectedLanguage: selectedLanguage, setTargetSelectedLanguage: setSelectedLanguage, availableLanguages } = useVisitor();
 
   // Example: Show current language
   if (!selectedLanguage) {
