@@ -53,14 +53,14 @@ export default function Checkout() {
             const hashParams = new URLSearchParams(window.location.hash.slice(1));
             const googleToken = hashParams.get('token')
             if (googleToken && !visitor.token) {
-                window.location.href = '/checkout';
                 visitor.setToken(googleToken)
                 await apiService.createTemporalProfile({
                     nativeLanguageId: visitor.nativeLanguage.code,
                     targetLanguageId: visitor.targetSelectedLanguage.code,
                     languageLevel: visitor.targetSelectedLanguageLevel.code
                 },
-                    googleToken)
+                googleToken)
+                window.location.href = '/checkout';
                 console.log("set token")
             }
             else
