@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import PricingPage from "components/PricingPage/PricingPage";
 import { useVisitor } from "contexts/VisitorContext";
@@ -8,6 +9,7 @@ import { RedditEventTypes } from "utils/redditPixel";
 
 export default function Checkout() {
     const visitor = useVisitor();
+    const router = useRouter()
     const [isPricingLoading, setIsPricingLoading] = useState(false);
 
     useEffect(() => {
@@ -28,7 +30,7 @@ export default function Checkout() {
                 await TriggerRegisterEmail({ email: visitor.email }, visitor.token)
             }
             // Redirect to email verification or onboarding
-            window.location.href = '/verification';
+            router.replace('/verification')
         };
 
         const handleReturn = async () => {
@@ -64,7 +66,8 @@ export default function Checkout() {
                     languageLevel: visitor.targetSelectedLanguageLevel.code
                 },
                 googleToken)
-                window.location.href = '/checkout';
+                router.replace('/checkout')
+
                 console.log("set token")
             }
             else
@@ -72,7 +75,7 @@ export default function Checkout() {
         };
 
         handleReturn();
-    }, [visitor]);
+    }, [visitor, router]);
 
 
     // Handle pricing plan selection
