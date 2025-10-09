@@ -1,13 +1,27 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useVisitor } from 'contexts/VisitorContext';
+import { TriggerRegisterEmail } from 'services/apiService';
 import { media } from 'utils/media';
 
 export default function VerifyEmail() {
   const router = useRouter();
-  const{email} = useVisitor()
+  const { email, token } = useVisitor()
 
+  const handleResend = useCallback(async () => {
+    if (!email || !token) return;
+    try {
+      await TriggerRegisterEmail({ email }, token);
+      // Optionally show success message
+      alert('Verification email resent successfully!');
+    } catch (error) {
+      console.error('Failed to resend email:', error);
+      // Optionally show error message
+      alert('Failed to resend email. Please try again.');
+    }
+  }, [email, token]);
   return (
     <>
       <Head>
@@ -15,24 +29,24 @@ export default function VerifyEmail() {
         <meta name="description" content="Please check your email to complete your registration" />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      
+
       <PageWrapper>
         <Content>
           {/* Email Envelope Illustration */}
           <EmailIllustration>
             <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
               {/* Envelope */}
-              <rect x="20" y="40" width="160" height="100" rx="8" fill="#ffffff" stroke="#ddd" strokeWidth="2"/>
+              <rect x="20" y="40" width="160" height="100" rx="8" fill="#ffffff" stroke="#ddd" strokeWidth="2" />
               {/* Envelope Flap */}
-              <path d="M20 48 L100 95 L180 48" stroke="#ddd" strokeWidth="2" fill="none"/>
+              <path d="M20 48 L100 95 L180 48" stroke="#ddd" strokeWidth="2" fill="none" />
               {/* Checkmark Circle */}
-              <circle cx="100" cy="65" r="25" fill="rgb(254, 197, 70)"/>
-              <path d="M88 65 L95 72 L112 55" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="100" cy="65" r="25" fill="rgb(254, 197, 70)" />
+              <path d="M88 65 L95 72 L112 55" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </EmailIllustration>
 
           <Title>Thank you!</Title>
-          
+
           <Message>
             We&apos;ve sent a verification email to
             <EmailAddress>{email}</EmailAddress>
@@ -46,6 +60,10 @@ export default function VerifyEmail() {
             Can&apos;t find it? Check your spam folder.
           </SpamNote>
 
+          <BackButton onClick={handleResend}>
+            Send Again
+          </BackButton>
+
           <BackButton onClick={() => router.push('/')}>
             Back Home
           </BackButton>
@@ -55,7 +73,7 @@ export default function VerifyEmail() {
             <SocialLinks>
               <SocialLink href="mailto:acilveti@langomango.com" aria-label="Email">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                 </svg>
               </SocialLink>
             </SocialLinks>
@@ -173,6 +191,7 @@ const BackButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin: 1rem;
   margin-bottom: 4rem;
 
   &:hover {
