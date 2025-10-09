@@ -53,6 +53,7 @@ export default function Checkout() {
             const hashParams = new URLSearchParams(window.location.hash.slice(1));
             const googleToken = hashParams.get('token')
             if (googleToken && !visitor.token) {
+                window.location.href = '/checkout';
                 visitor.setToken(googleToken)
                 await apiService.createTemporalProfile({
                     nativeLanguageId: visitor.nativeLanguage.code,
@@ -61,7 +62,6 @@ export default function Checkout() {
                 },
                     googleToken)
                 console.log("set token")
-                window.location.href = '/checkout';
             }
             else
                 console.log("check stripe return")
