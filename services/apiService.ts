@@ -152,6 +152,47 @@ class ApiService {
     }
   }
 
+  private async requestSimpleResponse(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<boolean> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    const config: RequestInit = {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    };
+
+    try {
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        // Try to parse error message from response
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If parsing fails, use default error message
+        }
+        throw new Error(errorMessage);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+  
+
   // Demo signup endpoint
   async demoSignup(data: DemoSignupRequest): Promise<DemoSignupResponse> {
     return this.request<DemoSignupResponse>('/auth/demo-signup', {
@@ -223,7 +264,7 @@ class ApiService {
 
   // Update user profile endpoint for authenticated users
   async createTemporalProfile(data: createTemporalProfileRequest, token: string): Promise<boolean> {
-    return this.request<boolean>('/auth/create-temporal-profile', {
+    return this.requestSimpleResponse('/auth/create-temporal-profile', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
