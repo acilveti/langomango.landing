@@ -6,7 +6,7 @@ import OverTitle from './OverTitle';
 import ReaderDemoWidget from './ReaderDemoWidget';
 
 // Component for demonstrating the e-reader functionality as a section
-export default function ReaderDemoSection({ selectedLanguage }) {
+export default function ReaderDemoSection() {
   return (
     <SectionWrapper>
       <Container>
@@ -18,7 +18,7 @@ export default function ReaderDemoSection({ selectedLanguage }) {
           </SectionSubtitle>
         </HeaderContainer>
 
-        <ReaderDemoWidget selectedLanguage={selectedLanguage} useInlineSignup={true} />
+        <ReaderDemoWidget useInlineSignup={true} />
       </Container>
     </SectionWrapper>
   );

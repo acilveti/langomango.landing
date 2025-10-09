@@ -32,27 +32,31 @@ export default function Checkout() {
         };
 
         const handleReturn = async () => {
-            // Check if returning from Stripe
-            const urlParams = new URLSearchParams(window.location.search);
-            console.log(urlParams)
-            const sessionId = urlParams.get('session_id');
-            const success = urlParams.get('success');
-            console.log(window.location.href)
-            if (sessionId && success === 'true') {
-                console.log("stripe success detected " + visitor.signupChannel)
-                // Perform channel-specific actions
-                switch (visitor.signupChannel) {
-                    case 'Google':
-                        await handleStripeGoogleSignupCompletion();
-                        break;
-                    case 'email':
-                        await handleStripeEmailSignupCompletion();
-                        break;
+            if(visitor.token){
+                // Check if returning from Stripe
+                const urlParams = new URLSearchParams(window.location.search);
+                console.log(urlParams)
+                const sessionId = urlParams.get('session_id');
+                const success = urlParams.get('success');
+                console.log(window.location.href)
+                if (sessionId && success === 'true') {
+                    console.log("stripe success detected " + visitor.signupChannel)
+                    // Perform channel-specific actions
+                    switch (visitor.signupChannel) {
+                        case 'Google':
+                            await handleStripeGoogleSignupCompletion();
+                            break;
+                        case 'email':
+                            await handleStripeEmailSignupCompletion();
+                            break;
+                    }
                 }
+                return
             }
             const hashParams = new URLSearchParams(window.location.hash.slice(1));
             const googleToken = hashParams.get('token')
             if (googleToken && !visitor.token) {
+                console.log('set token to:' + googleToken)
                 visitor.setToken(googleToken)
                 await apiService.createTemporalProfile({
                     nativeLanguageId: visitor.nativeLanguage.code,
