@@ -25,7 +25,7 @@ export default function Checkout() {
             console.log('Completing email signup flow');
 
             if (visitor.token && visitor.email) {
-                await TriggerRegisterEmail({email: visitor.email}, visitor.token)
+                await TriggerRegisterEmail({ email: visitor.email }, visitor.token)
             }
             // Redirect to email verification or onboarding
             window.location.href = '/verification';
@@ -52,24 +52,21 @@ export default function Checkout() {
             }
             const hashParams = new URLSearchParams(window.location.hash.slice(1));
             const googleToken = hashParams.get('token')
-            if (googleToken) {
-                if (googleToken) {
-                    visitor.setToken(googleToken)
-                    await apiService.createTemporalProfile({
-                        nativeLanguageId: visitor.nativeLanguage.code,
-                        targetLanguageId: visitor.targetSelectedLanguage.code,
-                        languageLevel: visitor.targetSelectedLanguageLevel.code
-                    },
-                        googleToken)
-                    console.log("set token")
-                    window.location.href = '/checkout';
-                }
-                else
-                    console.log("check stripe return")
+            if (googleToken && !visitor.token) {
+                visitor.setToken(googleToken)
+                await apiService.createTemporalProfile({
+                    nativeLanguageId: visitor.nativeLanguage.code,
+                    targetLanguageId: visitor.targetSelectedLanguage.code,
+                    languageLevel: visitor.targetSelectedLanguageLevel.code
+                },
+                    googleToken)
+                console.log("set token")
+                window.location.href = '/checkout';
             }
+            else
+                console.log("check stripe return")
         };
 
-        console.log("check stripe return")
         handleReturn();
     }, [visitor]);
 
@@ -127,7 +124,7 @@ export default function Checkout() {
             setIsPricingLoading(false);
         }
     }, [visitor.token]);
-    
+
     return (
         <PricingPage
             onSelectPlan={handlePricingPlanSelect}
