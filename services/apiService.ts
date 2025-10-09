@@ -1,8 +1,6 @@
 // API configuration
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://staging.langomango.com';
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-//const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://419ccdd789de.ngrok.app';
 
 // Type definitions
 export interface DemoSignupRequest {
