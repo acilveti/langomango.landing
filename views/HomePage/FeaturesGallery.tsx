@@ -25,6 +25,8 @@ interface QuizQuestion {
   questionKey: string;
   exampleText: ExampleText;
   options: QuizOption[];
+  explanationTitle: string;
+  explanationText: string;
 }
 
 export default function FeaturesGallery() {
@@ -47,6 +49,8 @@ export default function FeaturesGallery() {
         { id: 'q1-b', text: 'libraries', isCorrect: false },
         { id: 'q1-c', text: 'stories', isCorrect: false },
       ],
+      explanationTitle: 'Learn by Reading',
+      explanationText: 'With LangoMango, you can read authentic content in your target language. When you encounter an unknown word, simply click on it to see the instant translation. This natural, context-based learning helps you remember vocabulary better than traditional memorization.',
     },
     {
       id: 2,
@@ -62,6 +66,8 @@ export default function FeaturesGallery() {
         { id: 'q2-b', text: 'clima', isCorrect: true },
         { id: 'q2-c', text: 'cielo', isCorrect: false },
       ],
+      explanationTitle: 'Instant Translations',
+      explanationText: 'No need to interrupt your reading flow. LangoMango provides instant, contextual translations for any word you click. The more you read and discover words in context, the faster you learn and retain new vocabulary.',
     },
     {
       id: 3,
@@ -77,6 +83,8 @@ export default function FeaturesGallery() {
         { id: 'q3-b', text: 'learn', isCorrect: true },
         { id: 'q3-c', text: 'teach', isCorrect: false },
       ],
+      explanationTitle: 'Adaptive Learning',
+      explanationText: 'LangoMango adapts to your level. Choose content that matches your proficiency, from beginner to advanced. As you progress, the system tracks your vocabulary knowledge and suggests increasingly challenging material to keep you growing.',
     },
   ];
 
@@ -84,6 +92,7 @@ export default function FeaturesGallery() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
 
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === QUIZ_QUESTIONS.length - 1;
@@ -95,21 +104,27 @@ export default function FeaturesGallery() {
     setIsCorrect(option.isCorrect);
     setShowFeedback(true);
 
-    // Move to next question or open signup modal
+    // Show explanation or allow retry
     setTimeout(() => {
       if (option.isCorrect) {
-        if (isLastQuestion) {
-          setIsModalOpened(true);
-        } else {
-          setCurrentQuestionIndex((prev) => prev + 1);
-          setSelectedOption(null);
-          setShowFeedback(false);
-        }
+        setShowFeedback(false);
+        setShowExplanation(true);
       } else {
         setShowFeedback(false);
         setSelectedOption(null);
       }
     }, 1500);
+  }
+
+  function handleContinue() {
+    setShowExplanation(false);
+    setSelectedOption(null);
+
+    if (isLastQuestion) {
+      setIsModalOpened(true);
+    } else {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
   }
 
   return (
@@ -120,56 +135,69 @@ export default function FeaturesGallery() {
       </Content>
 
       <QuizContainer>
-        <QuestionCard>
-          <QuestionNumber>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}</QuestionNumber>
+        {showExplanation ? (
+          // Explanation View
+          <ExplanationCard>
+            <ExplanationIcon>✓</ExplanationIcon>
+            <ExplanationTitle>{currentQuestion.explanationTitle}</ExplanationTitle>
+            <ExplanationText>{currentQuestion.explanationText}</ExplanationText>
+            <ContinueButton onClick={handleContinue}>
+              {isLastQuestion ? 'Start Learning' : 'Continue'}
+            </ContinueButton>
+          </ExplanationCard>
+        ) : (
+          // Quiz View
+          <QuestionCard>
+            <QuestionNumber>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}</QuestionNumber>
 
-          {/* Example text with highlighted word */}
-          <ExampleTextContainer>
-            <ExampleSentence>
-              {currentQuestion.exampleText.beforeWord}
-              <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
-              {currentQuestion.exampleText.afterWord}
-            </ExampleSentence>
-            {currentQuestion.exampleText.translation && (
-              <TranslationHint>"{currentQuestion.exampleText.translation}"</TranslationHint>
+            {/* Example text with highlighted word */}
+            <ExampleTextContainer>
+              <ExampleSentence>
+                {currentQuestion.exampleText.beforeWord}
+                <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+                {currentQuestion.exampleText.afterWord}
+              </ExampleSentence>
+              {currentQuestion.exampleText.translation && (
+                <TranslationHint>"{currentQuestion.exampleText.translation}"</TranslationHint>
+              )}
+            </ExampleTextContainer>
+
+            <QuestionText>
+              {t(currentQuestion.questionKey) || 'What is the best way to learn a language?'}
+            </QuestionText>
+
+            <OptionsGrid>
+              {currentQuestion.options.map((option) => {
+                const isSelected = selectedOption === option.id;
+                const showCorrect = showFeedback && isSelected && isCorrect;
+                const showIncorrect = showFeedback && isSelected && !isCorrect;
+
+                return (
+                  <OptionCard
+                    key={option.id}
+                    onClick={() => handleOptionSelect(option)}
+                    isSelected={isSelected}
+                    showCorrect={showCorrect}
+                    showIncorrect={showIncorrect}
+                    disabled={showFeedback}
+                  >
+                    <OptionText>{option.text}</OptionText>
+                    {showCorrect && <Checkmark>✓</Checkmark>}
+                    {showIncorrect && <CrossMark>✗</CrossMark>}
+                  </OptionCard>
+                );
+              })}
+            </OptionsGrid>
+
+            {showFeedback && (
+              <FeedbackMessage isCorrect={isCorrect}>
+                {isCorrect
+                  ? 'Correct!'
+                  : 'Try another answer!'}
+              </FeedbackMessage>
             )}
-          </ExampleTextContainer>
-
-          <QuestionText>
-            {t(currentQuestion.questionKey) || 'What is the best way to learn a language?'}
-          </QuestionText>
-
-          <OptionsGrid>
-            {currentQuestion.options.map((option) => {
-              const isSelected = selectedOption === option.id;
-              const showCorrect = showFeedback && isSelected && isCorrect;
-              const showIncorrect = showFeedback && isSelected && !isCorrect;
-
-              return (
-                <OptionCard
-                  key={option.id}
-                  onClick={() => handleOptionSelect(option)}
-                  isSelected={isSelected}
-                  showCorrect={showCorrect}
-                  showIncorrect={showIncorrect}
-                  disabled={showFeedback}
-                >
-                  <OptionText>{option.text}</OptionText>
-                  {showCorrect && <Checkmark>✓</Checkmark>}
-                  {showIncorrect && <CrossMark>✗</CrossMark>}
-                </OptionCard>
-              );
-            })}
-          </OptionsGrid>
-
-          {showFeedback && (
-            <FeedbackMessage isCorrect={isCorrect}>
-              {isCorrect
-                ? (isLastQuestion ? 'Perfect! Ready to start learning?' : 'Correct! Moving to next question...')
-                : 'Try another answer!'}
-            </FeedbackMessage>
-          )}
-        </QuestionCard>
+          </QuestionCard>
+        )}
 
         <ProgressBar>
           {QUIZ_QUESTIONS.map((_, idx) => (
@@ -228,7 +256,7 @@ const QuestionCard = styled.div`
 const QuestionNumber = styled.div`
   font-size: 1.3rem;
   font-weight: 600;
-  color: #10b981;
+  color: rgb(245, 162, 1);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 1rem;
@@ -261,17 +289,17 @@ const ExampleSentence = styled.p`
 `;
 
 const HighlightedWord = styled.span`
-  color: #ff6b35;
-  background: rgba(255, 107, 53, 0.1);
+  color: rgb(245, 162, 1);
+  background: rgba(245, 162, 1, 0.1);
   padding: 0.2rem 0.6rem;
   border-radius: 0.4rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-bottom: 3px solid #ff6b35;
+  border-bottom: 3px solid rgb(245, 162, 1);
 
   &:hover {
-    background: rgba(255, 107, 53, 0.2);
+    background: rgba(245, 162, 1, 0.2);
     transform: translateY(-1px);
   }
 `;
@@ -320,10 +348,10 @@ const OptionCard = styled.button<{
   position: relative;
   padding: 1.5rem 1rem;
   background: ${(p) =>
-    p.showCorrect ? '#d1fae5' : p.showIncorrect ? '#fee2e2' : 'rgb(var(--cardBackground))'};
+    p.showCorrect ? 'rgba(245, 162, 1, 0.1)' : p.showIncorrect ? '#fee2e2' : 'rgb(var(--cardBackground))'};
   border: 2px solid
     ${(p) =>
-      p.showCorrect ? '#10b981' : p.showIncorrect ? '#ef4444' : p.isSelected ? '#10b981' : '#e5e7eb'};
+      p.showCorrect ? 'rgb(245, 162, 1)' : p.showIncorrect ? '#ef4444' : p.isSelected ? 'rgb(245, 162, 1)' : '#e5e7eb'};
   border-radius: 0.8rem;
   cursor: ${(p) => (p.disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.3s ease;
@@ -337,8 +365,8 @@ const OptionCard = styled.button<{
     ${(p) =>
       !p.disabled &&
       `
-      border-color: #10b981;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+      border-color: rgb(245, 162, 1);
+      box-shadow: 0 4px 12px rgba(245, 162, 1, 0.25);
       transform: translateY(-2px);
     `}
   }
@@ -363,7 +391,7 @@ const Checkmark = styled.span`
   right: 1.5rem;
   transform: translateY(-50%);
   font-size: 2rem;
-  color: #10b981;
+  color: rgb(245, 162, 1);
   font-weight: bold;
 `;
 
@@ -396,9 +424,9 @@ const FeedbackMessage = styled.div<{ isCorrect: boolean }>`
   font-size: 1.5rem;
   font-weight: 600;
   animation: ${fadeIn} 0.3s ease;
-  background: ${(p) => (p.isCorrect ? '#d1fae5' : '#fef3c7')};
-  color: ${(p) => (p.isCorrect ? '#065f46' : '#92400e')};
-  border: 1px solid ${(p) => (p.isCorrect ? '#10b981' : '#f59e0b')};
+  background: ${(p) => (p.isCorrect ? 'rgba(245, 162, 1, 0.1)' : '#fef3c7')};
+  color: ${(p) => (p.isCorrect ? 'rgb(245, 162, 1)' : '#92400e')};
+  border: 1px solid ${(p) => (p.isCorrect ? 'rgb(245, 162, 1)' : '#f59e0b')};
 `;
 
 const ProgressBar = styled.div`
@@ -412,8 +440,100 @@ const ProgressDot = styled.div<{ isActive: boolean; isCompleted: boolean }>`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: ${(p) => (p.isCompleted ? '#10b981' : p.isActive ? '#10b981' : '#e5e7eb')};
+  background: ${(p) => (p.isCompleted ? 'rgb(245, 162, 1)' : p.isActive ? 'rgb(245, 162, 1)' : '#e5e7eb')};
   opacity: ${(p) => (p.isActive ? 1 : p.isCompleted ? 0.6 : 0.3)};
   transition: all 0.3s ease;
   transform: ${(p) => (p.isActive ? 'scale(1.3)' : 'scale(1)')};
+`;
+
+// Explanation View Styled Components
+const ExplanationCard = styled.div`
+  background: white;
+  border-radius: 1.2rem;
+  padding: 4rem 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  animation: ${fadeIn} 0.5s ease;
+
+  ${media('<=tablet')} {
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+  }
+`;
+
+const ExplanationIcon = styled.div`
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 2rem;
+  background: rgb(245, 162, 1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 162, 1, 0.3);
+
+  ${media('<=tablet')} {
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
+  }
+`;
+
+const ExplanationTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgb(var(--textSecondary));
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+  }
+`;
+
+const ExplanationText = styled.p`
+  font-size: 1.6rem;
+  line-height: 1.7;
+  color: #64748b;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  ${media('<=tablet')} {
+    font-size: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+`;
+
+const ContinueButton = styled.button`
+  padding: 1.5rem 4rem;
+  background: rgb(245, 162, 1);
+  color: white;
+  border: none;
+  border-radius: 0.8rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(245, 162, 1, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 162, 1, 0.4);
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  ${media('<=tablet')} {
+    padding: 1.3rem 3rem;
+    font-size: 1.5rem;
+  }
 `;
