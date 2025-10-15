@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
@@ -93,6 +93,7 @@ export default function FeaturesGallery() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === QUIZ_QUESTIONS.length - 1;
@@ -100,6 +101,7 @@ export default function FeaturesGallery() {
   function handleOptionSelect(option: QuizOption) {
     if (showFeedback) return; // Prevent selecting when feedback is showing
 
+    setHasInteracted(true);
     setSelectedOption(option.id);
     setIsCorrect(option.isCorrect);
     setShowFeedback(true);
@@ -119,6 +121,7 @@ export default function FeaturesGallery() {
   function handleContinue() {
     setShowExplanation(false);
     setSelectedOption(null);
+    setHasInteracted(false);
 
     if (isLastQuestion) {
       setIsModalOpened(true);
@@ -167,7 +170,7 @@ export default function FeaturesGallery() {
             </QuestionText>
 
             <OptionsGrid>
-              {currentQuestion.options.map((option) => {
+              {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedOption === option.id;
                 const showCorrect = showFeedback && isSelected && isCorrect;
                 const showIncorrect = showFeedback && isSelected && !isCorrect;
@@ -180,6 +183,8 @@ export default function FeaturesGallery() {
                     showCorrect={showCorrect}
                     showIncorrect={showIncorrect}
                     disabled={showFeedback}
+                    hasInteracted={hasInteracted}
+                    style={{ animationDelay: `${index * 0.15}s` }}
                   >
                     <OptionText>{option.text}</OptionText>
                     {showCorrect && <Checkmark>✓</Checkmark>}
@@ -339,72 +344,7 @@ const OptionsGrid = styled.div`
   }
 `;
 
-const OptionCard = styled.button<{
-  isSelected: boolean;
-  showCorrect: boolean;
-  showIncorrect: boolean;
-  disabled: boolean;
-}>`
-  position: relative;
-  padding: 1.5rem 1rem;
-  background: ${(p) =>
-    p.showCorrect ? 'rgba(245, 162, 1, 0.1)' : p.showIncorrect ? '#fee2e2' : 'rgb(var(--cardBackground))'};
-  border: 2px solid
-    ${(p) =>
-      p.showCorrect ? 'rgb(245, 162, 1)' : p.showIncorrect ? '#ef4444' : p.isSelected ? 'rgb(245, 162, 1)' : '#e5e7eb'};
-  border-radius: 0.8rem;
-  cursor: ${(p) => (p.disabled ? 'not-allowed' : 'pointer')};
-  transition: all 0.3s ease;
-  text-align: center;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: rgb(var(--text));
-  opacity: ${(p) => (p.disabled && !p.isSelected ? 0.5 : 1)};
-
-  &:hover {
-    ${(p) =>
-      !p.disabled &&
-      `
-      border-color: rgb(245, 162, 1);
-      box-shadow: 0 4px 12px rgba(245, 162, 1, 0.25);
-      transform: translateY(-2px);
-    `}
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  ${media('<=tablet')} {
-    padding: 1.2rem 0.8rem;
-    font-size: 1.4rem;
-  }
-`;
-
-const OptionText = styled.span`
-  display: block;
-`;
-
-const Checkmark = styled.span`
-  position: absolute;
-  top: 50%;
-  right: 1.5rem;
-  transform: translateY(-50%);
-  font-size: 2rem;
-  color: rgb(245, 162, 1);
-  font-weight: bold;
-`;
-
-const CrossMark = styled.span`
-  position: absolute;
-  top: 50%;
-  right: 1.5rem;
-  transform: translateY(-50%);
-  font-size: 2rem;
-  color: #ef4444;
-  font-weight: bold;
-`;
-
+// Keyframe animations - B2C SaaS style
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -413,6 +353,262 @@ const fadeIn = keyframes`
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+`;
+
+const excitedBounce = keyframes`
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    box-shadow: 0 4px 15px rgba(245, 162, 1, 0.25);
+  }
+  25% {
+    transform: translateY(-8px) scale(1.05) rotate(-1deg);
+    box-shadow: 0 10px 25px rgba(245, 162, 1, 0.4);
+  }
+  50% {
+    transform: translateY(0) scale(1.03) rotate(0deg);
+    box-shadow: 0 6px 20px rgba(245, 162, 1, 0.35);
+  }
+  75% {
+    transform: translateY(-4px) scale(1.02) rotate(1deg);
+    box-shadow: 0 8px 22px rgba(245, 162, 1, 0.38);
+  }
+`;
+
+const glowPulse = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 162, 1, 0.7);
+    border-color: rgba(245, 162, 1, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(245, 162, 1, 0);
+    border-color: rgb(245, 162, 1);
+  }
+`;
+
+const shimmerSweep = keyframes`
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(300%) rotate(45deg);
+  }
+`;
+
+const successBurst = keyframes`
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 162, 1, 0.5);
+  }
+  30% {
+    transform: scale(1.15);
+    box-shadow: 0 0 30px 15px rgba(245, 162, 1, 0);
+  }
+  50% {
+    transform: scale(0.95) rotate(-3deg);
+  }
+  70% {
+    transform: scale(1.08) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 0 0 rgba(245, 162, 1, 0);
+  }
+`;
+
+const errorShake = keyframes`
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  15% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+  30% {
+    transform: translateX(10px) rotate(2deg);
+  }
+  45% {
+    transform: translateX(-8px) rotate(-1.5deg);
+  }
+  60% {
+    transform: translateX(8px) rotate(1.5deg);
+  }
+  75% {
+    transform: translateX(-4px) rotate(-0.5deg);
+  }
+  90% {
+    transform: translateX(4px) rotate(0.5deg);
+  }
+`;
+
+const popIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  60% {
+    transform: scale(1.1) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+`;
+
+const OptionCard = styled.button<{
+  isSelected: boolean;
+  showCorrect: boolean;
+  showIncorrect: boolean;
+  disabled: boolean;
+  hasInteracted: boolean;
+}>`
+  position: relative;
+  padding: 1.5rem 1rem;
+  background: ${(p) =>
+    p.showCorrect
+      ? 'linear-gradient(135deg, rgba(245, 162, 1, 0.15) 0%, rgba(245, 162, 1, 0.05) 100%)'
+      : p.showIncorrect
+      ? 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)'
+      : 'linear-gradient(135deg, rgb(var(--cardBackground)) 0%, rgba(245, 162, 1, 0.05) 100%)'};
+  border: 3px solid
+    ${(p) =>
+      p.showCorrect ? 'rgb(245, 162, 1)' : p.showIncorrect ? '#ef4444' : p.isSelected ? 'rgb(245, 162, 1)' : '#e2e8f0'};
+  border-radius: 1.2rem;
+  cursor: ${(p) => (p.disabled ? 'not-allowed' : 'pointer')};
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  opacity: ${(p) => (p.disabled && !p.isSelected ? 0.4 : 1)};
+  overflow: hidden;
+  animation: ${(p) =>
+    p.showCorrect
+      ? successBurst
+      : p.showIncorrect
+      ? errorShake
+      : !p.hasInteracted
+      ? excitedBounce
+      : 'none'}
+    ${(p) => (p.showCorrect || p.showIncorrect ? '0.6s' : '2s')}
+    ${(p) => (p.showCorrect || p.showIncorrect ? 'ease-out' : 'ease-in-out')}
+    ${(p) => (p.showCorrect || p.showIncorrect ? '1' : 'infinite')};
+
+  /* Glow pulse animation */
+  ${(p) =>
+    !p.hasInteracted &&
+    !p.disabled &&
+    css`
+      animation: ${excitedBounce} 2s ease-in-out infinite, ${glowPulse} 2s ease-in-out infinite;
+    `}
+
+  /* Shimmer effect overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 30%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%
+    );
+    opacity: ${(p) => (p.hasInteracted ? 0 : 0.7)};
+    ${(p) =>
+      !p.hasInteracted &&
+      css`
+        animation: ${shimmerSweep} 3s ease-in-out infinite;
+      `}
+    pointer-events: none;
+  }
+
+  /* Glow effect on hover */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1.2rem;
+    background: linear-gradient(135deg, rgb(245, 162, 1), rgba(245, 162, 1, 0.5));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &:hover {
+    ${(p) =>
+      !p.disabled &&
+      !p.hasInteracted &&
+      css`
+        border-color: rgb(245, 162, 1);
+        box-shadow: 0 10px 40px rgba(245, 162, 1, 0.5), 0 0 0 4px rgba(245, 162, 1, 0.15);
+        transform: translateY(-6px) scale(1.08) rotate(-1deg);
+        animation: none;
+      `}
+  }
+
+  &:hover::after {
+    opacity: ${(p) => (p.disabled || p.hasInteracted ? 0 : 0.2)};
+  }
+
+  &:active {
+    ${(p) =>
+      !p.disabled &&
+      css`
+        transform: translateY(-2px) scale(1.03);
+        transition: all 0.1s ease;
+      `}
+  }
+
+  ${media('<=tablet')} {
+    padding: 1.2rem 0.8rem;
+    font-size: 1.4rem;
+    border-width: 2px;
+  }
+`;
+
+const OptionText = styled.span`
+  display: block;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+`;
+
+const Checkmark = styled.span`
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  font-size: 2.5rem;
+  color: rgb(245, 162, 1);
+  font-weight: bold;
+  z-index: 2;
+  animation: ${popIn} 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 2px 8px rgba(245, 162, 1, 0.5));
+
+  ${media('<=tablet')} {
+    font-size: 2rem;
+    right: 1rem;
+  }
+`;
+
+const CrossMark = styled.span`
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  font-size: 2.5rem;
+  color: #ef4444;
+  font-weight: bold;
+  z-index: 2;
+  animation: ${errorShake} 0.6s ease-out;
+  filter: drop-shadow(0 2px 8px rgba(239, 68, 68, 0.5));
+
+  ${media('<=tablet')} {
+    font-size: 2rem;
+    right: 1rem;
   }
 `;
 
