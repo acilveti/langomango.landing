@@ -20,13 +20,22 @@ interface ExampleText {
   translation?: string;
 }
 
+interface HighlightedWordData {
+  word: string;
+  translation: string;
+}
+
 interface QuizQuestion {
   id: number;
   questionKey: string;
-  exampleText: ExampleText;
+  exampleText?: ExampleText;
+  multipleWordsText?: {
+    parts: Array<{ text: string; highlight?: HighlightedWordData }>;
+  };
   options: QuizOption[];
   explanationTitle: string;
   explanationText: string;
+  hideTranslationInQuiz?: boolean;
 }
 
 export default function FeaturesGallery() {
@@ -62,29 +71,32 @@ export default function FeaturesGallery() {
         translation: 'clima',
       },
       options: [
-        { id: 'q2-a', text: 'tiempo', isCorrect: false },
-        { id: 'q2-b', text: 'clima', isCorrect: true },
-        { id: 'q2-c', text: 'cielo', isCorrect: false },
+        { id: 'q2-a', text: 'Yes', isCorrect: true },
+        { id: 'q2-b', text: 'No', isCorrect: true },
       ],
-      explanationTitle: 'Instant Translations',
-      explanationText: 'No need to interrupt your reading flow. LangoMango provides instant, contextual translations for any word you click. The more you read and discover words in context, the faster you learn and retain new vocabulary.',
+      hideTranslationInQuiz: true,
+      explanationTitle: 'Visual Word-Meaning Pairing',
+      explanationText: 'Of course you don\'t know what "weather" means in Spanish - you\'re learning! That\'s exactly why LangoMango shows you instant translations right above the word. This visual pairing of the word with its meaning creates a powerful memory connection that helps you retain vocabulary much faster than traditional methods.',
     },
     {
       id: 3,
       questionKey: 'features.quiz.question3',
-      exampleText: {
-        beforeWord: 'Je veux ',
-        highlightedWord: 'apprendre',
-        afterWord: ' le français.',
-        translation: 'learn',
+      multipleWordsText: {
+        parts: [
+          { text: 'Yesterday I went to the ' },
+          { text: 'mercado', highlight: { word: 'mercado', translation: 'market' } },
+          { text: ' with my friend. We bought fresh ' },
+          { text: 'frutas', highlight: { word: 'frutas', translation: 'fruits' } },
+          { text: ' and vegetables. The ' },
+          { text: 'vendedor', highlight: { word: 'vendedor', translation: 'seller' } },
+          { text: ' was very friendly and helped us choose the best products.' },
+        ],
       },
       options: [
-        { id: 'q3-a', text: 'study', isCorrect: false },
-        { id: 'q3-b', text: 'learn', isCorrect: true },
-        { id: 'q3-c', text: 'teach', isCorrect: false },
+        { id: 'q3-a', text: 'Start Free Trial', isCorrect: true },
       ],
-      explanationTitle: 'Adaptive Learning',
-      explanationText: 'LangoMango adapts to your level. Choose content that matches your proficiency, from beginner to advanced. As you progress, the system tracks your vocabulary knowledge and suggests increasingly challenging material to keep you growing.',
+      explanationTitle: 'Ready to Start Learning?',
+      explanationText: 'Now you\'ve seen how LangoMango combines context-based learning with instant visual translations to help you learn languages naturally and effectively. Try it yourself with our free trial and start reading in your target language today!',
     },
   ];
 
@@ -149,16 +161,34 @@ export default function FeaturesGallery() {
             {/* Show the example again for reinforcement */}
             <ExampleTextContainer>
               <ExampleSentence>
-                {currentQuestion.exampleText.beforeWord}
-                {currentQuestion.exampleText.translation ? (
-                  <WordWithTooltip>
-                    <TooltipTranslation>{currentQuestion.exampleText.translation}</TooltipTranslation>
-                    <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
-                  </WordWithTooltip>
-                ) : (
-                  <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
-                )}
-                {currentQuestion.exampleText.afterWord}
+                {currentQuestion.multipleWordsText ? (
+                  // Render multiple highlighted words
+                  currentQuestion.multipleWordsText.parts.map((part, idx) => {
+                    if (part.highlight) {
+                      return (
+                        <WordWithTooltip key={idx}>
+                          <TooltipTranslation>{part.highlight.translation}</TooltipTranslation>
+                          <HighlightedWord>{part.highlight.word}</HighlightedWord>
+                        </WordWithTooltip>
+                      );
+                    }
+                    return <span key={idx}>{part.text}</span>;
+                  })
+                ) : currentQuestion.exampleText ? (
+                  // Render single highlighted word
+                  <>
+                    {currentQuestion.exampleText.beforeWord}
+                    {currentQuestion.exampleText.translation ? (
+                      <WordWithTooltip>
+                        <TooltipTranslation>{currentQuestion.exampleText.translation}</TooltipTranslation>
+                        <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+                      </WordWithTooltip>
+                    ) : (
+                      <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+                    )}
+                    {currentQuestion.exampleText.afterWord}
+                  </>
+                ) : null}
               </ExampleSentence>
             </ExampleTextContainer>
 
@@ -192,16 +222,34 @@ export default function FeaturesGallery() {
             {/* Example text with highlighted word */}
             <ExampleTextContainer>
               <ExampleSentence>
-                {currentQuestion.exampleText.beforeWord}
-                {currentQuestion.exampleText.translation ? (
-                  <WordWithTooltip>
-                    <TooltipTranslation>{currentQuestion.exampleText.translation}</TooltipTranslation>
-                    <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
-                  </WordWithTooltip>
-                ) : (
-                  <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
-                )}
-                {currentQuestion.exampleText.afterWord}
+                {currentQuestion.multipleWordsText ? (
+                  // Render multiple highlighted words
+                  currentQuestion.multipleWordsText.parts.map((part, idx) => {
+                    if (part.highlight) {
+                      return (
+                        <WordWithTooltip key={idx}>
+                          <TooltipTranslation>{part.highlight.translation}</TooltipTranslation>
+                          <HighlightedWord>{part.highlight.word}</HighlightedWord>
+                        </WordWithTooltip>
+                      );
+                    }
+                    return <span key={idx}>{part.text}</span>;
+                  })
+                ) : currentQuestion.exampleText ? (
+                  // Render single highlighted word
+                  <>
+                    {currentQuestion.exampleText.beforeWord}
+                    {currentQuestion.exampleText.translation && !currentQuestion.hideTranslationInQuiz ? (
+                      <WordWithTooltip>
+                        <TooltipTranslation>{currentQuestion.exampleText.translation}</TooltipTranslation>
+                        <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+                      </WordWithTooltip>
+                    ) : (
+                      <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+                    )}
+                    {currentQuestion.exampleText.afterWord}
+                  </>
+                ) : null}
               </ExampleSentence>
             </ExampleTextContainer>
 
@@ -210,9 +258,21 @@ export default function FeaturesGallery() {
               {t(currentQuestion.questionKey) || 'What is the best way to learn a language?'}
             </QuestionText>
 
-            <WordPrompt>What does "<HighlightSpan>{currentQuestion.exampleText.highlightedWord}</HighlightSpan>" mean?</WordPrompt>
+            {!currentQuestion.multipleWordsText && (
+              <WordPrompt>
+                {currentQuestion.hideTranslationInQuiz
+                  ? `Are you able to know the meaning of "${currentQuestion.exampleText?.highlightedWord}"?`
+                  : `What does "${currentQuestion.exampleText?.highlightedWord}" mean?`}
+              </WordPrompt>
+            )}
 
-            <OptionsGrid>
+            {currentQuestion.multipleWordsText && (
+              <CallToActionPrompt>
+                Now it's your turn! Test yourself with real content and start learning today.
+              </CallToActionPrompt>
+            )}
+
+            <OptionsGrid columnsCount={currentQuestion.options.length}>
               {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedOption === option.id;
                 const showCorrect = showFeedback && isSelected && isCorrect;
@@ -555,14 +615,28 @@ const WordPrompt = styled.p`
   }
 `;
 
+const CallToActionPrompt = styled.p`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgb(var(--textSecondary));
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.5;
+
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+`;
+
 const HighlightSpan = styled.span`
   color: rgb(245, 162, 1);
   font-weight: 700;
 `;
 
-const OptionsGrid = styled.div`
+const OptionsGrid = styled.div<{ columnsCount: number }>`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: ${(p) => `repeat(${p.columnsCount}, 1fr)`};
   gap: 1.2rem;
 
   ${media('<=tablet')} {
