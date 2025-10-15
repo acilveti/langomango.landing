@@ -497,18 +497,23 @@ const ExampleTextContainer = styled.div`
 const ExampleSentence = styled.p`
   font-size: 2.2rem;
   font-weight: 500;
-  line-height: 1.6;
+  line-height: 2.2;
   color: rgb(var(--text));
-  margin: 0 0 0.8rem 0;
+  margin: 0;
+  text-align: justify;
+  padding: 1rem 0;
 
   ${media('<=tablet')} {
     font-size: 1.8rem;
+    line-height: 2;
   }
 `;
 
 const WordWithTooltip = styled.span`
   position: relative;
   display: inline-block;
+  margin: 0 0.2rem;
+  padding: 0 0.3rem;
 `;
 
 const TooltipTranslation = styled.span`
@@ -518,13 +523,14 @@ const TooltipTranslation = styled.span`
   transform: translateX(-50%);
   background: rgba(100, 116, 139, 0.95);
   color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.4rem;
-  font-size: 1.3rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.2rem;
   font-weight: 500;
   white-space: nowrap;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
 
   /* Arrow pointing down */
   &::after {
@@ -539,8 +545,8 @@ const TooltipTranslation = styled.span`
 
   ${media('<=tablet')} {
     font-size: 1.1rem;
-    padding: 0.3rem 0.6rem;
-    margin-bottom: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    margin-bottom: 0.6rem;
 
     &::after {
       border-width: 4px;
