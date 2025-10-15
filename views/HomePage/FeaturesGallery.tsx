@@ -1,265 +1,419 @@
-import NextImage from 'next/image';
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import Collapse from 'components/Collapse';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
-import ThreeLayersCircle from 'components/ThreeLayersCircle';
 import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
-import LanguageSelector from 'components/LanguageSelector'; // Import the new component
-import { Language } from 'contexts/VisitorContext';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 
-// Define the proper type for objectFit
-type ObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+interface QuizOption {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
 
-interface TabItem {
-  titleKey: string;
-  descriptionKey: string;
-  imageUrl: string | null;
-  baseColor: string;
-  secondColor: string;
-  objectFit: ObjectFit | null;
-  isLanguageSelector?: boolean;
+interface ExampleText {
+  beforeWord: string;
+  highlightedWord: string;
+  afterWord: string;
+  translation?: string;
+}
+
+interface QuizQuestion {
+  id: number;
+  questionKey: string;
+  exampleText: ExampleText;
+  options: QuizOption[];
 }
 
 export default function FeaturesGallery() {
   const { t } = useTranslation();
-  const {setIsModalOpened} = useSignupModalContext();
+  const { setIsModalOpened } = useSignupModalContext();
 
-  // Define tabs with proper typing
-  const TABS: TabItem[] = [
+  // Define quiz questions
+  const QUIZ_QUESTIONS: QuizQuestion[] = [
     {
-      titleKey: 'features.tabs.smart_assistance.title',
-      descriptionKey: 'features.tabs.smart_assistance.description',
-      imageUrl: '/feature2.jpeg',
-      baseColor: '249,82,120',
-      secondColor: '221,9,57',
-      objectFit: 'cover' as ObjectFit,
+      id: 1,
+      questionKey: 'features.quiz.question1',
+      exampleText: {
+        beforeWord: 'Me gusta leer ',
+        highlightedWord: 'libros',
+        afterWord: ' en español.',
+        translation: 'books',
+      },
+      options: [
+        { id: 'q1-a', text: 'books', isCorrect: true },
+        { id: 'q1-b', text: 'libraries', isCorrect: false },
+        { id: 'q1-c', text: 'stories', isCorrect: false },
+      ],
     },
     {
-      titleKey: 'features.tabs.instant_translation.title',
-      descriptionKey: 'features.tabs.instant_translation.description',
-      imageUrl: '/wordwise-text.jpeg',
-      baseColor: '57,148,224',
-      secondColor: '99,172,232',
-      objectFit: 'contain' as ObjectFit,
+      id: 2,
+      questionKey: 'features.quiz.question2',
+      exampleText: {
+        beforeWord: 'The ',
+        highlightedWord: 'weather',
+        afterWord: ' is beautiful today.',
+        translation: 'clima',
+      },
+      options: [
+        { id: 'q2-a', text: 'tiempo', isCorrect: false },
+        { id: 'q2-b', text: 'clima', isCorrect: true },
+        { id: 'q2-c', text: 'cielo', isCorrect: false },
+      ],
     },
     {
-      titleKey: 'features.tabs.adjustable_language.title',
-      descriptionKey: 'features.tabs.adjustable_language.description',
-      imageUrl: '/translated-text.jpeg',
-      baseColor: '88,193,132',
-      secondColor: '124,207,158',
-      objectFit: 'contain' as ObjectFit,
-    },
-    {
-      titleKey: 'features.tabs.language_selector.title',
-      descriptionKey: 'features.tabs.language_selector.description',
-      imageUrl: null,
-      baseColor: '255,152,0',
-      secondColor: '255,193,7',
-      objectFit: null,
-      isLanguageSelector: true,
-    },
-    {
-      titleKey: 'features.tabs.fourth_feature.title',
-      descriptionKey: 'features.tabs.fourth_feature.description',
-      imageUrl: null,
-      baseColor: '156,39,176',
-      secondColor: '186,104,200',
-      objectFit: null,
+      id: 3,
+      questionKey: 'features.quiz.question3',
+      exampleText: {
+        beforeWord: 'Je veux ',
+        highlightedWord: 'apprendre',
+        afterWord: ' le français.',
+        translation: 'learn',
+      },
+      options: [
+        { id: 'q3-a', text: 'study', isCorrect: false },
+        { id: 'q3-b', text: 'learn', isCorrect: true },
+        { id: 'q3-c', text: 'teach', isCorrect: false },
+      ],
     },
   ];
 
-  // Map translation keys to translated content
-  const translatedTabs = TABS.map((tab) => ({
-    ...tab,
-    title: tab.isLanguageSelector ? 'At this point you will experience how you are learning by the exposure' : t(tab.titleKey),
-    description: tab.isLanguageSelector
-      ? '<p>What language are you trying to learn now?.</p>'
-      : `<p>${t(tab.descriptionKey)}</p>`,
-  }));
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  const [currentTab, setCurrentTab] = useState(translatedTabs[0]);
+  const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === QUIZ_QUESTIONS.length - 1;
 
-  // Language selection handlers
-  function handleLanguageSelect(language: Language) {
-    console.log('Language selected:', language);
-  }
+  function handleOptionSelect(option: QuizOption) {
+    if (showFeedback) return; // Prevent selecting when feedback is showing
 
-  function handleLanguageProcessingComplete(language: Language) {
-    setIsModalOpened(true);
-  }
+    setSelectedOption(option.id);
+    setIsCorrect(option.isCorrect);
+    setShowFeedback(true);
 
-  const featuresMarkup = translatedTabs.map((singleTab, idx) => {
-    const isActive = singleTab.title === currentTab.title;
-    const isFirst = idx === 0;
-
-    return (
-      <FeatureItem key={singleTab.title}>
-        <Tab isActive={isActive} onClick={() => handleTabClick(idx)}>
-          <TabTitleContainer>
-            <CircleContainer>
-              <ThreeLayersCircle baseColor={isActive ? 'transparent' : singleTab.baseColor} secondColor={singleTab.secondColor} />
-            </CircleContainer>
-            <h4>{singleTab.title}</h4>
-          </TabTitleContainer>
-          <Collapse isOpen={true} duration={300}>
-            <TabContent>
-              <div dangerouslySetInnerHTML={{ __html: singleTab.description }}></div>
-
-              {/* Language selector for the language tab */}
-              {singleTab.isLanguageSelector && (
-                <LanguageSelector
-                  onLanguageSelect={handleLanguageSelect}
-                  onProcessingComplete={handleLanguageProcessingComplete}
-                  placeholder="Select a language"
-                  maxWidth="300px"
-                  showProcessingMessage={true}
-                  showConfirmationMessage={true}
-                  processingDuration={1200}
-                  confirmationDuration={1500}
-                />
-              )}
-            </TabContent>
-          </Collapse>
-        </Tab>
-
-        {/* Show image for tabs that have imageUrl and objectFit */}
-        {singleTab.imageUrl && singleTab.objectFit && (
-          <ImageContainer>
-            <NextImage src={singleTab.imageUrl} alt={singleTab.title} layout="fill" objectFit={singleTab.objectFit} priority={isFirst} />
-          </ImageContainer>
-        )}
-      </FeatureItem>
-    );
-  });
-
-  function handleTabClick(idx: number) {
-    setCurrentTab(translatedTabs[idx]);
+    // Move to next question or open signup modal
+    setTimeout(() => {
+      if (option.isCorrect) {
+        if (isLastQuestion) {
+          setIsModalOpened(true);
+        } else {
+          setCurrentQuestionIndex((prev) => prev + 1);
+          setSelectedOption(null);
+          setShowFeedback(false);
+        }
+      } else {
+        setShowFeedback(false);
+        setSelectedOption(null);
+      }
+    }, 1500);
   }
 
   return (
     <FeaturesGalleryWrapper>
       <Content>
-        <OverTitle>{t('features.overTitle')}</OverTitle>
-        <SectionTitle>{t('features.title')}</SectionTitle>
+        <OverTitle>{t('features.overTitle') || 'How it works'}</OverTitle>
+        <SectionTitle>{t('features.title') || 'Experience Language Learning'}</SectionTitle>
       </Content>
-      <FeaturesContainer>{featuresMarkup}</FeaturesContainer>
+
+      <QuizContainer>
+        <QuestionCard>
+          <QuestionNumber>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}</QuestionNumber>
+
+          {/* Example text with highlighted word */}
+          <ExampleTextContainer>
+            <ExampleSentence>
+              {currentQuestion.exampleText.beforeWord}
+              <HighlightedWord>{currentQuestion.exampleText.highlightedWord}</HighlightedWord>
+              {currentQuestion.exampleText.afterWord}
+            </ExampleSentence>
+            {currentQuestion.exampleText.translation && (
+              <TranslationHint>"{currentQuestion.exampleText.translation}"</TranslationHint>
+            )}
+          </ExampleTextContainer>
+
+          <QuestionText>
+            {t(currentQuestion.questionKey) || 'What is the best way to learn a language?'}
+          </QuestionText>
+
+          <OptionsGrid>
+            {currentQuestion.options.map((option) => {
+              const isSelected = selectedOption === option.id;
+              const showCorrect = showFeedback && isSelected && isCorrect;
+              const showIncorrect = showFeedback && isSelected && !isCorrect;
+
+              return (
+                <OptionCard
+                  key={option.id}
+                  onClick={() => handleOptionSelect(option)}
+                  isSelected={isSelected}
+                  showCorrect={showCorrect}
+                  showIncorrect={showIncorrect}
+                  disabled={showFeedback}
+                >
+                  <OptionText>{option.text}</OptionText>
+                  {showCorrect && <Checkmark>✓</Checkmark>}
+                  {showIncorrect && <CrossMark>✗</CrossMark>}
+                </OptionCard>
+              );
+            })}
+          </OptionsGrid>
+
+          {showFeedback && (
+            <FeedbackMessage isCorrect={isCorrect}>
+              {isCorrect
+                ? (isLastQuestion ? 'Perfect! Ready to start learning?' : 'Correct! Moving to next question...')
+                : 'Try another answer!'}
+            </FeedbackMessage>
+          )}
+        </QuestionCard>
+
+        <ProgressBar>
+          {QUIZ_QUESTIONS.map((_, idx) => (
+            <ProgressDot key={idx} isActive={idx === currentQuestionIndex} isCompleted={idx < currentQuestionIndex} />
+          ))}
+        </ProgressBar>
+      </QuizContainer>
     </FeaturesGalleryWrapper>
   );
 }
 
-// Styled Components (keeping only the ones still needed)
+// Styled Components - Readlang-inspired design
 const FeaturesGalleryWrapper = styled(Container)`
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-`;
+  padding: 6rem 2rem;
 
-const FeaturesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 4rem;
-  gap: 3rem;
-
-  ${media('<=desktop')} {
-    gap: 2rem;
+  ${media('<=tablet')} {
+    padding: 4rem 1.5rem;
   }
-`;
-
-const FeatureItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 `;
 
 const Content = styled.div`
   & > *:not(:first-child) {
     margin-top: 1rem;
   }
-  text-align: left;
+  text-align: center;
   width: 100%;
+  max-width: 800px;
 `;
 
-const ImageContainer = styled.div`
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.8rem;
-  border: 2px solid #d1d5db;
-  background: #f3f4f6;
-  padding: 10px;
-  box-shadow: var(--shadow-md);
-  margin-top: 2rem;
+const QuizContainer = styled.div`
   width: 100%;
-
-  &:before {
-    display: block;
-    content: '';
-    width: 100%;
-    padding-top: calc((9 / 16) * 100%);
-  }
-
-  & > div {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-`;
-
-const Tab = styled.div<{ isActive: boolean }>`
+  max-width: 700px;
+  margin-top: 4rem;
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.5rem;
-  background: rgb(var(--cardBackground));
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  border-radius: 0.6rem;
-  transition: opacity 0.2s;
+  gap: 2rem;
+`;
 
+const QuestionCard = styled.div`
+  background: white;
+  border-radius: 1.2rem;
+  padding: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  ${media('<=tablet')} {
+    padding: 2rem 1.5rem;
+    border-radius: 1rem;
+  }
+`;
+
+const QuestionNumber = styled.div`
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+`;
+
+const ExampleTextContainer = styled.div`
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+
+  ${media('<=tablet')} {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+`;
+
+const ExampleSentence = styled.p`
+  font-size: 2.2rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgb(var(--text));
+  margin: 0 0 0.8rem 0;
+
+  ${media('<=tablet')} {
+    font-size: 1.8rem;
+  }
+`;
+
+const HighlightedWord = styled.span`
+  color: #ff6b35;
+  background: rgba(255, 107, 53, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid #ff6b35;
+
+  &:hover {
+    background: rgba(255, 107, 53, 0.2);
+    transform: translateY(-1px);
+  }
+`;
+
+const TranslationHint = styled.span`
+  display: inline-block;
+  font-size: 1.4rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 0.5rem;
+
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+  }
+`;
+
+const QuestionText = styled.h3`
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgb(var(--textSecondary));
+  margin-bottom: 2.5rem;
+  line-height: 1.4;
+
+  ${media('<=tablet')} {
+    font-size: 1.7rem;
+    margin-bottom: 2rem;
+  }
+`;
+
+const OptionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.2rem;
+
+  ${media('<=tablet')} {
+    gap: 0.8rem;
+  }
+`;
+
+const OptionCard = styled.button<{
+  isSelected: boolean;
+  showCorrect: boolean;
+  showIncorrect: boolean;
+  disabled: boolean;
+}>`
+  position: relative;
+  padding: 1.5rem 1rem;
+  background: ${(p) =>
+    p.showCorrect ? '#d1fae5' : p.showIncorrect ? '#fee2e2' : 'rgb(var(--cardBackground))'};
+  border: 2px solid
+    ${(p) =>
+      p.showCorrect ? '#10b981' : p.showIncorrect ? '#ef4444' : p.isSelected ? '#10b981' : '#e5e7eb'};
+  border-radius: 0.8rem;
+  cursor: ${(p) => (p.disabled ? 'not-allowed' : 'pointer')};
+  transition: all 0.3s ease;
+  text-align: center;
   font-size: 1.6rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  opacity: ${(p) => (p.disabled && !p.isSelected ? 0.5 : 1)};
+
+  &:hover {
+    ${(p) =>
+      !p.disabled &&
+      `
+      border-color: #10b981;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+      transform: translateY(-2px);
+    `}
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  ${media('<=tablet')} {
+    padding: 1.2rem 0.8rem;
+    font-size: 1.4rem;
+  }
+`;
+
+const OptionText = styled.span`
+  display: block;
+`;
+
+const Checkmark = styled.span`
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: #10b981;
   font-weight: bold;
 `;
 
-const TabTitleContainer = styled.div`
-  display: flex;
-  align-items: center;
+const CrossMark = styled.span`
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: #ef4444;
+  font-weight: bold;
+`;
 
-  h4 {
-    flex: 1;
-    text-align: left;
-    margin: 0;
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 `;
 
-const TabContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-weight: normal;
-  margin-top: 0.5rem;
+const FeedbackMessage = styled.div<{ isCorrect: boolean }>`
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 0.8rem;
+  text-align: center;
   font-size: 1.5rem;
-  padding-left: calc(5rem + 1.5rem);
-
-  ${media('<=tablet')} {
-    padding-left: calc(4rem + 1.25rem);
-  }
-
-  p {
-    font-weight: normal;
-  }
+  font-weight: 600;
+  animation: ${fadeIn} 0.3s ease;
+  background: ${(p) => (p.isCorrect ? '#d1fae5' : '#fef3c7')};
+  color: ${(p) => (p.isCorrect ? '#065f46' : '#92400e')};
+  border: 1px solid ${(p) => (p.isCorrect ? '#10b981' : '#f59e0b')};
 `;
 
-const CircleContainer = styled.div`
-  flex: 0 calc(5rem + 1.5rem);
+const ProgressBar = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+`;
 
-  ${media('<=tablet')} {
-    flex: 0 calc(4rem + 1.25rem);
-  }
+const ProgressDot = styled.div<{ isActive: boolean; isCompleted: boolean }>`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: ${(p) => (p.isCompleted ? '#10b981' : p.isActive ? '#10b981' : '#e5e7eb')};
+  opacity: ${(p) => (p.isActive ? 1 : p.isCompleted ? 0.6 : 0.3)};
+  transition: all 0.3s ease;
+  transform: ${(p) => (p.isActive ? 'scale(1.3)' : 'scale(1)')};
 `;
