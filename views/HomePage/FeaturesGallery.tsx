@@ -65,7 +65,7 @@ export default function FeaturesGallery({ title, overTitle }: FeaturesGalleryPro
       exampleText: {
         beforeWord: 'I like to read  ',
         highlightedWord: 'libros',
-        afterWord: ' en español.',
+        afterWord: ' in Spanish.',
         translation: '',
       },
       options: [

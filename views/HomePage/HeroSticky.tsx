@@ -7,6 +7,7 @@ import ReaderDemo from 'components/ReaderDemoModal';
 import Portal from 'components/Portal';
 import { useReaderDemoModalContext } from 'contexts/ReaderDemoModalContext';
 import { useLanguageSelectorModalContext } from 'contexts/LanguageSelectorModalContext';
+import Image from 'next/image';
 
 interface HeroStickyProps {
   backgroundImage: string;
@@ -138,12 +139,25 @@ export default function HeroSticky({
         />
       </ContentWrapper>
 
-      {/* Second title that appears after scrolling */}
-      <SecondTitleWrapper visible={shouldShowTrialText} ref={secondTitleRef}>
-        <Title>
-        </Title>
-      </SecondTitleWrapper>
-
+      <PlatformAvailability>
+        <PlatformIconsRow opacity={dynamicOverlayOpacity}>
+          <PlatformIconItem>
+            <IconWrapper>
+              <Image src="/kindle-icon.svg" alt="Kindle" width={96} height={96} />
+            </IconWrapper>
+          </PlatformIconItem>
+          <PlatformIconItem>
+            <IconWrapper>
+              <Image src="/apple-icon.svg" alt="Apple" width={96} height={96} />
+            </IconWrapper>
+          </PlatformIconItem>
+          <PlatformIconItem>
+            <IconWrapper>
+              <Image src="/android-icon.svg" alt="Android" width={96} height={96} />
+            </IconWrapper>
+          </PlatformIconItem>
+        </PlatformIconsRow>
+      </PlatformAvailability>
       {/* Reader Demo Modal with Signup - Rendered in Portal */}
       {isReaderDemoModalOpened && selectedLanguage && (
         <Portal>
@@ -156,7 +170,85 @@ export default function HeroSticky({
     </HeroWrapper>
   );
 }
+const PlatformAvailability = styled.div`
+  margin-bottom: 2rem;
+  text-align: center;
+  width: 100%;
+  padding: 2rem 0 2rem;
 
+  ${media('<=desktop')} {
+    margin-top: 1rem;
+  }
+`;
+
+const PlatformTitle = styled.p`
+  font-size: 1.4rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+
+  ${media('<=desktop')} {
+    font-size: 1.2rem;
+  }
+`;
+
+const PlatformIconsRow = styled.div<{ opacity: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5rem;
+  background: white;
+  background-color: rgba(254, 254, 254, ${props => 0.2 + props.opacity});
+
+  ${media('<=desktop')} {
+    gap: 3rem;
+  }
+
+  ${media('<=tablet')} {
+    gap: 2.5rem;
+  }
+`;
+
+const PlatformIconItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 1.6rem;
+  
+  padding: 1.5rem;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  ${media('<=desktop')} {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+`;
 // Main wrapper that contains everything
 const HeroWrapper = styled.div`
   position: relative;
@@ -212,22 +304,6 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   pointer-events: auto; /* Ensure pointer events work */
-`;
-
-// Second title with visibility control
-const SecondTitleWrapper = styled.div<{ visible: boolean }>`
-  position: relative;
-  z-index: 10; /* Increased z-index to match ContentWrapper */
-  width: 100%;
-  max-width: 1200px;
-  margin: 2rem auto 4rem; /* Add bottom margin to ensure space after this element */
-  padding: 0 2rem;
-  text-align: center;
-  opacity: ${props => (props.visible ? 1 : 0)};
-  transform: translateY(${props => (props.visible ? 0 : '20px')});
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
-  pointer-events: ${props => (props.visible ? 'auto' : 'none')};
 `;
 
 const Title = styled.h1`

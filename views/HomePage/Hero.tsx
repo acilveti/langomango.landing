@@ -99,7 +99,7 @@ export default function Hero() {
             <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
           </MobileDemoContainer>
 
-          <PlatformAvailability>
+          {/* <PlatformAvailability>
             <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
             <PlatformIconsRow>
               <PlatformIconItem>
@@ -118,7 +118,7 @@ export default function Hero() {
                 </IconWrapper>
               </PlatformIconItem>
             </PlatformIconsRow>
-          </PlatformAvailability>
+          </PlatformAvailability> */}
         </MobileContents>
 
         <style jsx>{`
@@ -189,7 +189,7 @@ export default function Hero() {
           </DemoColumn>
         </TwoColumnLayout>
 
-        <PlatformAvailability>
+        {/* <PlatformAvailability>
           <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
           <PlatformIconsRow>
             <PlatformIconItem>
@@ -208,7 +208,7 @@ export default function Hero() {
               </IconWrapper>
             </PlatformIconItem>
           </PlatformIconsRow>
-        </PlatformAvailability>
+        </PlatformAvailability> */}
       </DesktopContentWrapper>
 
       <style jsx>{`
