@@ -25,6 +25,11 @@ interface HighlightedWordData {
   translation: string;
 }
 
+interface Benefit {
+  icon: string;
+  text: string;
+}
+
 interface QuizQuestion {
   id: number;
   questionKey: string;
@@ -33,8 +38,11 @@ interface QuizQuestion {
     parts: Array<{ text: string; highlight?: HighlightedWordData }>;
   };
   options: QuizOption[];
+  methodBadge: string;
+  introText: string;
   explanationTitle: string;
   explanationText: string;
+  benefits: Benefit[];
   hideTranslationInQuiz?: boolean;
 }
 
@@ -58,8 +66,15 @@ export default function FeaturesGallery() {
         { id: 'q1-b', text: 'libraries', isCorrect: false },
         { id: 'q1-c', text: 'food', isCorrect: false },
       ],
+      methodBadge: 'Context-Based Learning',
+      introText: 'What you just experienced is context-based learning',
       explanationTitle: 'Learn by Reading',
-      explanationText: 'Guessing from context creates stronger memory connections. Your brain learns better when it makes its own discoveries.',
+      explanationText: 'Context-based guessing creates stronger memory connections than passive memorization.',
+      benefits: [
+        { icon: '🧠', text: 'Better retention' },
+        { icon: '⚡', text: 'Faster learning' },
+        { icon: '🎨', text: 'Natural flow' },
+      ],
     },
     {
       id: 2,
@@ -75,8 +90,15 @@ export default function FeaturesGallery() {
         { id: 'q2-b', text: 'No', isCorrect: true },
       ],
       hideTranslationInQuiz: true,
-      explanationTitle: 'Visual Word-Meaning Pairing',
-      explanationText: 'Of course you don\'t know what "weather" means in Spanish - you\'re learning! That\'s exactly why LangoMango shows you instant translations right above the word. This visual pairing of the word with its meaning creates a powerful memory connection that helps you retain vocabulary much faster than traditional methods.',
+      methodBadge: 'Visual-Pairing Learning',
+      introText: 'Don\'t know a word? Is normal, this is why we include the translation',
+      explanationTitle: 'Visual-Pairing Learning',
+      explanationText: 'This visual pairing of words with their meanings, combined with repetitive exposure as you read, creates powerful memory associations that stick with you long-term.',
+      benefits: [
+        { icon: '👁️', text: 'Visual pairing' },
+        { icon: '🔄', text: 'Repetitive exposure' },
+        { icon: '💡', text: 'Natural retention' },
+      ],
     },
     {
       id: 3,
@@ -95,8 +117,15 @@ export default function FeaturesGallery() {
       options: [
         { id: 'q3-a', text: 'Start Free Trial', isCorrect: true },
       ],
+      methodBadge: 'Context-Based Learning',
+      introText: 'What you just experienced is context-based learning',
       explanationTitle: 'Ready to Start Learning?',
-      explanationText: 'Now you\'ve seen how LangoMango combines context-based learning with instant visual translations to help you learn languages naturally and effectively. Try it yourself with our free trial and start reading in your target language today!',
+      explanationText: 'Experience context-based learning with instant visual translations. Start reading in your target language today.',
+      benefits: [
+        { icon: '🧠', text: 'Better retention' },
+        { icon: '⚡', text: 'Faster learning' },
+        { icon: '🎨', text: 'Natural flow' },
+      ],
     },
   ];
 
@@ -124,26 +153,33 @@ export default function FeaturesGallery() {
     if (option.isCorrect) {
       setShowFeedback(true);
 
-      // Move to explanation quickly
-      setTimeout(() => {
-        setShowFeedback(false);
-        setShowExplanation(true);
-
-        // Scroll after expansion to show the quiz explanation
+      // Special case: if this is the last question (Start Free Trial), open modal directly
+      if (isLastQuestion) {
         setTimeout(() => {
-          if (quizContainerRef.current) {
-            const elementRect = quizContainerRef.current.getBoundingClientRect();
-            const absoluteElementTop = elementRect.top + window.pageYOffset;
-            const offset = 80; // Top padding for better visibility
-            const targetPosition = absoluteElementTop - offset;
+          setIsModalOpened(true);
+        }, 600);
+      } else {
+        // Move to explanation quickly
+        setTimeout(() => {
+          setShowFeedback(false);
+          setShowExplanation(true);
 
-            window.scrollTo({
-              top: targetPosition,
-              behavior: 'smooth'
-            });
-          }
-        }, 100);
-      }, 600);
+          // Scroll after expansion to show the quiz explanation
+          setTimeout(() => {
+            if (quizContainerRef.current) {
+              const elementRect = quizContainerRef.current.getBoundingClientRect();
+              const absoluteElementTop = elementRect.top + window.pageYOffset;
+              const offset = 80; // Top padding for better visibility
+              const targetPosition = absoluteElementTop - offset;
+
+              window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }
+          }, 100);
+        }, 600);
+      }
     } else {
       // If incorrect, show brief feedback and reset
       setShowFeedback(true);
@@ -174,12 +210,13 @@ export default function FeaturesGallery() {
       </Content>
 
       <QuizContainer ref={quizContainerRef}>
-        <PromptText>Want to know why this method works?</PromptText>
+        <PromptText>Why this method works</PromptText>
         {showExplanation ? (
           // Explanation View
           <ExplanationCard>
-            <MethodBadge>Context-Based Learning</MethodBadge>
+            <MethodBadge>{currentQuestion.methodBadge}</MethodBadge>
             <ExplanationIconLarge>🎯</ExplanationIconLarge>
+            <IntroText>{currentQuestion.introText}</IntroText>
             <ExplanationTitle>{currentQuestion.explanationTitle}</ExplanationTitle>
 
             {/* Show the example again for reinforcement */}
@@ -220,18 +257,12 @@ export default function FeaturesGallery() {
 
             <BenefitsTitle>Why it works:</BenefitsTitle>
             <BenefitsList>
-              <BenefitItem>
-                <BenefitIcon>🧠</BenefitIcon>
-                <BenefitText>Stronger memory retention</BenefitText>
-              </BenefitItem>
-              <BenefitItem>
-                <BenefitIcon>⚡</BenefitIcon>
-                <BenefitText>Faster vocabulary acquisition</BenefitText>
-              </BenefitItem>
-              <BenefitItem>
-                <BenefitIcon>🎨</BenefitIcon>
-                <BenefitText>Natural learning flow</BenefitText>
-              </BenefitItem>
+              {currentQuestion.benefits.map((benefit, idx) => (
+                <BenefitItem key={idx}>
+                  <BenefitIcon>{benefit.icon}</BenefitIcon>
+                  <BenefitText>{benefit.text}</BenefitText>
+                </BenefitItem>
+              ))}
             </BenefitsList>
 
             <ContinueButton onClick={handleContinue}>
@@ -242,6 +273,13 @@ export default function FeaturesGallery() {
           // Quiz View
           <QuestionCard>
             <QuestionNumber>Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}</QuestionNumber>
+
+            {/* Introductory text for question 3 */}
+            {currentQuestion.multipleWordsText && (
+              <BookPreviewIntro>
+                This is how a book in LangoMango looks like: readable, enjoyable, and a productive learning experience!
+              </BookPreviewIntro>
+            )}
 
             {/* Example text with highlighted word */}
             <ExampleTextContainer>
@@ -292,7 +330,7 @@ export default function FeaturesGallery() {
 
             {currentQuestion.multipleWordsText && (
               <CallToActionPrompt>
-                Now it's your turn! Test yourself with real content and start learning today.
+                Ready to learn? Start reading today.
               </CallToActionPrompt>
             )}
 
@@ -506,6 +544,25 @@ const QuestionNumber = styled.div`
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 1rem;
+`;
+
+const BookPreviewIntro = styled.div`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgb(var(--textPrimary));
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(245, 162, 1, 0.08) 0%, rgba(245, 162, 1, 0.03) 100%);
+  border-radius: 1rem;
+  border-left: 4px solid rgb(245, 162, 1);
+
+  ${media('<=tablet')} {
+    font-size: 1.5rem;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 `;
 
 const ExampleTextContainer = styled.div`
@@ -893,9 +950,9 @@ const MethodBadge = styled.div`
   display: inline-block;
   background: linear-gradient(135deg, rgb(245, 162, 1) 0%, rgb(230, 145, 0) 100%);
   color: white;
-  padding: 0.8rem 2rem;
+  padding: 1rem 2.5rem;
   border-radius: 2rem;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -904,8 +961,8 @@ const MethodBadge = styled.div`
   animation: ${popIn} 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   ${media('<=tablet')} {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
+    font-size: 1.3rem;
+    padding: 0.7rem 1.5rem;
     margin-bottom: 0.8rem;
   }
 `;
@@ -918,6 +975,19 @@ const ExplanationIconLarge = styled.div`
   ${media('<=tablet')} {
     font-size: 3rem;
     margin-bottom: 0.5rem;
+  }
+`;
+
+const IntroText = styled.p`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+
+  ${media('<=tablet')} {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -935,7 +1005,7 @@ const ExplanationTitle = styled.h3`
 `;
 
 const ExplanationText = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   line-height: 1.7;
   color: #64748b;
   margin-bottom: 2.5rem;
@@ -944,7 +1014,7 @@ const ExplanationText = styled.p`
   margin-right: auto;
 
   ${media('<=tablet')} {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     line-height: 1.5;
     margin-bottom: 1rem;
   }
@@ -974,7 +1044,7 @@ const BenefitsList = styled.div`
   margin-right: auto;
 
   ${media('<=tablet')} {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
@@ -1038,12 +1108,12 @@ const BenefitText = styled.span`
 `;
 
 const ContinueButton = styled.button`
-  padding: 1.5rem 4rem;
+  padding: 1.2rem 3rem;
   background: rgb(245, 162, 1);
   color: white;
   border: none;
   border-radius: 0.8rem;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1060,7 +1130,7 @@ const ContinueButton = styled.button`
   }
 
   ${media('<=tablet')} {
-    padding: 1.3rem 3rem;
-    font-size: 1.5rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.3rem;
   }
 `;
