@@ -16,6 +16,7 @@ interface HeroStickyProps {
 }
 
 const ROTATING_LANGUAGES = [
+  { code: 'lan', name: 'Language', word: 'Language', font: 'Georgia, serif' },
   { code: 'en', name: 'English', word: 'English', font: 'Georgia, serif' },
   { code: 'es', name: 'Spanish', word: 'Español', font: 'Arial, sans-serif' },
   { code: 'de', name: 'German', word: 'Deutsch', font: 'Helvetica, sans-serif' },
@@ -43,9 +44,9 @@ export default function HeroSticky({
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentLanguageIndex, setCurrentLanguageIndex] = useState(2); // Start with German (index 2)
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
-  const {isReaderDemoModalOpened, setIsReaderDemoModalOpened} = useReaderDemoModalContext();
+  const { isReaderDemoModalOpened, setIsReaderDemoModalOpened } = useReaderDemoModalContext();
   const [hasStartedRotating, setHasStartedRotating] = useState(false);
-  const {isLanguageSelectorModalOpened, setIsLanguageSelectorModalOpened} = useLanguageSelectorModalContext();
+  const { isLanguageSelectorModalOpened, setIsLanguageSelectorModalOpened } = useLanguageSelectorModalContext();
   const heroRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const secondTitleRef = useRef<HTMLHeadingElement>(null);
@@ -58,7 +59,7 @@ export default function HeroSticky({
     };
 
     window.addEventListener('scroll', handleScroll);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -79,7 +80,7 @@ export default function HeroSticky({
 
     // Start rotating every 2 seconds after the initial 5 second delay
     const interval = setInterval(() => {
-      setCurrentLanguageIndex((prevIndex) => 
+      setCurrentLanguageIndex((prevIndex) =>
         (prevIndex + 1) % ROTATING_LANGUAGES.length
       );
     }, 2000); // Change language every 2 seconds
@@ -89,7 +90,7 @@ export default function HeroSticky({
 
   // Calculate whether to show the trial text based on scroll position
   const shouldShowTrialText = scrollProgress > 50; // Show text after 50px of scrolling
-  
+
   // Calculate dynamic overlay opacity based on scroll position
   // Start with the initial overlayOpacity and increase to a maximum of 0.8
   const dynamicOverlayOpacity = Math.min(overlayOpacity + (scrollProgress * 0.001), 0.8);
@@ -101,18 +102,19 @@ export default function HeroSticky({
         <BackgroundImage backgroundImage={backgroundImage} />
         <Overlay opacity={dynamicOverlayOpacity} />
       </BackgroundContainer>
-      
+
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>
-          You just started to learn 28 words in <LanguageWordContainer>
-            <LanguageWord 
+          Transform Every Book in a Learning Experience
+          {/* <LanguageWordContainer>
+            <LanguageWord
               fontFamily={ROTATING_LANGUAGES[currentLanguageIndex].font}
               key={currentLanguageIndex}
             >
               {ROTATING_LANGUAGES[currentLanguageIndex].word}
             </LanguageWord>
-          </LanguageWordContainer>
+          </LanguageWordContainer> */}
         </Title>
         <Question>What language are you trying to learn now?</Question>
         <LanguageSelector
@@ -135,17 +137,17 @@ export default function HeroSticky({
           requireLevel={true}
         />
       </ContentWrapper>
-      
+
       {/* Second title that appears after scrolling */}
       <SecondTitleWrapper visible={shouldShowTrialText} ref={secondTitleRef}>
         <Title>
         </Title>
       </SecondTitleWrapper>
-      
+
       {/* Reader Demo Modal with Signup - Rendered in Portal */}
       {isReaderDemoModalOpened && selectedLanguage && (
         <Portal>
-          <ReaderDemo 
+          <ReaderDemo
             selectedLanguage={selectedLanguage}
             onClose={() => setIsReaderDemoModalOpened(false)}
           />

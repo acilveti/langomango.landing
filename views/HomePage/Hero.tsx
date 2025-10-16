@@ -11,6 +11,7 @@ import { useTranslation } from 'next-i18next';
 import ReaderDemoWidget from 'components/ReaderDemoWidget';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
+import Image from 'next/image';
 
 export default function Hero() {
   const { t } = useTranslation(['common', 'home']);
@@ -97,6 +98,27 @@ export default function Hero() {
           <MobileDemoContainer ref={mobileDemoContainerRef} className="reader-demo-container">
             <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
           </MobileDemoContainer>
+
+          <PlatformAvailability>
+            <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
+            <PlatformIconsRow>
+              <PlatformIconItem>
+                <IconWrapper>
+                  <Image src="/android-icon.svg" alt="Android" width={80} height={80} />
+                </IconWrapper>
+              </PlatformIconItem>
+              <PlatformIconItem>
+                <IconWrapper>
+                  <Image src="/apple-icon.svg" alt="Apple" width={80} height={80} />
+                </IconWrapper>
+              </PlatformIconItem>
+              <PlatformIconItem>
+                <IconWrapper>
+                  <Image src="/kindle-icon.svg" alt="Kindle" width={80} height={80} />
+                </IconWrapper>
+              </PlatformIconItem>
+            </PlatformIconsRow>
+          </PlatformAvailability>
         </MobileContents>
 
         <style jsx>{`
@@ -140,31 +162,54 @@ export default function Hero() {
     <>
       <PageDarkenOverlay opacity={darkenAmount} />
       <HeroWrapper id="hero-section">
-      <TwoColumnLayout>
-        <TextColumn>
-          <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
-          <Heading style={{ fontSize: '4rem' }}>{t('home:hero.heading')}</Heading>
-          <Description style={{ lineHeight: '2' }}>
-            {t('home:hero.description')}
-          </Description>
-          <CustomButtonGroup>
-            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
-              {t('common:startReading')} <span>&rarr;</span>
-            </VibratingButton>
-            <NextLink href="/authors" passHref>
-              <Button transparent>
-                {t('common:areYouAuthor')} <span>&rarr;</span>
-              </Button>
-            </NextLink>
-          </CustomButtonGroup>
-        </TextColumn>
-        
-        <DemoColumn>
-          <DemoContainer ref={demoContainerRef} className="reader-demo-container">
-            <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
-          </DemoContainer>
-        </DemoColumn>
-      </TwoColumnLayout>
+      <DesktopContentWrapper>
+        <TwoColumnLayout>
+          <TextColumn>
+            <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
+            <Heading style={{ fontSize: '4rem' }}>{t('home:hero.heading')}</Heading>
+            <Description style={{ lineHeight: '2' }}>
+              {t('home:hero.description')}
+            </Description>
+            <CustomButtonGroup>
+              <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
+                {t('common:startReading')} <span>&rarr;</span>
+              </VibratingButton>
+              <NextLink href="/authors" passHref>
+                <Button transparent>
+                  {t('common:areYouAuthor')} <span>&rarr;</span>
+                </Button>
+              </NextLink>
+            </CustomButtonGroup>
+          </TextColumn>
+
+          <DemoColumn>
+            <DemoContainer ref={demoContainerRef} className="reader-demo-container">
+              <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
+            </DemoContainer>
+          </DemoColumn>
+        </TwoColumnLayout>
+
+        <PlatformAvailability>
+          <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
+          <PlatformIconsRow>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/android-icon.svg" alt="Android" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/apple-icon.svg" alt="Apple" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/kindle-icon.svg" alt="Kindle" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+          </PlatformIconsRow>
+        </PlatformAvailability>
+      </DesktopContentWrapper>
 
       <style jsx>{`
         span.wordWisePosition::before {
@@ -211,6 +256,13 @@ const HeroWrapper = styled(Container)`
     flex-direction: column;
     align-items: center;
   }
+`;
+
+const DesktopContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
 `;
 
 // Two column layout for desktop
@@ -327,4 +379,92 @@ const MobileHeading = styled.h1`
   margin-bottom: 1.5rem;
   letter-spacing: -0.03em;
   text-align: center;
+`;
+
+const PlatformAvailability = styled.div`
+  margin-top: 4rem;
+  text-align: center;
+  width: 100%;
+  padding: 2rem 0;
+
+  ${media('<=desktop')} {
+    margin-top: 3rem;
+  }
+`;
+
+const PlatformTitle = styled.p`
+  font-size: 1.4rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+
+  ${media('<=desktop')} {
+    font-size: 1.2rem;
+  }
+`;
+
+const PlatformIconsRow = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5rem;
+
+  ${media('<=desktop')} {
+    gap: 3rem;
+  }
+
+  ${media('<=tablet')} {
+    gap: 2.5rem;
+  }
+`;
+
+const PlatformIconItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 1.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  ${media('<=desktop')} {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+`;
+
+const IconLabel = styled.span`
+  font-size: 1.6rem;
+  opacity: 0.8;
+  font-weight: 500;
+
+  ${media('<=desktop')} {
+    font-size: 1.4rem;
+  }
 `;
