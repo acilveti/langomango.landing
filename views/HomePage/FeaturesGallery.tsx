@@ -8,6 +8,12 @@ import { media } from 'utils/media';
 import { useTranslation } from 'next-i18next';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 
+// Add props interface
+interface FeaturesGalleryProps {
+  title?: string;
+  overTitle?: string;
+}
+
 interface QuizOption {
   id: string;
   text: string;
@@ -47,7 +53,7 @@ interface QuizQuestion {
   hideTranslationInQuiz?: boolean;
 }
 
-export default function FeaturesGallery() {
+export default function FeaturesGallery({ title, overTitle }: FeaturesGalleryProps) {
   const { t } = useTranslation();
   const { setIsModalOpened } = useSignupModalContext();
 
@@ -204,10 +210,14 @@ export default function FeaturesGallery() {
 
   return (
     <FeaturesGalleryWrapper ref={featuresGalleryRef}>
-      <Content>
-        <OverTitle>{t('features.overTitle') || 'How it works'}</OverTitle>
-        <SectionTitle>{t('features.title') || 'Experience Language Learning'}</SectionTitle>
-      </Content>
+      <HeaderContainer>
+        {(overTitle || t('features.overTitle')) && (
+          <CustomOverTitle>{overTitle || t('features.overTitle') || 'How it works'}</CustomOverTitle>
+        )}
+        {(title || t('features.title')) && (
+          <Title>{title || t('features.title') || 'Experience Language Learning'}</Title>
+        )}
+      </HeaderContainer>
 
       <QuizContainer ref={quizContainerRef}>
         <PromptText>Why this method works</PromptText>
@@ -525,13 +535,32 @@ const FeaturesGalleryWrapper = styled(Container)`
   }
 `;
 
-const Content = styled.div`
-  & > *:not(:first-child) {
-    margin-top: 1rem;
-  }
+const HeaderContainer = styled.div`
+  margin-bottom: 4rem;
   text-align: center;
   width: 100%;
   max-width: 800px;
+
+  ${media('<=tablet')} {
+    margin-bottom: 3rem;
+  }
+`;
+
+const CustomOverTitle = styled(OverTitle)`
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: 5.2rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 0;
+  letter-spacing: -0.03em;
+  max-width: 100%;
+
+  ${media('<=tablet')} {
+    font-size: 4.6rem;
+  }
 `;
 
 const QuizContainer = styled.div`
