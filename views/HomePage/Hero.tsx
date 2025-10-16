@@ -106,19 +106,16 @@ export default function Hero() {
                 <IconWrapper>
                   <Image src="/android-icon.svg" alt="Android" width={80} height={80} />
                 </IconWrapper>
-                <IconLabel>{t('common:features.platformAvailability.devices.mobile')}</IconLabel>
               </PlatformIconItem>
               <PlatformIconItem>
                 <IconWrapper>
                   <Image src="/apple-icon.svg" alt="Apple" width={80} height={80} />
                 </IconWrapper>
-                <IconLabel>{t('common:features.platformAvailability.devices.apple')}</IconLabel>
               </PlatformIconItem>
               <PlatformIconItem>
                 <IconWrapper>
                   <Image src="/kindle-icon.svg" alt="Kindle" width={80} height={80} />
                 </IconWrapper>
-                <IconLabel>{t('common:features.platformAvailability.devices.kindle')}</IconLabel>
               </PlatformIconItem>
             </PlatformIconsRow>
           </PlatformAvailability>
@@ -165,55 +162,54 @@ export default function Hero() {
     <>
       <PageDarkenOverlay opacity={darkenAmount} />
       <HeroWrapper id="hero-section">
-      <TwoColumnLayout>
-        <TextColumn>
-          <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
-          <Heading style={{ fontSize: '4rem' }}>{t('home:hero.heading')}</Heading>
-          <Description style={{ lineHeight: '2' }}>
-            {t('home:hero.description')}
-          </Description>
-          <CustomButtonGroup>
-            <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
-              {t('common:startReading')} <span>&rarr;</span>
-            </VibratingButton>
-            <NextLink href="/authors" passHref>
-              <Button transparent>
-                {t('common:areYouAuthor')} <span>&rarr;</span>
-              </Button>
-            </NextLink>
-          </CustomButtonGroup>
-        </TextColumn>
-        
-        <DemoColumn>
-          <DemoContainer ref={demoContainerRef} className="reader-demo-container">
-            <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
-          </DemoContainer>
-        </DemoColumn>
-      </TwoColumnLayout>
+      <DesktopContentWrapper>
+        <TwoColumnLayout>
+          <TextColumn>
+            <CustomOverTitle>{t('home:hero.overTitle')}</CustomOverTitle>
+            <Heading style={{ fontSize: '4rem' }}>{t('home:hero.heading')}</Heading>
+            <Description style={{ lineHeight: '2' }}>
+              {t('home:hero.description')}
+            </Description>
+            <CustomButtonGroup>
+              <VibratingButton data-umami-event="Hero button" onClick={handleButtonClick}>
+                {t('common:startReading')} <span>&rarr;</span>
+              </VibratingButton>
+              <NextLink href="/authors" passHref>
+                <Button transparent>
+                  {t('common:areYouAuthor')} <span>&rarr;</span>
+                </Button>
+              </NextLink>
+            </CustomButtonGroup>
+          </TextColumn>
 
-      <PlatformAvailability>
-        <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
-        <PlatformIconsRow>
-          <PlatformIconItem>
-            <IconWrapper>
-              <Image src="/android-icon.svg" alt="Android" width={96} height={96} />
-            </IconWrapper>
-            <IconLabel>{t('common:features.platformAvailability.devices.mobile')}</IconLabel>
-          </PlatformIconItem>
-          <PlatformIconItem>
-            <IconWrapper>
-              <Image src="/apple-icon.svg" alt="Apple" width={96} height={96} />
-            </IconWrapper>
-            <IconLabel>{t('common:features.platformAvailability.devices.apple')}</IconLabel>
-          </PlatformIconItem>
-          <PlatformIconItem>
-            <IconWrapper>
-              <Image src="/kindle-icon.svg" alt="Kindle" width={96} height={96} />
-            </IconWrapper>
-            <IconLabel>{t('common:features.platformAvailability.devices.kindle')}</IconLabel>
-          </PlatformIconItem>
-        </PlatformIconsRow>
-      </PlatformAvailability>
+          <DemoColumn>
+            <DemoContainer ref={demoContainerRef} className="reader-demo-container">
+              <ReaderDemoWidget useInlineSignup={true} isFullRegister={true} />
+            </DemoContainer>
+          </DemoColumn>
+        </TwoColumnLayout>
+
+        <PlatformAvailability>
+          <PlatformTitle>{t('common:features.platformAvailability.overTitle')}</PlatformTitle>
+          <PlatformIconsRow>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/android-icon.svg" alt="Android" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/apple-icon.svg" alt="Apple" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+            <PlatformIconItem>
+              <IconWrapper>
+                <Image src="/kindle-icon.svg" alt="Kindle" width={96} height={96} />
+              </IconWrapper>
+            </PlatformIconItem>
+          </PlatformIconsRow>
+        </PlatformAvailability>
+      </DesktopContentWrapper>
 
       <style jsx>{`
         span.wordWisePosition::before {
@@ -260,6 +256,13 @@ const HeroWrapper = styled(Container)`
     flex-direction: column;
     align-items: center;
   }
+`;
+
+const DesktopContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
 `;
 
 // Two column layout for desktop

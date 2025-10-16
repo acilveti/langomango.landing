@@ -376,36 +376,6 @@ export default function FeaturesGallery() {
 
       {/* Platform Availability Section */}
       <PlatformAvailabilitySection>
-        <PlatformOverTitle>Available Everywhere</PlatformOverTitle>
-        <PlatformTitle>Read on Any Device</PlatformTitle>
-
-        {/* Device Compatibility Cards */}
-        <DeviceGrid>
-          <DeviceCard>
-            <DeviceIconWrapper>
-              <Image src="/android-icon.svg" alt="Android" width={120} height={120} />
-            </DeviceIconWrapper>
-            <DeviceName>Android</DeviceName>
-            <DeviceDescription>Read on your phone or tablet</DeviceDescription>
-          </DeviceCard>
-
-          <DeviceCard>
-            <DeviceIconWrapper>
-              <Image src="/kindle-icon.svg" alt="Kindle" width={120} height={60} />
-            </DeviceIconWrapper>
-            <DeviceName>Kindle</DeviceName>
-            <DeviceDescription>Perfect for your e-reader</DeviceDescription>
-          </DeviceCard>
-
-          <DeviceCard>
-            <DeviceIconWrapper>
-              <Image src="/apple-icon.svg" alt="Apple" width={120} height={120} />
-            </DeviceIconWrapper>
-            <DeviceName>Apple Devices</DeviceName>
-            <DeviceDescription>iPhone, iPad & more</DeviceDescription>
-          </DeviceCard>
-        </DeviceGrid>
-
         {/* Content Options */}
         <ContentOptionsTitle>Your Content, Your Way</ContentOptionsTitle>
         <ContentOptionsGrid>
