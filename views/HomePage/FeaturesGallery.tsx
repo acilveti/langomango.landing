@@ -220,7 +220,6 @@ export default function FeaturesGallery({ title, overTitle }: FeaturesGalleryPro
       </HeaderContainer>
 
       <QuizContainer ref={quizContainerRef}>
-        <PromptText>Why this method works</PromptText>
         {showExplanation ? (
           // Explanation View
           <ExplanationCard>
@@ -410,6 +409,17 @@ export default function FeaturesGallery({ title, overTitle }: FeaturesGalleryPro
   );
 }
 
+const Description = styled.div`
+  font-size: 1.8rem;
+  items-align: center;
+  max-width: 60%;
+  margin: 0 auto 4rem;
+
+  ${media('<=tablet')} {
+    max-width: 100%;
+  }
+`;
+
 // Keyframe animations - B2C SaaS style
 const fadeIn = keyframes`
   from {
@@ -537,7 +547,6 @@ const FeaturesGalleryWrapper = styled(Container)`
 
 const HeaderContainer = styled.div`
   margin-bottom: 4rem;
-  text-align: center;
   width: 100%;
   max-width: 800px;
 
