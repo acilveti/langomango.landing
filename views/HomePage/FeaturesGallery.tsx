@@ -149,6 +149,12 @@ export default function FeaturesGallery() {
     setSelectedOption(option.id);
     setIsCorrect(option.isCorrect);
 
+    // If it's the last question and the option is the CTA, open modal directly
+    if (isLastQuestion && option.text === 'Start Free Trial') {
+      setIsModalOpened(true);
+      return;
+    }
+
     // If correct, show explanation directly
     if (option.isCorrect) {
       setShowFeedback(true);
