@@ -25,6 +25,29 @@
         "title": "That's it! After the first 5 minutes, it will become second nature to you",
         "description": "Just enjoy the reading, build the habit, and have fun during the process. No effort required!"
       }
+    },
+    "platformAvailability": {
+      "overTitle": "Available Everywhere",
+      "title": "Read on Any Device",
+      "contentTitle": "Your Content, Your Way",
+      "devices": {
+        "mobile": "iOS & Android",
+        "mobileDesc": "Read on your phone or tablet",
+        "kindle": "Kindle",
+        "kindleDesc": "Perfect for your e-reader",
+        "apple": "Apple Devices",
+        "appleDesc": "iPhone, iPad & more"
+      },
+      "content": {
+        "upload": {
+          "title": "Upload Your Own eBooks",
+          "description": "Bring your personal library and learn with books you love. Support for popular formats."
+        },
+        "catalog": {
+          "title": "Free Catalog Available",
+          "description": "Access our curated collection of free books. Start reading immediately with quality content."
+        }
+      }
     }
   },
   "cta": {

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
+import Image from 'next/image';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
 import SectionTitle from 'components/SectionTitle';
@@ -372,6 +373,59 @@ export default function FeaturesGallery() {
           ))}
         </ProgressBar>
       </QuizContainer>
+
+      {/* Platform Availability Section */}
+      <PlatformAvailabilitySection>
+        <PlatformOverTitle>Available Everywhere</PlatformOverTitle>
+        <PlatformTitle>Read on Any Device</PlatformTitle>
+
+        {/* Device Compatibility Cards */}
+        <DeviceGrid>
+          <DeviceCard>
+            <DeviceIconWrapper>
+              <Image src="/android-icon.svg" alt="Android" width={120} height={120} />
+            </DeviceIconWrapper>
+            <DeviceName>Android</DeviceName>
+            <DeviceDescription>Read on your phone or tablet</DeviceDescription>
+          </DeviceCard>
+
+          <DeviceCard>
+            <DeviceIconWrapper>
+              <Image src="/kindle-icon.svg" alt="Kindle" width={120} height={60} />
+            </DeviceIconWrapper>
+            <DeviceName>Kindle</DeviceName>
+            <DeviceDescription>Perfect for your e-reader</DeviceDescription>
+          </DeviceCard>
+
+          <DeviceCard>
+            <DeviceIconWrapper>
+              <Image src="/apple-icon.svg" alt="Apple" width={120} height={120} />
+            </DeviceIconWrapper>
+            <DeviceName>Apple Devices</DeviceName>
+            <DeviceDescription>iPhone, iPad & more</DeviceDescription>
+          </DeviceCard>
+        </DeviceGrid>
+
+        {/* Content Options */}
+        <ContentOptionsTitle>Your Content, Your Way</ContentOptionsTitle>
+        <ContentOptionsGrid>
+          <ContentOptionCard>
+            <ContentIcon>📚</ContentIcon>
+            <ContentOptionTitle>Upload Your Own eBooks</ContentOptionTitle>
+            <ContentOptionDescription>
+              Bring your personal library and learn with books you love. Support for popular formats.
+            </ContentOptionDescription>
+          </ContentOptionCard>
+
+          <ContentOptionCard>
+            <ContentIcon>🎁</ContentIcon>
+            <ContentOptionTitle>Free Catalog Available</ContentOptionTitle>
+            <ContentOptionDescription>
+              Access our curated collection of free books. Start reading immediately with quality content.
+            </ContentOptionDescription>
+          </ContentOptionCard>
+        </ContentOptionsGrid>
+      </PlatformAvailabilitySection>
     </FeaturesGalleryWrapper>
   );
 }
@@ -1171,5 +1225,213 @@ const ContinueButton = styled.button`
   ${media('<=tablet')} {
     padding: 1rem 2.5rem;
     font-size: 1.3rem;
+  }
+`;
+
+// Platform Availability Section Styled Components
+const PlatformAvailabilitySection = styled.div`
+  width: 100%;
+  max-width: 900px;
+  margin-top: 8rem;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  ${media('<=tablet')} {
+    margin-top: 5rem;
+    padding: 0 1.5rem;
+  }
+`;
+
+const PlatformOverTitle = styled(OverTitle)`
+  color: rgb(245, 162, 1);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+  }
+`;
+
+const PlatformTitle = styled.h2`
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4rem;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 2.4rem;
+    margin-bottom: 3rem;
+  }
+`;
+
+const DeviceGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 6rem;
+
+  ${media('<=tablet')} {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+`;
+
+const DeviceCard = styled.div`
+  background: white;
+  border-radius: 1.2rem;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(245, 162, 1, 0.1);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: ${fadeIn} 0.6s ease backwards;
+
+  &:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgb(245, 162, 1);
+    box-shadow: 0 12px 30px rgba(245, 162, 1, 0.2);
+  }
+
+  ${media('<=tablet')} {
+    padding: 2rem 1.5rem;
+  }
+`;
+
+const DeviceIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+
+  ${media('<=tablet')} {
+    margin-bottom: 1rem;
+  }
+`;
+
+const DeviceName = styled.h3`
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.8rem;
+
+  ${media('<=tablet')} {
+    font-size: 1.6rem;
+  }
+`;
+
+const DeviceDescription = styled.p`
+  font-size: 1.4rem;
+  color: #64748b;
+  line-height: 1.6;
+
+  ${media('<=tablet')} {
+    font-size: 1.3rem;
+  }
+`;
+
+const ContentOptionsTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 3rem;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+`;
+
+const ContentOptionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  width: 100%;
+
+  ${media('<=tablet')} {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+`;
+
+const ContentOptionCard = styled.div`
+  background: linear-gradient(135deg, #fffbf5 0%, #fff8ed 100%);
+  border-radius: 1.5rem;
+  padding: 3.5rem 3rem;
+  border: 3px solid rgba(245, 162, 1, 0.2);
+  box-shadow: 0 6px 24px rgba(245, 162, 1, 0.12);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: ${fadeIn} 0.6s ease backwards;
+
+  &:nth-child(1) {
+    animation-delay: 0.4s;
+  }
+  &:nth-child(2) {
+    animation-delay: 0.5s;
+  }
+
+  &:hover {
+    transform: translateY(-10px) scale(1.03);
+    border-color: rgb(245, 162, 1);
+    box-shadow: 0 15px 40px rgba(245, 162, 1, 0.25);
+    background: linear-gradient(135deg, #fff8ed 0%, #ffedd5 100%);
+  }
+
+  ${media('<=tablet')} {
+    padding: 2.5rem 2rem;
+  }
+`;
+
+const ContentIcon = styled.div`
+  font-size: 5rem;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 2px 8px rgba(245, 162, 1, 0.2));
+
+  ${media('<=tablet')} {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+`;
+
+const ContentOptionTitle = styled.h4`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.2rem;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 1.7rem;
+    margin-bottom: 1rem;
+  }
+`;
+
+const ContentOptionDescription = styled.p`
+  font-size: 1.5rem;
+  color: #64748b;
+  line-height: 1.7;
+
+  ${media('<=tablet')} {
+    font-size: 1.4rem;
+    line-height: 1.6;
   }
 `;

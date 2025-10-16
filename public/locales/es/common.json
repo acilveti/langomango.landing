@@ -21,6 +21,29 @@
         "title": "Presencia ajustable del idioma objetivo en tu texto",
         "description": "Controla tu exposición al idioma que estás aprendiendo para adaptarlo a tu nivel. Logra disfrutar mientras aprendes."
       }
+    },
+    "platformAvailability": {
+      "overTitle": "Disponible en Todas Partes",
+      "title": "Lee en Cualquier Dispositivo",
+      "contentTitle": "Tu Contenido, A Tu Manera",
+      "devices": {
+        "mobile": "iOS y Android",
+        "mobileDesc": "Lee en tu teléfono o tablet",
+        "kindle": "Kindle",
+        "kindleDesc": "Perfecto para tu lector electrónico",
+        "apple": "Dispositivos Apple",
+        "appleDesc": "iPhone, iPad y más"
+      },
+      "content": {
+        "upload": {
+          "title": "Sube Tus Propios eBooks",
+          "description": "Trae tu biblioteca personal y aprende con los libros que amas. Compatible con formatos populares."
+        },
+        "catalog": {
+          "title": "Catálogo Gratuito Disponible",
+          "description": "Accede a nuestra colección curada de libros gratuitos. Comienza a leer de inmediato con contenido de calidad."
+        }
+      }
     }
   },
   "cta": {
