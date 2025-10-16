@@ -200,7 +200,7 @@ const PlatformIconsRow = styled.div<{ opacity: number }>`
   align-items: center;
   gap: 5rem;
   background: white;
-  background-color: rgba(254, 254, 254, ${props => 0.2 + props.opacity});
+  background-color: rgba(254, 254, 254, ${props => 0.2 + props.opacity > 0.4 ? 0.4 : 0.2 + props.opacity});
 
   ${media('<=desktop')} {
     gap: 3rem;
