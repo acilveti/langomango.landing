@@ -108,6 +108,7 @@ export default function FeaturesGallery() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const featuresGalleryRef = useRef<HTMLDivElement>(null);
+  const quizContainerRef = useRef<HTMLDivElement>(null);
 
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === QUIZ_QUESTIONS.length - 1;
@@ -123,25 +124,25 @@ export default function FeaturesGallery() {
     if (option.isCorrect) {
       setShowFeedback(true);
 
-      // Scroll to place the entire FeaturesGallery component in the center of the screen
-      setTimeout(() => {
-        if (featuresGalleryRef.current) {
-          const elementRect = featuresGalleryRef.current.getBoundingClientRect();
-          const absoluteElementTop = elementRect.top + window.pageYOffset;
-          const elementHeight = elementRect.height;
-          const targetPosition = absoluteElementTop - (window.innerHeight / 2) + (elementHeight / 2);
-
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
-
       // Move to explanation quickly
       setTimeout(() => {
         setShowFeedback(false);
         setShowExplanation(true);
+
+        // Scroll after expansion to show the quiz explanation
+        setTimeout(() => {
+          if (quizContainerRef.current) {
+            const elementRect = quizContainerRef.current.getBoundingClientRect();
+            const absoluteElementTop = elementRect.top + window.pageYOffset;
+            const offset = 80; // Top padding for better visibility
+            const targetPosition = absoluteElementTop - offset;
+
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
       }, 600);
     } else {
       // If incorrect, show brief feedback and reset
@@ -172,7 +173,7 @@ export default function FeaturesGallery() {
         <SectionTitle>{t('features.title') || 'Experience Language Learning'}</SectionTitle>
       </Content>
 
-      <QuizContainer>
+      <QuizContainer ref={quizContainerRef}>
         <PromptText>Want to know why this method works?</PromptText>
         {showExplanation ? (
           // Explanation View
@@ -454,10 +455,12 @@ const FeaturesGalleryWrapper = styled(Container)`
   align-items: center;
   flex-direction: column;
   justify-content: center;
+  min-height: 100vh;
   padding: 6rem 2rem;
 
   ${media('<=tablet')} {
     padding: 4rem 1.5rem;
+    min-height: 100vh;
   }
 `;
 
@@ -485,14 +488,14 @@ const QuestionCard = styled.div`
   padding: 3rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  min-height: max(600px, 60vh);
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  transition: min-height 0.5s ease, max-height 0.5s ease;
 
   ${media('<=tablet')} {
     padding: 2rem 1.5rem;
     border-radius: 1rem;
-    min-height: max(500px, 70vh);
   }
 `;
 
@@ -877,6 +880,7 @@ const ExplanationCard = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: min-height 0.5s ease, max-height 0.5s ease;
 
   ${media('<=tablet')} {
     padding: 1.5rem 1.5rem;
