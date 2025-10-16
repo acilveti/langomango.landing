@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import Container from 'components/Container';
 import OverTitle from 'components/OverTitle';
@@ -107,6 +107,8 @@ export default function FeaturesGallery() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  const featuresGalleryRef = useRef<HTMLDivElement>(null);
+
   const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === QUIZ_QUESTIONS.length - 1;
 
@@ -116,18 +118,39 @@ export default function FeaturesGallery() {
     setHasInteracted(true);
     setSelectedOption(option.id);
     setIsCorrect(option.isCorrect);
-    setShowFeedback(true);
 
-    // Show explanation or allow retry
-    setTimeout(() => {
-      if (option.isCorrect) {
+    // If correct, show explanation directly
+    if (option.isCorrect) {
+      setShowFeedback(true);
+
+      // Scroll to place the entire FeaturesGallery component in the center of the screen
+      setTimeout(() => {
+        if (featuresGalleryRef.current) {
+          const elementRect = featuresGalleryRef.current.getBoundingClientRect();
+          const absoluteElementTop = elementRect.top + window.pageYOffset;
+          const elementHeight = elementRect.height;
+          const targetPosition = absoluteElementTop - (window.innerHeight / 2) + (elementHeight / 2);
+
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+
+      // Move to explanation quickly
+      setTimeout(() => {
         setShowFeedback(false);
         setShowExplanation(true);
-      } else {
+      }, 600);
+    } else {
+      // If incorrect, show brief feedback and reset
+      setShowFeedback(true);
+      setTimeout(() => {
         setShowFeedback(false);
         setSelectedOption(null);
-      }
-    }, 1500);
+      }, 800);
+    }
   }
 
   function handleContinue() {
@@ -143,7 +166,7 @@ export default function FeaturesGallery() {
   }
 
   return (
-    <FeaturesGalleryWrapper>
+    <FeaturesGalleryWrapper ref={featuresGalleryRef}>
       <Content>
         <OverTitle>{t('features.overTitle') || 'How it works'}</OverTitle>
         <SectionTitle>{t('features.title') || 'Experience Language Learning'}</SectionTitle>
@@ -297,11 +320,9 @@ export default function FeaturesGallery() {
               })}
             </OptionsGrid>
 
-            {showFeedback && (
-              <FeedbackMessage isCorrect={isCorrect}>
-                {isCorrect
-                  ? 'Correct!'
-                  : 'Try another answer!'}
+            {showFeedback && !isCorrect && (
+              <FeedbackMessage isCorrect={false}>
+                Try another answer!
               </FeedbackMessage>
             )}
           </QuestionCard>
@@ -464,10 +485,14 @@ const QuestionCard = styled.div`
   padding: 3rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.06);
+  min-height: max(600px, 60vh);
+  display: flex;
+  flex-direction: column;
 
   ${media('<=tablet')} {
     padding: 2rem 1.5rem;
     border-radius: 1rem;
+    min-height: max(500px, 70vh);
   }
 `;
 
@@ -848,10 +873,15 @@ const ExplanationCard = styled.div`
   text-align: center;
   animation: ${fadeIn} 0.5s ease;
   position: relative;
+  min-height: max(600px, 60vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   ${media('<=tablet')} {
-    padding: 3rem 2rem;
+    padding: 1.5rem 1.5rem;
     border-radius: 1rem;
+    min-height: max(500px, 70vh);
   }
 `;
 
@@ -870,9 +900,9 @@ const MethodBadge = styled.div`
   animation: ${popIn} 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   ${media('<=tablet')} {
-    font-size: 1.2rem;
-    padding: 0.7rem 1.5rem;
-    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.8rem;
   }
 `;
 
@@ -882,8 +912,8 @@ const ExplanationIconLarge = styled.div`
   animation: ${popIn} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   ${media('<=tablet')} {
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
   }
 `;
 
@@ -895,8 +925,8 @@ const ExplanationTitle = styled.h3`
   line-height: 1.3;
 
   ${media('<=tablet')} {
-    font-size: 2rem;
-    margin-bottom: 1.2rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
   }
 `;
 
@@ -910,8 +940,9 @@ const ExplanationText = styled.p`
   margin-right: auto;
 
   ${media('<=tablet')} {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -923,9 +954,9 @@ const BenefitsTitle = styled.h4`
   margin-top: 2rem;
 
   ${media('<=tablet')} {
-    font-size: 1.6rem;
-    margin-bottom: 1.2rem;
-    margin-top: 1.5rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+    margin-top: 1rem;
   }
 `;
 
@@ -940,8 +971,8 @@ const BenefitsList = styled.div`
 
   ${media('<=tablet')} {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
-    margin-bottom: 2rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -976,7 +1007,8 @@ const BenefitItem = styled.div`
   }
 
   ${media('<=tablet')} {
-    padding: 1rem 0.8rem;
+    padding: 0.6rem 0.6rem;
+    gap: 0.3rem;
   }
 `;
 
@@ -985,7 +1017,7 @@ const BenefitIcon = styled.div`
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
 
   ${media('<=tablet')} {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
 `;
 
@@ -997,7 +1029,7 @@ const BenefitText = styled.span`
   line-height: 1.3;
 
   ${media('<=tablet')} {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 `;
 
