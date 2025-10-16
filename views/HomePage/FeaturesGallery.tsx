@@ -81,9 +81,9 @@ export default function FeaturesGallery() {
       questionKey: 'features.quiz.question2',
       exampleText: {
         beforeWord: 'The ',
-        highlightedWord: 'weather',
-        afterWord: ' is beautiful today.',
-        translation: 'clima',
+        highlightedWord: 'reunión',
+        afterWord: ' was boring.',
+        translation: 'meeting',
       },
       options: [
         { id: 'q2-a', text: 'Yes', isCorrect: true },
@@ -153,33 +153,26 @@ export default function FeaturesGallery() {
     if (option.isCorrect) {
       setShowFeedback(true);
 
-      // Special case: if this is the last question (Start Free Trial), open modal directly
-      if (isLastQuestion) {
-        setTimeout(() => {
-          setIsModalOpened(true);
-        }, 600);
-      } else {
-        // Move to explanation quickly
-        setTimeout(() => {
-          setShowFeedback(false);
-          setShowExplanation(true);
+      // Move to explanation quickly
+      setTimeout(() => {
+        setShowFeedback(false);
+        setShowExplanation(true);
 
-          // Scroll after expansion to show the quiz explanation
-          setTimeout(() => {
-            if (quizContainerRef.current) {
-              const elementRect = quizContainerRef.current.getBoundingClientRect();
-              const absoluteElementTop = elementRect.top + window.pageYOffset;
-              const offset = 80; // Top padding for better visibility
-              const targetPosition = absoluteElementTop - offset;
+        // Scroll after expansion to show the quiz explanation
+        setTimeout(() => {
+          if (quizContainerRef.current) {
+            const elementRect = quizContainerRef.current.getBoundingClientRect();
+            const absoluteElementTop = elementRect.top + window.pageYOffset;
+            const offset = 80; // Top padding for better visibility
+            const targetPosition = absoluteElementTop - offset;
 
-              window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-              });
-            }
-          }, 100);
-        }, 600);
-      }
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      }, 600);
     } else {
       // If incorrect, show brief feedback and reset
       setShowFeedback(true);
@@ -228,8 +221,8 @@ export default function FeaturesGallery() {
                     if (part.highlight) {
                       return (
                         <WordWithTooltip key={idx}>
-                          <TooltipTranslation>{part.highlight.translation}</TooltipTranslation>
-                          <HighlightedWord>{part.highlight.word}</HighlightedWord>
+                          <TooltipTranslationFinal>{part.highlight.translation}</TooltipTranslationFinal>
+                          <HighlightedWordFinal>{part.highlight.word}</HighlightedWordFinal>
                         </WordWithTooltip>
                       );
                     }
@@ -290,8 +283,8 @@ export default function FeaturesGallery() {
                     if (part.highlight) {
                       return (
                         <WordWithTooltip key={idx}>
-                          <TooltipTranslation>{part.highlight.translation}</TooltipTranslation>
-                          <HighlightedWord>{part.highlight.word}</HighlightedWord>
+                          <TooltipTranslationFinal>{part.highlight.translation}</TooltipTranslationFinal>
+                          <HighlightedWordFinal>{part.highlight.word}</HighlightedWordFinal>
                         </WordWithTooltip>
                       );
                     }
@@ -648,6 +641,46 @@ const HighlightedWord = styled.span`
   cursor: pointer;
   transition: all 0.2s ease;
   border-bottom: 3px solid rgb(245, 162, 1);
+
+  &:hover {
+    background: rgba(245, 162, 1, 0.2);
+    transform: translateY(-1px);
+  }
+`;
+
+const TooltipTranslationFinal = styled.span`
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-bottom: 0.8rem;
+  z-index: 10;
+
+  
+
+  ${media('<=tablet')} {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
+    margin-bottom: 0.6rem;
+
+    &::after {
+      border-width: 4px;
+    }
+  }
+`;
+
+const HighlightedWordFinal = styled.span`
+  color: rgb(245, 162, 1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
   &:hover {
     background: rgba(245, 162, 1, 0.2);
