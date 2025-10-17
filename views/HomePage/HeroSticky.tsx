@@ -107,7 +107,7 @@ export default function HeroSticky({
       {/* Main content */}
       <ContentWrapper ref={contentRef}>
         <Title>
-          Transform Every Book in a Learning Experience
+          Transform Books into <HighlightedText>Learning Experiences</HighlightedText>
           {/* <LanguageWordContainer>
             <LanguageWord
               fontFamily={ROTATING_LANGUAGES[currentLanguageIndex].font}
@@ -313,14 +313,18 @@ const Title = styled.h1`
   margin: 0 0 2rem 0;
   font-weight: 700;
   letter-spacing: 0.05em;
-  
+
   ${media('<=tablet')} {
     font-size: 3rem;
   }
-  
+
   ${media('<=phone')} {
     font-size: 2.5rem;
   }
+`;
+
+const HighlightedText = styled.span`
+  color: rgb(255, 152, 0);
 `;
 
 const Question = styled.h2`
