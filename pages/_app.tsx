@@ -42,7 +42,7 @@ const CLARITY_ID = 'rm0v2kcv7l';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const isStandalonePage = ['/verification', '/thank-you'].includes(router.pathname);
+  const isStandalonePage = ['/verification', '/simple',  '/thank-you'].includes(router.pathname);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -145,6 +145,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 function AppContent({ Component, pageProps }: { Component: any; pageProps: any }) {
+  const router = useRouter();
+  const isStandalonePage = ['/verification', '/simple', '/thank-you'].includes(router.pathname);
   const { setIsModalOpened } = useSignupModalContext();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -168,8 +170,8 @@ function AppContent({ Component, pageProps }: { Component: any; pageProps: any }
 
   return (
     <>
-      {<Navbar items={navItems} />}
-      <NavigationDrawer items={navItems} />
+      {!isStandalonePage && <Navbar items={navItems} />}
+      {!isStandalonePage && <NavigationDrawer items={navItems} />}
       <Component {...pageProps} />
     </>
   );

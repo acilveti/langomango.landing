@@ -152,5 +152,12 @@
     "title": "What languages are available?",
     "content": "The current languages supported are: English\nSpanish\nFrench\nGerman\nChinese\nJapanese\nKorean\nRussian\nPortuguese\nItalian\nDutch\nSwedish\nNorwegian\nDanish\nFinnish\nPolish\nTurkish\nArabic\nHindi\nThai\nVietnamese\nIndonesian\nMalay\nHebrew\nGreek\nRomanian\nHungarian\nCzech\nSlovak\nBulgarian\nCroatian\nSerbian\nUkrainian\nEstonian\nLatvian\nLithuanian\nBasque.\n\nThe languages that we have tested with users are: English, Spanish, German, French, Bulgarian and Basque. Tests are being performed with more real cases as you are reading this."
   }
-}
+},
+  "simplePage": {
+    "hero": {
+      "heading": "Transform your books in learning experiences",
+      "subheading": "What language are you trying to learn now?",
+      "ctaButton": "Get the App"
+    }
+  }
 }
