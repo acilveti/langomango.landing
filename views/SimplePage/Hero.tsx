@@ -1,18 +1,20 @@
 import NextLink from 'next/link';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { useTranslation } from 'next-i18next';
 import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
 import Image from 'next/image';
 
 export default function Hero() {
-  const { t } = useTranslation('common');
   const { setIsModalOpened } = useSignupModalContext();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    setIsModalOpened(true);
+  };
+
+  const handleDeviceClick = () => {
     setIsModalOpened(true);
   };
 
@@ -21,10 +23,10 @@ export default function Hero() {
       <ContentWrapper>
         <TextColumn>
           <Heading>Transform Books into <HighlightedText>Learning Experiences</HighlightedText></Heading>
-          <Subheading>{t('simplePage.hero.subheading')}</Subheading>
+          <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
 
           <CtaButton onClick={handleButtonClick}>
-            {t('simplePage.hero.ctaButton')}
+            Select Language
           </CtaButton>
 
           <PlatformAvailability>
@@ -49,7 +51,7 @@ export default function Hero() {
         </TextColumn>
 
         <DeviceColumn>
-          <DeviceMockup>
+          <DeviceMockup onClick={handleDeviceClick}>
             <DeviceFrame>
               <DeviceScreen>
                 <Image
@@ -139,7 +141,6 @@ const Subheading = styled.p`
   line-height: 1.5;
   margin-bottom: 3rem;
   opacity: 0.7;
-  color: rgb(var(--textSecondary));
 
   ${media('<=tablet')} {
     font-size: 1.6rem;
@@ -147,21 +148,67 @@ const Subheading = styled.p`
   }
 `;
 
+// Vibration animation
+const vibrateWithIntervals = keyframes`
+  /* First vibration burst at start */
+  0%, 2% { transform: translateX(0); }
+  2.5% { transform: translateX(-2px); }
+  3% { transform: translateX(2px); }
+  3.5% { transform: translateX(-2px); }
+  4% { transform: translateX(2px); }
+  4.5% { transform: translateX(-1px); }
+  5% { transform: translateX(1px); }
+  5.5% { transform: translateX(0); }
+
+  /* Rest period */
+  6%, 25% { transform: translateX(0); }
+
+  /* Second vibration burst */
+  25.5% { transform: translateX(-2px); }
+  26% { transform: translateX(2px); }
+  26.5% { transform: translateX(-2px); }
+  27% { transform: translateX(2px); }
+  27.5% { transform: translateX(-1px); }
+  28% { transform: translateX(1px); }
+  28.5% { transform: translateX(0); }
+
+  /* Rest period */
+  29%, 50% { transform: translateX(0); }
+
+  /* Third vibration burst */
+  50.5% { transform: translateX(-2px); }
+  51% { transform: translateX(2px); }
+  51.5% { transform: translateX(-2px); }
+  52% { transform: translateX(2px); }
+  52.5% { transform: translateX(-1px); }
+  53% { transform: translateX(1px); }
+  53.5% { transform: translateX(0); }
+
+  /* Long rest until cycle repeats */
+  54%, 100% { transform: translateX(0); }
+`;
+
 const CtaButton = styled(Button)`
   padding: 1.6rem 4rem;
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 4rem;
-  background: #ff6b35;
-  color: white;
-  border: none;
+  background: rgb(var(--primary));
+  color: rgb(var(--textSecondary));
+  border: 2px solid rgb(var(--primary));
   cursor: pointer;
   transition: all 0.3s ease;
+  animation: ${vibrateWithIntervals} 6s infinite;
+  animation-delay: 2s;
 
   &:hover {
-    background: #ff5722;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(var(--primary), 0.3);
+    animation-play-state: paused;
+  }
+
+  &:focus {
+    animation-play-state: paused;
   }
 
   ${media('<=tablet')} {
@@ -232,6 +279,12 @@ const DeviceMockup = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
 
   ${media('<=desktop')} {
     max-width: 40rem;
@@ -272,6 +325,7 @@ const DeviceScreen = styled.div`
     border-radius: 1.5rem;
   }
 `;
+
 const HighlightedText = styled.span`
   color: rgb(255, 152, 0);
 `;
