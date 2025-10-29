@@ -404,3 +404,34 @@ export async function TriggerRegisterEmail(
 
   return response.ok;
 }
+
+// Trial subscription types
+export interface CreateTrialSubscriptionResponse {
+  success: boolean;
+  subscriptionId: string;
+  customerId: string;
+  status: string;
+  trialEnd?: Date;
+  trialStart?: Date;
+  message: string;
+}
+
+// Create free trial subscription without Stripe checkout
+export async function createTrialSubscription(token: string): Promise<CreateTrialSubscriptionResponse> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+
+  const response = await fetch(`${API_URL}/stripe/create-trial-subscription`, {
+    method: 'POST',
+    headers,
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || 'Failed to create trial subscription');
+  }
+
+  return response.json();
+}

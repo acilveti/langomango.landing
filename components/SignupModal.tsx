@@ -66,6 +66,8 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
     // const [, setEmailError] = useState('');
     const router = useRouter();
 
+    const CHECKOUT_URL = '/free-trial-checkout'
+
     //temporal, delete
     const [isLoadingSignup, setIsLoadingSignup] = useState(false);
     const [hasRegistered, setHasRegistered] = useState(false);
@@ -418,7 +420,7 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                                 source: 'reader_widget'
                                                             });
                                                             // Show pricing page - user is already authenticated
-                                                            router.replace('/checkout')
+                                                            router.replace(CHECKOUT_URL)
                                                         } else {
                                                             throw new Error('Failed to create account');
                                                         }
@@ -467,7 +469,8 @@ export default function SignupModal({ showSignup }: SignupModalProps) {
                                                 setSignupChannel('Google')
                                                 // Redirect to Google OAuth
                                                 
-                                                const returnUrl = encodeURIComponent('/checkout');
+                                                //const returnUrl = encodeURIComponent('/checkout');
+                                                const returnUrl = encodeURIComponent(CHECKOUT_URL);
                                                 const frontendRedirectUrl = encodeURIComponent(window.location.origin);
                                                 const googleAuthUrl = `${API_URL}/auth/login-google?returnUrl=${returnUrl}&frontendRedirectUrl=${frontendRedirectUrl}`;
 
