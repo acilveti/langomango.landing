@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useVisitor } from "contexts/VisitorContext";
-import { APP_URL, createTrialSubscription, TriggerRegisterEmail } from "services/apiService";
+import { apiService, APP_URL, createTrialSubscription, TriggerRegisterEmail } from "services/apiService";
 
 export default function FreeTrialCheckout() {
     const visitor = useVisitor();
@@ -13,13 +13,24 @@ export default function FreeTrialCheckout() {
     useEffect(() => {
         const createTrial = async () => {
             // Check if user is authenticated
-            if (!visitor.token) {
-                console.error('No authentication token found');
-                setError('Authentication required. Please sign up first.');
-                setIsProcessing(false);
-                return;
+            const hashParams = new URLSearchParams(window.location.hash.slice(1));
+            const googleToken = hashParams.get('token')
+            if (googleToken && !visitor.token) {
+                console.log('set token to:' + googleToken)
+                visitor.setToken(googleToken)
+                await apiService.createTemporalProfile({
+                    nativeLanguageId: visitor.nativeLanguage.code,
+                    targetLanguageId: visitor.targetSelectedLanguage.code,
+                    languageLevel: visitor.targetSelectedLanguageLevel.code
+                },
+                    googleToken)
+                console.log("set token")
             }
-
+            console.log("visitor.token " + visitor.token)
+            console.log("googleToken " + googleToken)
+            
+            if (visitor.token) {
+            console.log("test for Creating free trial subscriptione")
             try {
                 setIsProcessing(true);
                 setError(null);
@@ -58,51 +69,52 @@ export default function FreeTrialCheckout() {
                 setIsProcessing(false);
             }
         };
+    }
 
-        createTrial();
-    }, [visitor.token, visitor.signupChannel, visitor.email, router]);
+        //createTrial();
+}, [visitor.token, visitor.signupChannel, visitor.email, visitor, router]);
 
-    const handleRetry = () => {
-        setError(null);
-        setIsProcessing(true);
-        // Trigger useEffect by updating state
-        window.location.reload();
-    };
+const handleRetry = () => {
+    setError(null);
+    setIsProcessing(true);
+    // Trigger useEffect by updating state
+    window.location.reload();
+};
 
-    const handleGoBack = () => {
-        router.push('/');
-    };
+const handleGoBack = () => {
+    router.push('/');
+};
 
-    return (
-        <StyledPageWrapper>
-            <StyledContentContainer>
-                {isProcessing ? (
-                    <>
-                        <StyledSpinner />
-                        <StyledTitle>Setting up your free trial</StyledTitle>
-                        <StyledSubtitle>You will be redirected in a few seconds...</StyledSubtitle>
-                        <StyledProgressBar>
-                            <StyledProgressFill />
-                        </StyledProgressBar>
-                    </>
-                ) : error ? (
-                    <>
-                        <StyledErrorIcon>⚠️</StyledErrorIcon>
-                        <StyledTitle>Oops! Something went wrong</StyledTitle>
-                        <StyledErrorMessage>{error}</StyledErrorMessage>
-                        <StyledButtonGroup>
-                            <StyledRetryButton onClick={handleRetry}>
-                                Try Again
-                            </StyledRetryButton>
-                            <StyledBackButton onClick={handleGoBack}>
-                                Go Back
-                            </StyledBackButton>
-                        </StyledButtonGroup>
-                    </>
-                ) : null}
-            </StyledContentContainer>
-        </StyledPageWrapper>
-    );
+return (
+    <StyledPageWrapper>
+        <StyledContentContainer>
+            {isProcessing ? (
+                <>
+                    <StyledSpinner />
+                    <StyledTitle>Setting up your free trial</StyledTitle>
+                    <StyledSubtitle>You will be redirected in a few seconds...</StyledSubtitle>
+                    <StyledProgressBar>
+                        <StyledProgressFill />
+                    </StyledProgressBar>
+                </>
+            ) : error ? (
+                <>
+                    <StyledErrorIcon>⚠️</StyledErrorIcon>
+                    <StyledTitle>Oops! Something went wrong</StyledTitle>
+                    <StyledErrorMessage>{error}</StyledErrorMessage>
+                    <StyledButtonGroup>
+                        <StyledRetryButton onClick={handleRetry}>
+                            Try Again
+                        </StyledRetryButton>
+                        <StyledBackButton onClick={handleGoBack}>
+                            Go Back
+                        </StyledBackButton>
+                    </StyledButtonGroup>
+                </>
+            ) : null}
+        </StyledContentContainer>
+    </StyledPageWrapper>
+);
 }
 
 // Styled Components
