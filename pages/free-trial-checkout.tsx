@@ -28,103 +28,108 @@ export default function FreeTrialCheckout() {
             }
             console.log("visitor.token " + visitor.token)
             console.log("googleToken " + googleToken)
-            
+
             if (visitor.token) {
-            console.log("test for Creating free trial subscriptione")
-            try {
-                setIsProcessing(true);
-                setError(null);
+                console.log("test for Creating free trial subscriptione")
+                try {
+                    setIsProcessing(true);
+                    setError(null);
 
-                console.log('Creating free trial subscription...');
+                    console.log('Creating free trial subscription...');
 
-                // Call the backend to create trial subscription
-                const response = await createTrialSubscription(visitor.token);
+                    // Call the backend to create trial subscription
+                    const response = await createTrialSubscription(visitor.token);
 
-                console.log('Trial subscription created:', response);
+                    console.log('Trial subscription created:', response);
 
-                // Small delay to show success message
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Small delay to show success message
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Channel-specific redirects
-                switch (visitor.signupChannel) {
-                    case 'Google':
-                        console.log('Redirecting to Google bridge sign-up');
-                        window.location.href = APP_URL + '/google-bridge-sign-up?token=' + visitor.token;
-                        break;
-                    case 'email':
-                        console.log('Triggering registration email and redirecting to verification');
-                        if (visitor.email) {
-                            await TriggerRegisterEmail({ email: visitor.email }, visitor.token);
-                        }
-                        router.replace('/verification');
-                        break;
-                    default:
-                        // Fallback to onboarding
-                        console.log('No signup channel specified, redirecting to onboarding');
-                        window.location.href = APP_URL + '/onboarding?token=' + visitor.token;
+                    // Channel-specific redirects
+                    switch (visitor.signupChannel) {
+                        case 'Google':
+                            console.log('Redirecting to Google bridge sign-up');
+                            window.location.href = APP_URL + '/google-bridge-sign-up?token=' + visitor.token;
+                            break;
+                        case 'email':
+                            console.log('Triggering registration email and redirecting to verification');
+                            if (visitor.email) {
+                                await TriggerRegisterEmail({ email: visitor.email }, visitor.token);
+                            }
+                            router.replace('/verification');
+                            break;
+                        default:
+                            // Fallback to onboarding
+                            console.log('No signup channel specified, redirecting to onboarding');
+                            window.location.href = APP_URL + '/onboarding?token=' + visitor.token;
+                    }
+                } catch (error) {
+                    console.error('Error creating trial subscription:', error);
+                    setError(error instanceof Error ? error.message : 'Failed to create trial subscription. Please try again.');
+                    setIsProcessing(false);
                 }
-            } catch (error) {
-                console.error('Error creating trial subscription:', error);
-                setError(error instanceof Error ? error.message : 'Failed to create trial subscription. Please try again.');
-                setIsProcessing(false);
-            }
-        };
-    }
+            };
+        }
+        createTrial();
+    }, [visitor.token, visitor.signupChannel, visitor.email, visitor, router]);
 
-        //createTrial();
-}, [visitor.token, visitor.signupChannel, visitor.email, visitor, router]);
+    const handleRetry = () => {
+        setError(null);
+        setIsProcessing(true);
+        // Trigger useEffect by updating state
+        window.location.reload();
+    };
 
-const handleRetry = () => {
-    setError(null);
-    setIsProcessing(true);
-    // Trigger useEffect by updating state
-    window.location.reload();
-};
+    const handleGoBack = () => {
+        router.push('/');
+    };
 
-const handleGoBack = () => {
-    router.push('/');
-};
-
-return (
-    <StyledPageWrapper>
-        <StyledContentContainer>
-            {isProcessing ? (
-                <>
-                    <StyledSpinner />
-                    <StyledTitle>Setting up your free trial</StyledTitle>
-                    <StyledSubtitle>You will be redirected in a few seconds...</StyledSubtitle>
-                    <StyledProgressBar>
-                        <StyledProgressFill />
-                    </StyledProgressBar>
-                </>
-            ) : error ? (
-                <>
-                    <StyledErrorIcon>⚠️</StyledErrorIcon>
-                    <StyledTitle>Oops! Something went wrong</StyledTitle>
-                    <StyledErrorMessage>{error}</StyledErrorMessage>
-                    <StyledButtonGroup>
-                        <StyledRetryButton onClick={handleRetry}>
-                            Try Again
-                        </StyledRetryButton>
-                        <StyledBackButton onClick={handleGoBack}>
-                            Go Back
-                        </StyledBackButton>
-                    </StyledButtonGroup>
-                </>
-            ) : null}
-        </StyledContentContainer>
-    </StyledPageWrapper>
-);
+    return (
+        <StyledPageWrapper>
+            <StyledContentContainer>
+                {isProcessing ? (
+                    <>
+                        <StyledSpinner />
+                        <StyledTitle>Setting up your free trial</StyledTitle>
+                        <StyledSubtitle>You will be redirected in a few seconds...</StyledSubtitle>
+                        <StyledProgressBar>
+                            <StyledProgressFill />
+                        </StyledProgressBar>
+                    </>
+                ) : error ? (
+                    <>
+                        <StyledErrorIcon>⚠️</StyledErrorIcon>
+                        <StyledTitle>Oops! Something went wrong</StyledTitle>
+                        <StyledErrorMessage>{error}</StyledErrorMessage>
+                        <StyledButtonGroup>
+                            <StyledRetryButton onClick={handleRetry}>
+                                Try Again
+                            </StyledRetryButton>
+                            <StyledBackButton onClick={handleGoBack}>
+                                Go Back
+                            </StyledBackButton>
+                        </StyledButtonGroup>
+                    </>
+                ) : null}
+            </StyledContentContainer>
+        </StyledPageWrapper>
+    );
 }
 
 // Styled Components
 const StyledPageWrapper = styled.div`
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
     padding: 2rem;
+    overflow-y: auto;
+    z-index: 2147483647;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
