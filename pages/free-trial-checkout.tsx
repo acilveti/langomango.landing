@@ -65,6 +65,21 @@ export default function FreeTrialCheckout() {
                     }
                 } catch (error) {
                     console.error('Error creating trial subscription:', error);
+
+                    // Check if the error indicates the user already exists or has already used their trial
+                    const errorMessage = error instanceof Error ? error.message : '';
+                    const userAlreadyExists = errorMessage.toLowerCase().includes('already exists') ||
+                                              errorMessage.toLowerCase().includes('already has') ||
+                                              errorMessage.toLowerCase().includes('already registered') ||
+                                              errorMessage.toLowerCase().includes('already used');
+
+                    // For Google users who already have an account, redirect to login for auto-login
+                    if (userAlreadyExists && visitor.signupChannel === 'Google') {
+                        console.log('Google user already exists, redirecting to login for auto-login');
+                        window.location.href = APP_URL + '/login?token=' + visitor.token + '&type=google';
+                        return;
+                    }
+
                     setError(error instanceof Error ? error.message : 'Failed to create trial subscription. Please try again.');
                     setIsProcessing(false);
                 }
