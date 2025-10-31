@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { DEFAULT_LEVELS, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import useEscClose from 'hooks/useEscKey';
+import { apiService } from 'services/apiService';
 import { media } from 'utils/media';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
@@ -17,6 +18,7 @@ interface LanguageSelectorModalProps {
   isDark?: boolean;
   hasUserSelected?: boolean;
   requireLevel?: boolean;
+  onCompleteSignup?: boolean;
 }
 
 export default function LanguageSelectorModal({
@@ -28,12 +30,16 @@ export default function LanguageSelectorModal({
   onLanguageSelect,
   isDark = false,
   hasUserSelected = false,
+  onCompleteSignup = false,
 }: LanguageSelectorModalProps) {
   const [showLevelSelection, setShowLevelSelection] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreatingDemoUser, setIsCreatingDemoUser] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
   const {
     targetSelectedLanguage,
     targetSelectedLanguageLevel,
+    nativeLanguage,
     setTargetSelectedLanguage,
     setHasTargetSelectedLanguage,
     setHasSelectedLevel
@@ -56,16 +62,54 @@ export default function LanguageSelectorModal({
     setShowLevelSelection(true);
   }, [setTargetSelectedLanguage, setHasTargetSelectedLanguage]);
 
-  const handleLevelSelect = useCallback((level: Levels) => {
-    if (targetSelectedLanguage) {
-      setTargetSelectedLanguage(targetSelectedLanguage, level)
+  const handleLevelSelect = useCallback(async (level: Levels) => {
+    if (!targetSelectedLanguage) return;
+
+    setTargetSelectedLanguage(targetSelectedLanguage, level);
+    setHasSelectedLevel(true);
+
+    // If onCompleteSignup is true, create demo user and redirect
+    if (onCompleteSignup) {
+      setIsCreatingDemoUser(true);
+      setSignupError(null);
+
+      try {
+        const response = await apiService.demoSignup({
+          nativeLanguage: nativeLanguage.code,
+          targetLanguage: targetSelectedLanguage.code,
+          level: level.code,
+        });
+
+        if (response.success && response.redirectUrl) {
+          // Redirect to the reader page
+          window.location.href = response.redirectUrl;
+        } else {
+          throw new Error('Failed to create demo user');
+        }
+      } catch (error) {
+        console.error('Demo signup failed:', error);
+        setSignupError(
+          error instanceof Error
+            ? error.message
+            : 'Unable to start demo. Please try again.'
+        );
+        setIsCreatingDemoUser(false);
+      }
+    } else {
+      // Normal flow without signup
       onLanguageSelect(targetSelectedLanguage, level);
-      setHasSelectedLevel(true)
       onClose();
-      // Reset state
       setShowLevelSelection(false);
     }
-  }, [onLanguageSelect, onClose, targetSelectedLanguage, setHasSelectedLevel, setTargetSelectedLanguage]);
+  }, [
+    onLanguageSelect,
+    onClose,
+    targetSelectedLanguage,
+    setHasSelectedLevel,
+    setTargetSelectedLanguage,
+    onCompleteSignup,
+    nativeLanguage
+  ]);
 
   if (!isOpen) return null;
 
@@ -95,24 +139,38 @@ export default function LanguageSelectorModal({
             )}
           </ModalHeader>
           {showLevelSelection ? (
-            <LevelGrid>
-              {DEFAULT_LEVELS.map(level => (
-                <LevelOption
-                  key={level.code}
-                  onClick={() => handleLevelSelect(level)}
-                  isSelected={
-                    targetSelectedLanguageLevel === level ||
-                    (targetSelectedLanguage?.code === selectedLanguage?.code &&
-                      selectedLevel === level)
-                  }
-                  isDark={isDark}
-                >
-                  <LevelEmoji>{level.emoji}</LevelEmoji>
-                  <LevelName isDark={isDark}>{level.code}</LevelName>
-                  <LevelDesc isDark={isDark}>{level.name}</LevelDesc>
-                </LevelOption>
-              ))}
-            </LevelGrid>
+            <>
+              {signupError && (
+                <ErrorMessage isDark={isDark}>
+                  {signupError}
+                </ErrorMessage>
+              )}
+              <LevelGrid>
+                {DEFAULT_LEVELS.map(level => (
+                  <LevelOption
+                    key={level.code}
+                    onClick={() => !isCreatingDemoUser && handleLevelSelect(level)}
+                    isSelected={
+                      targetSelectedLanguageLevel === level ||
+                      (targetSelectedLanguage?.code === selectedLanguage?.code &&
+                        selectedLevel === level)
+                    }
+                    isDark={isDark}
+                    disabled={isCreatingDemoUser}
+                  >
+                    <LevelEmoji>{level.emoji}</LevelEmoji>
+                    <LevelName isDark={isDark}>{level.code}</LevelName>
+                    <LevelDesc isDark={isDark}>{level.name}</LevelDesc>
+                  </LevelOption>
+                ))}
+              </LevelGrid>
+              {isCreatingDemoUser && (
+                <LoadingOverlay>
+                  <LoadingSpinner />
+                  <LoadingText isDark={isDark}>Creating your demo account...</LoadingText>
+                </LoadingOverlay>
+              )}
+            </>
           )
           : (<LanguageGrid>
             {filteredLanguages.map((language) => (
@@ -420,14 +478,15 @@ const LevelGrid = styled.div`
   }
 `;
 
-const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
+const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean; disabled?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.8rem;
   padding: 2rem 1.5rem;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   transition: all 0.2s ease;
+  opacity: ${props => props.disabled ? 0.5 : 1};
   background: ${(props) => {
     if (props.isSelected) {
       return props.isDark ? 'rgba(255,152,0,0.2)' : 'rgba(255,152,0,0.1)';
@@ -445,12 +504,12 @@ const LevelOption = styled.div<{ isSelected: boolean; isDark?: boolean }>`
   position: relative;
 
   &:hover {
-    background: ${props => props.isDark ? 'rgba(255, 152, 0, 0.15)' : 'rgba(255, 152, 0, 0.08)'};
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    border-color: ${props => props.isDark ? 'rgba(255, 152, 0, 0.5)' : 'rgba(255, 152, 0, 0.4)'};
+    background: ${props => props.disabled ? undefined : (props.isDark ? 'rgba(255, 152, 0, 0.15)' : 'rgba(255, 152, 0, 0.08)')};
+    transform: ${props => props.disabled ? 'none' : 'translateY(-3px)'};
+    box-shadow: ${props => props.disabled ? 'none' : '0 6px 20px rgba(0, 0, 0, 0.15)'};
+    border-color: ${props => props.disabled ? undefined : (props.isDark ? 'rgba(255, 152, 0, 0.5)' : 'rgba(255, 152, 0, 0.4)')};
   }
-  
+
   ${media('<=tablet')} {
     padding: 1.5rem 1rem;
   }
@@ -478,8 +537,64 @@ const LevelName = styled.span<{ isDark?: boolean }>`
 const LevelDesc = styled.span<{ isDark?: boolean }>`
   font-size: 1.2rem;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
-  
+
   ${media('<=tablet')} {
     font-size: 1.1rem;
+  }
+`;
+
+const ErrorMessage = styled.div<{ isDark?: boolean }>`
+  background: ${props => props.isDark ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.1)'};
+  border: 1px solid ${props => props.isDark ? 'rgba(239, 68, 68, 0.5)' : 'rgba(239, 68, 68, 0.3)'};
+  color: ${props => props.isDark ? '#fca5a5' : '#dc2626'};
+  padding: 1rem 1.5rem;
+  margin: 0 2rem;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  text-align: center;
+
+  ${media('<=tablet')} {
+    margin: 0 1.5rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.2rem;
+  }
+`;
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  z-index: 100002;
+`;
+
+const LoadingSpinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid rgb(255, 152, 0);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingText = styled.div<{ isDark?: boolean }>`
+  color: white;
+  font-size: 1.6rem;
+  font-weight: 600;
+
+  ${media('<=tablet')} {
+    font-size: 1.4rem;
   }
 `;

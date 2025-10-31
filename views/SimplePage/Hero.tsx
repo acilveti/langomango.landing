@@ -27,7 +27,7 @@ export default function Hero() {
     setTimeout(() => {
       setShowFullScreenImage(false);
       setIsLanguageSelectorModalOpen(true);
-    }, 2000);
+    }, 5000);
   };
 
   const handleLanguageSelect = (language: Language, level?: Levels) => {
@@ -109,6 +109,7 @@ export default function Hero() {
         isDark={false}
         hasUserSelected={hasTargetSelectedLanguage}
         requireLevel={true}
+        onCompleteSignup={true}
       />
     </HeroWrapper>
   );
