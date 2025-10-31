@@ -11,6 +11,7 @@ import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/Visito
 export default function Hero() {
   const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const [showFullScreenImage, setShowFullScreenImage] = useState(false);
   const { targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage } = useVisitor();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -19,7 +20,14 @@ export default function Hero() {
   };
 
   const handleDeviceClick = () => {
-    setIsLanguageSelectorModalOpen(true);
+    // Show full-screen image
+    setShowFullScreenImage(true);
+
+    // After 2 seconds, hide image and show language modal
+    setTimeout(() => {
+      setShowFullScreenImage(false);
+      setIsLanguageSelectorModalOpen(true);
+    }, 2000);
   };
 
   const handleLanguageSelect = (language: Language, level?: Levels) => {
@@ -75,6 +83,20 @@ export default function Hero() {
           </DeviceMockup>
         </DeviceColumn>
       </ContentWrapper>
+
+      {/* Full Screen Image Preview */}
+      {showFullScreenImage && (
+        <FullScreenImageOverlay>
+          <FullScreenImageContainer>
+            <Image
+              src="/demo-reading.jpeg"
+              alt="Reading demo preview"
+              layout="fill"
+              objectFit="contain"
+            />
+          </FullScreenImageContainer>
+        </FullScreenImageOverlay>
+      )}
 
       {/* Language Selector Modal */}
       <LanguageSelectorModal
@@ -352,4 +374,46 @@ const DeviceScreen = styled.div`
 
 const HighlightedText = styled.span`
   color: rgb(255, 152, 0);
+`;
+
+// Full screen image overlay animations and styles
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const zoomIn = keyframes`
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+const FullScreenImageOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ${fadeIn} 0.3s ease-out;
+`;
+
+const FullScreenImageContainer = styled.div`
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  animation: ${zoomIn} 0.4s ease-out;
 `;
