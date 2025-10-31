@@ -2,20 +2,30 @@ import NextLink from 'next/link';
 import styled, { keyframes } from 'styled-components';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { useSignupModalContext } from 'contexts/SignupModalContext';
 import { media } from 'utils/media';
 import Image from 'next/image';
+import { useState } from 'react';
+import LanguageSelectorModal from 'components/LanguageSelectorModal';
+import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 
 export default function Hero() {
-  const { setIsModalOpened } = useSignupModalContext();
+  const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+  const { targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage } = useVisitor();
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    setIsModalOpened(true);
+    setIsLanguageSelectorModalOpen(true);
   };
 
   const handleDeviceClick = () => {
-    setIsModalOpened(true);
+    setIsLanguageSelectorModalOpen(true);
+  };
+
+  const handleLanguageSelect = (language: Language, level?: Levels) => {
+    setSelectedLanguage(language);
+    // Close the language selector modal
+    setIsLanguageSelectorModalOpen(false);
   };
 
   return (
@@ -65,6 +75,19 @@ export default function Hero() {
           </DeviceMockup>
         </DeviceColumn>
       </ContentWrapper>
+
+      {/* Language Selector Modal */}
+      <LanguageSelectorModal
+        isOpen={isLanguageSelectorModalOpen}
+        onClose={() => setIsLanguageSelectorModalOpen(false)}
+        languages={DEFAULT_LANGUAGES}
+        selectedLanguage={targetSelectedLanguage}
+        selectedLevel={targetSelectedLanguageLevel}
+        onLanguageSelect={handleLanguageSelect}
+        isDark={false}
+        hasUserSelected={hasTargetSelectedLanguage}
+        requireLevel={true}
+      />
     </HeroWrapper>
   );
 }
@@ -240,6 +263,7 @@ const PlatformIconItem = styled.div`
   align-items: center;
   gap: 1rem;
   transition: transform 0.2s ease;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-4px);
