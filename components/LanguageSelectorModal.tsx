@@ -30,6 +30,7 @@ export default function LanguageSelectorModal({
   hasUserSelected = false,
 }: LanguageSelectorModalProps) {
   const [showLevelSelection, setShowLevelSelection] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const {
     targetSelectedLanguage,
     targetSelectedLanguageLevel,
@@ -39,6 +40,15 @@ export default function LanguageSelectorModal({
   } = useVisitor();
 
   useEscClose({ onClose: isOpen ? onClose : () => { } });
+
+  const filteredLanguages = React.useMemo(() => {
+    if (!searchTerm) return languages;
+    const term = searchTerm.toLowerCase();
+    return languages.filter(lang =>
+      lang.name.toLowerCase().includes(term) ||
+      lang.code.toLowerCase().includes(term)
+    );
+  }, [languages, searchTerm]);
 
   const handleLanguageSelect = useCallback((language: Language) => {
     setTargetSelectedLanguage(language);
@@ -74,6 +84,15 @@ export default function LanguageSelectorModal({
             <ModalSubtitle isDark={isDark}>
               {showLevelSelection ? 'Choose your proficiency level' : 'Choose the language you want to learn'}
             </ModalSubtitle>
+            {!showLevelSelection && (
+              <SearchInput
+                type="text"
+                placeholder="Search languages..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                isDark={isDark}
+              />
+            )}
           </ModalHeader>
           {showLevelSelection ? (
             <LevelGrid>
@@ -96,7 +115,7 @@ export default function LanguageSelectorModal({
             </LevelGrid>
           )
           : (<LanguageGrid>
-            {languages.map((language) => (
+            {filteredLanguages.map((language) => (
               <LanguageOption
                 key={language.code}
                 isSelected={hasUserSelected && selectedLanguage?.code === language.code}
@@ -203,9 +222,44 @@ const ModalSubtitle = styled.p<{ isDark?: boolean }>`
   font-size: 1.4rem;
   color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.7)' : '#6b7280'};
   margin: 0;
-  
+
   ${media('<=tablet')} {
     font-size: 1.2rem;
+  }
+`;
+
+const SearchInput = styled.input<{ isDark?: boolean }>`
+  width: 100%;
+  max-width: 40rem;
+  margin: 1.5rem auto 0;
+  padding: 1rem 1.5rem;
+  font-size: 1.4rem;
+  border: 2px solid ${props => props.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'};
+  border-radius: 0.8rem;
+  background: ${props => props.isDark ? 'rgba(255, 255, 255, 0.05)' : 'white'};
+  color: ${props => props.isDark ? 'white' : '#1f2937'};
+  outline: none;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: ${props => props.isDark ? 'rgba(255, 255, 255, 0.4)' : '#9ca3af'};
+  }
+
+  &:focus {
+    border-color: ${props => props.isDark ? 'rgba(255, 152, 0, 0.5)' : 'rgba(255, 152, 0, 0.4)'};
+    background: ${props => props.isDark ? 'rgba(255, 255, 255, 0.08)' : 'white'};
+  }
+
+  ${media('<=tablet')} {
+    font-size: 1.3rem;
+    padding: 0.9rem 1.2rem;
+    margin-top: 1.2rem;
+  }
+
+  ${media('<=phone')} {
+    font-size: 1.2rem;
+    padding: 0.8rem 1rem;
+    margin-top: 1rem;
   }
 `;
 
