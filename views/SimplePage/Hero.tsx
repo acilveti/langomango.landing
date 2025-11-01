@@ -80,7 +80,7 @@ export default function Hero() {
               <DeviceFrame>
                 <DeviceScreen>
                   <Image
-                    src="/demo-reading.jpeg"
+                    src="/reading-image-v2.jpeg"
                     alt="Reading demo"
                     layout="fill"
                     objectFit="cover"
