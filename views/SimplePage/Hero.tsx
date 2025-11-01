@@ -54,6 +54,7 @@ export default function Hero() {
             </CtaButton>
 
             <PlatformAvailability>
+              <PlatformText>Use it from anywhere</PlatformText>
               <PlatformIconsRow>
                 <PlatformIconItem>
                   <IconWrapper>
@@ -233,7 +234,7 @@ const Subheading = styled.p`
 
 const CtaButton = styled(ExpandingButton)`
   padding: 1.6rem 4rem;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 4rem;
   background: rgb(var(--primary));
@@ -242,8 +243,8 @@ const CtaButton = styled(ExpandingButton)`
   cursor: pointer;
 
   ${media('<=tablet')} {
-    padding: 1.4rem 3rem;
-    font-size: 1.6rem;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
     margin-bottom: 3rem;
   }
 `;
@@ -251,6 +252,18 @@ const CtaButton = styled(ExpandingButton)`
 const PlatformAvailability = styled.div`
   width: 100%;
   text-align: center;
+`;
+
+const PlatformText = styled.p`
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  opacity: 1;
+
+  ${media('<=tablet')} {
+    font-size: 1.2rem;
+    margin-bottom: 0rem;
+  }
 `;
 
 const PlatformIconsRow = styled.div`
