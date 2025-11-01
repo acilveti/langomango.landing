@@ -22,7 +22,6 @@ export default function SimplePage() {
 }
 
 const PageWrapper = styled.div`
-  background: rgb(var(--secondBackground));
   min-height: 100vh;
   width: 100%;
 `;

@@ -1,12 +1,13 @@
 import NextLink from 'next/link';
 import styled, { keyframes } from 'styled-components';
-import Button from 'components/Button';
+import ExpandingButton from 'components/ExpandingButton';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import Image from 'next/image';
 import { useState } from 'react';
 import LanguageSelectorModal from 'components/LanguageSelectorModal';
 import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
+import Logo from 'components/Logo';
 
 export default function Hero() {
   const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function Hero() {
     setTimeout(() => {
       setShowFullScreenImage(false);
       setIsLanguageSelectorModalOpen(true);
-    }, 5000);
+    }, 2000);
   };
 
   const handleLanguageSelect = (language: Language, level?: Levels) => {
@@ -37,52 +38,59 @@ export default function Hero() {
   };
 
   return (
-    <HeroWrapper>
-      <ContentWrapper>
-        <TextColumn>
-          <Heading>Transform Books into <HighlightedText>Learning Experiences</HighlightedText></Heading>
-          <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
+    <>
+      <HeroBackground>
+        <HeroWrapper>
+          <ContentWrapper>
+          <TextColumn>
+            <LogoWrapper>
+              <Logo />
+            </LogoWrapper>
+            <Heading>Transform Books into <OrangeText>Language Learning Experiences</OrangeText></Heading>
+            <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
 
-          <CtaButton onClick={handleButtonClick}>
-            Select Language
-          </CtaButton>
+            <CtaButton onClick={handleButtonClick}>
+              Select Language
+            </CtaButton>
 
-          <PlatformAvailability>
-            <PlatformIconsRow>
-              <PlatformIconItem>
-                <IconWrapper>
-                  <Image src="/kindle-icon.svg" alt="Kindle" width={64} height={64} />
-                </IconWrapper>
-              </PlatformIconItem>
-              <PlatformIconItem>
-                <IconWrapper>
-                  <Image src="/android-icon.svg" alt="Android" width={64} height={64} />
-                </IconWrapper>
-              </PlatformIconItem>
-              <PlatformIconItem>
-                <IconWrapper>
-                  <Image src="/apple-icon.svg" alt="Apple" width={64} height={64} />
-                </IconWrapper>
-              </PlatformIconItem>
-            </PlatformIconsRow>
-          </PlatformAvailability>
-        </TextColumn>
+            <PlatformAvailability>
+              <PlatformIconsRow>
+                <PlatformIconItem>
+                  <IconWrapper>
+                    <Image src="/kindle-icon.svg" alt="Kindle" width={64} height={64} />
+                  </IconWrapper>
+                </PlatformIconItem>
+                <PlatformIconItem>
+                  <IconWrapper>
+                    <Image src="/android-icon.svg" alt="Android" width={64} height={64} />
+                  </IconWrapper>
+                </PlatformIconItem>
+                <PlatformIconItem>
+                  <IconWrapper>
+                    <Image src="/apple-icon.svg" alt="Apple" width={64} height={64} />
+                  </IconWrapper>
+                </PlatformIconItem>
+              </PlatformIconsRow>
+            </PlatformAvailability>
+          </TextColumn>
 
-        <DeviceColumn>
-          <DeviceMockup onClick={handleDeviceClick}>
-            <DeviceFrame>
-              <DeviceScreen>
-                <Image
-                  src="/demo-reading.jpeg"
-                  alt="Reading demo"
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </DeviceScreen>
-            </DeviceFrame>
-          </DeviceMockup>
-        </DeviceColumn>
-      </ContentWrapper>
+          <DeviceColumn>
+            <DeviceMockup onClick={handleDeviceClick}>
+              <DeviceFrame>
+                <DeviceScreen>
+                  <Image
+                    src="/demo-reading.jpeg"
+                    alt="Reading demo"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </DeviceScreen>
+              </DeviceFrame>
+            </DeviceMockup>
+          </DeviceColumn>
+        </ContentWrapper>
+        </HeroWrapper>
+      </HeroBackground>
 
       {/* Full Screen Image Preview */}
       {showFullScreenImage && (
@@ -111,23 +119,35 @@ export default function Hero() {
         requireLevel={true}
         onCompleteSignup={true}
       />
-    </HeroWrapper>
+    </>
   );
 }
+
+const HeroBackground = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg,
+    rgba(1, 60, 88, 0.15) 0%,
+    rgba(48, 132, 161, 0.20) 50%,
+    rgba(245, 162, 1, 0.15) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+
+  ${media('<=tablet')} {
+    padding: 3rem 0;
+  }
+`;
 
 const HeroWrapper = styled(Container)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 8rem;
-  padding-bottom: 8rem;
-  min-height: 80vh;
-
-  ${media('<=tablet')} {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-    min-height: auto;
-  }
+  justify-content: center;
+  position: relative;
 `;
 
 const ContentWrapper = styled.div`
@@ -169,6 +189,23 @@ const DeviceColumn = styled.div`
   }
 `;
 
+const LogoWrapper = styled.div`
+  margin-bottom: 3rem;
+
+  svg {
+    width: 40rem;
+    height: auto;
+  }
+
+  ${media('<=tablet')} {
+    margin-bottom: 2rem;
+
+    svg {
+      width: 24rem;
+    }
+  }
+`;
+
 const Heading = styled.h1`
   font-size: 5.2rem;
   font-weight: bold;
@@ -177,7 +214,7 @@ const Heading = styled.h1`
   letter-spacing: -0.02em;
 
   ${media('<=tablet')} {
-    font-size: 3.6rem;
+    font-size: 3.2rem;
     margin-bottom: 1.5rem;
   }
 `;
@@ -194,47 +231,7 @@ const Subheading = styled.p`
   }
 `;
 
-// Vibration animation
-const vibrateWithIntervals = keyframes`
-  /* First vibration burst at start */
-  0%, 2% { transform: translateX(0); }
-  2.5% { transform: translateX(-2px); }
-  3% { transform: translateX(2px); }
-  3.5% { transform: translateX(-2px); }
-  4% { transform: translateX(2px); }
-  4.5% { transform: translateX(-1px); }
-  5% { transform: translateX(1px); }
-  5.5% { transform: translateX(0); }
-
-  /* Rest period */
-  6%, 25% { transform: translateX(0); }
-
-  /* Second vibration burst */
-  25.5% { transform: translateX(-2px); }
-  26% { transform: translateX(2px); }
-  26.5% { transform: translateX(-2px); }
-  27% { transform: translateX(2px); }
-  27.5% { transform: translateX(-1px); }
-  28% { transform: translateX(1px); }
-  28.5% { transform: translateX(0); }
-
-  /* Rest period */
-  29%, 50% { transform: translateX(0); }
-
-  /* Third vibration burst */
-  50.5% { transform: translateX(-2px); }
-  51% { transform: translateX(2px); }
-  51.5% { transform: translateX(-2px); }
-  52% { transform: translateX(2px); }
-  52.5% { transform: translateX(-1px); }
-  53% { transform: translateX(1px); }
-  53.5% { transform: translateX(0); }
-
-  /* Long rest until cycle repeats */
-  54%, 100% { transform: translateX(0); }
-`;
-
-const CtaButton = styled(Button)`
+const CtaButton = styled(ExpandingButton)`
   padding: 1.6rem 4rem;
   font-size: 1.8rem;
   font-weight: 600;
@@ -243,19 +240,6 @@ const CtaButton = styled(Button)`
   color: rgb(var(--textSecondary));
   border: 2px solid rgb(var(--primary));
   cursor: pointer;
-  transition: all 0.3s ease;
-  animation: ${vibrateWithIntervals} 6s infinite;
-  animation-delay: 2s;
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(var(--primary), 0.3);
-    animation-play-state: paused;
-  }
-
-  &:focus {
-    animation-play-state: paused;
-  }
 
   ${media('<=tablet')} {
     padding: 1.4rem 3rem;
@@ -373,8 +357,17 @@ const DeviceScreen = styled.div`
   }
 `;
 
-const HighlightedText = styled.span`
-  color: rgb(255, 152, 0);
+const GradientText = styled.span`
+  background: linear-gradient(135deg, #F5A201 0%, #3084A1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+`;
+
+const OrangeText = styled.span`
+  color: #F5A201;
+  font-weight: bold;
 `;
 
 // Full screen image overlay animations and styles
