@@ -82,7 +82,7 @@ export default function LanguageSelectorModal({
 
         if (response.success && response.redirectUrl) {
           // Redirect to the reader page
-          window.location.href = response.redirectUrl;
+          window.location.href = response.redirectUrl + "/?chapter=2";
         } else {
           throw new Error('Failed to create demo user');
         }
