@@ -94,10 +94,10 @@ export default function Hero() {
         </HeroWrapper>
           <DeviceColumn>
             <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
-              <DeviceFrame>
+              <DeviceFrame scrollProgress={scrollProgress}>
                 <DeviceScreen>
                   <StyledIframe
-                    src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader?chapter=2"
+                    src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader/?chapter=2"
                     title="LangoMango Reader Demo"
                   />
                 </DeviceScreen>
@@ -105,20 +105,6 @@ export default function Hero() {
             </DeviceMockup>
           </DeviceColumn>
       </HeroBackground>
-
-      {/* Full Screen Image Preview */}
-      {showFullScreenImage && (
-        <FullScreenImageOverlay>
-          <FullScreenImageContainer>
-            <Image
-              src="/demo-reading.jpeg"
-              alt="Reading demo preview"
-              layout="fill"
-              objectFit="contain"
-            />
-          </FullScreenImageContainer>
-        </FullScreenImageOverlay>
-      )}
 
       {/* Language Selector Modal */}
       <LanguageSelectorModal
@@ -364,7 +350,7 @@ const DeviceMockup = styled.div<DeviceMockupProps>`
   }
 `;
 
-const DeviceFrame = styled.div`
+const DeviceFrame = styled.div<DeviceMockupProps>`
   position: relative;
   height: 80%;
   width: 100%;
@@ -374,11 +360,22 @@ const DeviceFrame = styled.div`
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-
   ${media('<=tablet')} {
     border-radius: 2rem;
     padding: 1rem;
+    ${(props) => {
+      const progress = props.scrollProgress;
+      if(progress > 0.99){
+      return `
+        border: 0rem;
+        border-radius: 0rem;
+        background: white;
+        padding: 0rem;
+      `;
+    }
   }
+
+  }}
 `;
 
 const DeviceScreen = styled.div`
@@ -398,64 +395,12 @@ const StyledIframe = styled.iframe`
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 2rem;
 
   ${media('<=tablet')} {
-    border-radius: 1.5rem;
   }
-`;
-
-const GradientText = styled.span`
-  background: linear-gradient(135deg, #F5A201 0%, #3084A1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: bold;
 `;
 
 const OrangeText = styled.span`
   color: #F5A201;
   font-weight: bold;
-`;
-
-// Full screen image overlay animations and styles
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`;
-
-const zoomIn = keyframes`
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-`;
-
-const FullScreenImageOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100000;
-  background: rgba(0, 0, 0, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: ${fadeIn} 0.3s ease-out;
-`;
-
-const FullScreenImageContainer = styled.div`
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  animation: ${zoomIn} 0.4s ease-out;
 `;
