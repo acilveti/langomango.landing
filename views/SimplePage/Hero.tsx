@@ -394,14 +394,11 @@ const DeviceScreen = styled.div`
   border-radius: 2rem;
   overflow: hidden;
   background: white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
 
   ${media('<=tablet')} {
     height: calc(100vh - 2rem);
     margin: 1rem;
     border-radius: 1.5rem;
-  border:none;
-
   }
 `;
 
