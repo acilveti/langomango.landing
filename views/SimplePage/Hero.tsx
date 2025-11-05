@@ -66,53 +66,65 @@ export default function Hero() {
       <HeroBackground>
         <HeroWrapper>
           <ContentWrapper>
-          <TextColumn>
-            <LogoWrapper>
-              <Logo />
-            </LogoWrapper>
-            <Heading>Transform Books into <OrangeText>Language Learning Experiences</OrangeText></Heading>
-            <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
+            <TextColumn>
+              <LogoWrapper>
+                <Logo />
+              </LogoWrapper>
+              <Heading>Transform Books into <OrangeText>Language Learning Experiences</OrangeText></Heading>
+              <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
 
-            <CtaButton ref={ctaButtonRef} onClick={handleButtonClick}>
-              Select Language
-            </CtaButton>
+              <CtaButton ref={ctaButtonRef} onClick={handleButtonClick}>
+                Select Language
+              </CtaButton>
 
-            <PlatformAvailability>
-              <PlatformText>Use it from anywhere</PlatformText>
-              <PlatformIconsRow>
-                <PlatformIconItem>
-                  <IconWrapper>
-                    <Image src="/kindle-icon.svg" alt="Kindle" width={64} height={64} />
-                  </IconWrapper>
-                </PlatformIconItem>
-                <PlatformIconItem>
-                  <IconWrapper>
-                    <Image src="/android-icon.svg" alt="Android" width={64} height={64} />
-                  </IconWrapper>
-                </PlatformIconItem>
-                <PlatformIconItem>
-                  <IconWrapper>
-                    <Image src="/apple-icon.svg" alt="Apple" width={64} height={64} />
-                  </IconWrapper>
-                </PlatformIconItem>
-              </PlatformIconsRow>
-            </PlatformAvailability>
-          </TextColumn>
+              <PlatformAvailability>
+                <PlatformText>Use it from anywhere</PlatformText>
+                <PlatformIconsRow>
+                  <PlatformIconItem>
+                    <IconWrapper>
+                      <Image src="/kindle-icon.svg" alt="Kindle" width={64} height={64} />
+                    </IconWrapper>
+                  </PlatformIconItem>
+                  <PlatformIconItem>
+                    <IconWrapper>
+                      <Image src="/android-icon.svg" alt="Android" width={64} height={64} />
+                    </IconWrapper>
+                  </PlatformIconItem>
+                  <PlatformIconItem>
+                    <IconWrapper>
+                      <Image src="/apple-icon.svg" alt="Apple" width={64} height={64} />
+                    </IconWrapper>
+                  </PlatformIconItem>
+                </PlatformIconsRow>
+              </PlatformAvailability>
+            </TextColumn>
 
-        </ContentWrapper>
+            <DeviceColumnDesktop>
+              <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
+                <DeviceFrame scrollProgress={scrollProgress}>
+                  <DeviceScreen>
+                    <StyledIframe
+                      src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader/?chapter=2"
+                      title="LangoMango Reader Demo"
+                    />
+                  </DeviceScreen>
+                </DeviceFrame>
+              </DeviceMockup>
+            </DeviceColumnDesktop>
+          </ContentWrapper>
         </HeroWrapper>
-          <DeviceColumn>
-            <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
-              <DeviceFrame scrollProgress={scrollProgress}>
-                <DeviceScreen>
-                  <StyledIframe
-                    src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader/?chapter=2"
-                    title="LangoMango Reader Demo"
-                  />
-                </DeviceScreen>
-              </DeviceFrame>
-            </DeviceMockup>
-          </DeviceColumn>
+        <DeviceColumnMobile>
+          <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
+            <DeviceFrame scrollProgress={scrollProgress}>
+              <DeviceScreen>
+                <StyledIframe
+                  src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader/?chapter=2"
+                  title="LangoMango Reader Demo"
+                />
+              </DeviceScreen>
+            </DeviceFrame>
+          </DeviceMockup>
+        </DeviceColumnMobile>
       </HeroBackground>
 
       {/* Language Selector Modal */}
@@ -195,7 +207,7 @@ const TextColumn = styled.div`
   }
 `;
 
-const DeviceColumn = styled.div`
+const DeviceColumnDesktop = styled.div`
   flex: 1;
   max-width: 50%;
   display: flex;
@@ -203,9 +215,20 @@ const DeviceColumn = styled.div`
   justify-content: center;
 
   ${media('<=desktop')} {
+    display: none;
+  }
+`;
+
+const DeviceColumnMobile = styled.div`
+  display: none;
+
+  ${media('<=desktop')} {
+    display: flex;
     max-width: 100%;
     width: 100%;
     margin-top: -2rem;
+    align-items: center;
+    justify-content: center;
   }
 
   ${media('<=tablet')} {
