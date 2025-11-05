@@ -4,7 +4,7 @@ import ExpandingButton from 'components/ExpandingButton';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import LanguageSelectorModal from 'components/LanguageSelectorModal';
 import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import Logo from 'components/Logo';
@@ -15,6 +15,8 @@ export default function Hero() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const [showFullScreenImage, setShowFullScreenImage] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [showStickyButton, setShowStickyButton] = useState(false);
+  const ctaButtonRef = useRef<HTMLButtonElement>(null);
   const { targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage } = useVisitor();
 
   useEffect(() => {
@@ -24,13 +26,20 @@ export default function Hero() {
       const progress = Math.min(currentScroll / scrollHeight, 1);
       setScrollProgress(progress);
       console.log(progress);
+
+      // Check if CTA button is out of view
+      if (ctaButtonRef.current) {
+        const buttonRect = ctaButtonRef.current.getBoundingClientRect();
+        const isOutOfView = buttonRect.bottom < 0;
+        setShowStickyButton(isOutOfView);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLanguageSelectorModalOpen(true);
   };
@@ -64,7 +73,7 @@ export default function Hero() {
             <Heading>Transform Books into <OrangeText>Language Learning Experiences</OrangeText></Heading>
             <Subheading>What language are you trying to learn now? Select one and try it yourself</Subheading>
 
-            <CtaButton onClick={handleButtonClick}>
+            <CtaButton ref={ctaButtonRef} onClick={handleButtonClick}>
               Select Language
             </CtaButton>
 
@@ -119,6 +128,13 @@ export default function Hero() {
         requireLevel={true}
         onCompleteSignup={true}
       />
+
+      {/* Sticky CTA Button */}
+      {showStickyButton && (
+        <StickyCtaButton onClick={handleButtonClick}>
+          Select Language
+        </StickyCtaButton>
+      )}
     </>
   );
 }
@@ -239,6 +255,15 @@ const Subheading = styled.p`
   }
 `;
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
 const CtaButton = styled(ExpandingButton)`
   padding: 1.6rem 4rem;
   font-size: 1.4rem;
@@ -253,6 +278,29 @@ const CtaButton = styled(ExpandingButton)`
     padding: 1rem 3rem;
     font-size: 1.2rem;
     margin-bottom: 3rem;
+  }
+`;
+
+const StickyCtaButton = styled(ExpandingButton)`
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 1.6rem 4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: rgb(var(--primary));
+  color: rgb(var(--textSecondary));
+  border: 2px solid rgb(var(--primary));
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: ${fadeIn} 0.3s ease-out;
+
+  ${media('<=tablet')} {
+    padding: 1.2rem 3rem;
+    font-size: 1.3rem;
+    bottom: 10rem;
   }
 `;
 
