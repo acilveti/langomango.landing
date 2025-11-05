@@ -208,8 +208,9 @@ const TextColumn = styled.div`
 `;
 
 const DeviceColumnDesktop = styled.div`
-  flex: 1;
-  max-width: 50%;
+  flex: 0 0 auto;
+  width: 500px;
+  height: 800px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -428,29 +429,40 @@ interface DeviceMockupProps {
 
 const DeviceMockup = styled.div<DeviceMockupProps>`
   width: 100%;
-  height: 80%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   transition: all 0.15s ease-out;
 
-  ${(props) => {
-    const progress = props.scrollProgress;
-    const scale = 0.8 + (progress*0.2);;
-    return `
-      transform: scale(${scale});
-    `;
-  }}
+  /* Desktop: no scaling, fixed size */
+  @media (min-width: 1025px) {
+    transform: scale(1);
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
 
-  &:hover {
-    ${(props) => props.scrollProgress <= 0.3 && 'transform: scale(1.02);'}
+  /* Mobile: scroll-based scaling */
+  ${media('<=desktop')} {
+    height: 80%;
+    ${(props) => {
+      const progress = props.scrollProgress;
+      const scale = 0.8 + (progress*0.2);
+      return `
+        transform: scale(${scale});
+      `;
+    }}
+
+    &:hover {
+      ${(props) => props.scrollProgress <= 0.3 && 'transform: scale(1.02);'}
+    }
   }
 `;
 
 const DeviceFrame = styled.div<DeviceMockupProps>`
   position: relative;
-  height: 80%;
   width: 100%;
   background: linear-gradient(145deg, #2c3e50, #34495e);
   border-radius: 3rem;
@@ -460,6 +472,16 @@ const DeviceFrame = styled.div<DeviceMockupProps>`
     0 20px 60px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset,
     inset 0 0 0 1.5rem #2c3e50;
+
+  /* Desktop: full height */
+  @media (min-width: 1025px) {
+    height: 100%;
+  }
+
+  /* Mobile: 80% height */
+  ${media('<=desktop')} {
+    height: 80%;
+  }
 
   ${media('<=tablet')} {
     border-radius: 2rem;
@@ -487,11 +509,20 @@ const DeviceFrame = styled.div<DeviceMockupProps>`
 
 const DeviceScreen = styled.div`
   position: relative;
-  height: calc(100vh - 3rem);
   margin: 1.5rem;
   border-radius: 2rem;
   overflow: hidden;
   background: white;
+
+  /* Desktop: fit within fixed e-reader size */
+  @media (min-width: 1025px) {
+    height: calc(100% - 3rem);
+  }
+
+  /* Mobile: viewport-based height */
+  ${media('<=desktop')} {
+    height: calc(100vh - 3rem);
+  }
 
   ${media('<=tablet')} {
     height: calc(100vh - 2rem);
