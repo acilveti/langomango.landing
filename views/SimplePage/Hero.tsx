@@ -96,11 +96,9 @@ export default function Hero() {
             <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
               <DeviceFrame>
                 <DeviceScreen>
-                  <Image
-                    src="/reading-image-v2.jpeg"
-                    alt="Reading demo"
-                    layout="fill"
-                    objectFit="cover"
+                  <StyledIframe
+                    src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader?chapter=2"
+                    title="LangoMango Reader Demo"
                   />
                 </DeviceScreen>
               </DeviceFrame>
@@ -390,6 +388,17 @@ const DeviceScreen = styled.div`
   overflow: hidden;
   background: white;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+
+  ${media('<=tablet')} {
+    border-radius: 1.5rem;
+  }
+`;
+
+const StyledIframe = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 2rem;
 
   ${media('<=tablet')} {
     border-radius: 1.5rem;
