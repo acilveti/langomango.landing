@@ -205,6 +205,11 @@ const DeviceColumn = styled.div`
   ${media('<=desktop')} {
     max-width: 100%;
     width: 100%;
+    margin-top: -2rem;
+  }
+
+  ${media('<=tablet')} {
+    margin-top: -8rem;
   }
 `;
 
