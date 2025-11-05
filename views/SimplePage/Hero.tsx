@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import LanguageSelectorModal from 'components/LanguageSelectorModal';
 import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import Logo from 'components/Logo';
+import { log } from 'console';
 
 export default function Hero() {
   const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
@@ -22,6 +23,7 @@ export default function Hero() {
       const currentScroll = window.scrollY;
       const progress = Math.min(currentScroll / scrollHeight, 1);
       setScrollProgress(progress);
+      console.log(progress);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -88,6 +90,8 @@ export default function Hero() {
             </PlatformAvailability>
           </TextColumn>
 
+        </ContentWrapper>
+        </HeroWrapper>
           <DeviceColumn>
             <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
               <DeviceFrame>
@@ -102,8 +106,6 @@ export default function Hero() {
               </DeviceFrame>
             </DeviceMockup>
           </DeviceColumn>
-        </ContentWrapper>
-        </HeroWrapper>
       </HeroBackground>
 
       {/* Full Screen Image Preview */}
@@ -336,7 +338,6 @@ interface DeviceMockupProps {
 
 const DeviceMockup = styled.div<DeviceMockupProps>`
   width: 100%;
-  max-width: 50rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -368,14 +369,6 @@ const DeviceMockup = styled.div<DeviceMockupProps>`
 
   &:hover {
     ${(props) => props.scrollProgress <= 0.3 && 'transform: scale(1.02);'}
-  }
-
-  ${media('<=desktop')} {
-    max-width: 40rem;
-  }
-
-  ${media('<=tablet')} {
-    max-width: 32rem;
   }
 `;
 
