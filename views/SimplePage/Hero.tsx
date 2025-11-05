@@ -132,7 +132,7 @@ export default function Hero() {
       {/* Sticky CTA Button */}
       {showStickyButton && (
         <StickyCtaButton onClick={handleButtonClick}>
-          Select Language
+          Start Learning
         </StickyCtaButton>
       )}
     </>
@@ -264,6 +264,21 @@ const fadeIn = keyframes`
   }
 `;
 
+const pulseSticky = keyframes`
+  0% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(var(--primary), 0.7);
+  }
+  70% {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 10px rgba(var(--primary), 0);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(var(--primary), 0);
+  }
+`;
+
 const CtaButton = styled(ExpandingButton)`
   padding: 1.6rem 4rem;
   font-size: 1.4rem;
@@ -295,7 +310,19 @@ const StickyCtaButton = styled(ExpandingButton)`
   border: 2px solid rgb(var(--primary));
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  animation: ${fadeIn} 0.3s ease-out;
+
+  /* Override default pulse animation with sticky version */
+  animation: ${pulseSticky} 2s infinite, ${fadeIn} 0.3s ease-out;
+
+  /* Override hover to preserve centering */
+  &:hover {
+    transform: translateX(-50%) translateY(-2px);
+    animation-play-state: paused;
+  }
+
+  &:active {
+    transform: translateX(-50%) translateY(0);
+  }
 
   ${media('<=tablet')} {
     padding: 1.2rem 3rem;
