@@ -4,7 +4,7 @@ import ExpandingButton from 'components/ExpandingButton';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LanguageSelectorModal from 'components/LanguageSelectorModal';
 import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import Logo from 'components/Logo';
@@ -13,7 +13,20 @@ export default function Hero() {
   const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const [showFullScreenImage, setShowFullScreenImage] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const { targetSelectedLanguage, targetSelectedLanguageLevel, hasTargetSelectedLanguage } = useVisitor();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      const progress = Math.min(currentScroll / scrollHeight, 1);
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -76,7 +89,7 @@ export default function Hero() {
           </TextColumn>
 
           <DeviceColumn>
-            <DeviceMockup onClick={handleDeviceClick}>
+            <DeviceMockup onClick={handleDeviceClick} scrollProgress={scrollProgress}>
               <DeviceFrame>
                 <DeviceScreen>
                   <Image
@@ -317,17 +330,44 @@ const IconWrapper = styled.div`
   }
 `;
 
-const DeviceMockup = styled.div`
+interface DeviceMockupProps {
+  scrollProgress: number;
+}
+
+const DeviceMockup = styled.div<DeviceMockupProps>`
   width: 100%;
   max-width: 50rem;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  // transition: all 0.15s ease-out;
+
+  ${(props) => {
+    const progress = props.scrollProgress;
+    // Scale from 1 to 2.5 (full screen effect)
+    // const scale = 1 + (progress * 1.5);
+    const scale = progress;
+
+    // When progress is high, make it fixed and centered
+    // if (progress > 0.3) {
+    //   return `
+    //     position: fixed;
+    //     top: 50%;
+    //     left: 50%;
+    //     transform: translate(-50%, -50%) scale(${scale});
+    //     z-index: 10;
+    //     max-width: none;
+    //   `;
+    // }
+
+    return `
+      transform: scale(${scale});
+    `;
+  }}
 
   &:hover {
-    transform: scale(1.02);
+    ${(props) => props.scrollProgress <= 0.3 && 'transform: scale(1.02);'}
   }
 
   ${media('<=desktop')} {
