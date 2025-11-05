@@ -356,21 +356,30 @@ const DeviceFrame = styled.div<DeviceMockupProps>`
   width: 100%;
   background: linear-gradient(145deg, #2c3e50, #34495e);
   border-radius: 3rem;
-  padding: 1.5rem;
+  padding: 0rem;
+  border:0px;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    inset 0 0 0 1.5rem #2c3e50;
+
   ${media('<=tablet')} {
     border-radius: 2rem;
-    padding: 1rem;
+    padding: 0rem;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+      inset 0 0 0 1rem #2c3e50;
+
     ${(props) => {
       const progress = props.scrollProgress;
-      if(progress > 0.99){
+      if(progress > 0.97){
       return `
-        border: 0rem;
         border-radius: 0rem;
         background: white;
-        padding: 0rem;
+        box-shadow: none;
+  border:none;
+
       `;
     }
   }
@@ -380,14 +389,19 @@ const DeviceFrame = styled.div<DeviceMockupProps>`
 
 const DeviceScreen = styled.div`
   position: relative;
-  height: 100vh;
+  height: calc(100vh - 3rem);
+  margin: 1.5rem;
   border-radius: 2rem;
   overflow: hidden;
   background: white;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
 
   ${media('<=tablet')} {
+    height: calc(100vh - 2rem);
+    margin: 1rem;
     border-radius: 1.5rem;
+  border:none;
+
   }
 `;
 
