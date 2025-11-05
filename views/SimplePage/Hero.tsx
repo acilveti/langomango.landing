@@ -151,10 +151,13 @@ const HeroBackground = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 0;
-
+  padding: 3rem 0;
+  
   ${media('<=tablet')} {
-    padding: 3rem 0;
+    padding-top: 3rem;
+    padding-right: 0px;
+    padding-bottom: 0rem;
+    padding-left: 0px;
   }
 `;
 
@@ -338,30 +341,16 @@ interface DeviceMockupProps {
 
 const DeviceMockup = styled.div<DeviceMockupProps>`
   width: 100%;
+  height: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  // transition: all 0.15s ease-out;
+  transition: all 0.15s ease-out;
 
   ${(props) => {
     const progress = props.scrollProgress;
-    // Scale from 1 to 2.5 (full screen effect)
-    // const scale = 1 + (progress * 1.5);
-    const scale = progress;
-
-    // When progress is high, make it fixed and centered
-    // if (progress > 0.3) {
-    //   return `
-    //     position: fixed;
-    //     top: 50%;
-    //     left: 50%;
-    //     transform: translate(-50%, -50%) scale(${scale});
-    //     z-index: 10;
-    //     max-width: none;
-    //   `;
-    // }
-
+    const scale = 0.8 + (progress*0.2);;
     return `
       transform: scale(${scale});
     `;
@@ -374,8 +363,8 @@ const DeviceMockup = styled.div<DeviceMockupProps>`
 
 const DeviceFrame = styled.div`
   position: relative;
+  height: 80%;
   width: 100%;
-  aspect-ratio: 9 / 16;
   background: linear-gradient(145deg, #2c3e50, #34495e);
   border-radius: 3rem;
   padding: 1.5rem;
@@ -391,8 +380,7 @@ const DeviceFrame = styled.div`
 
 const DeviceScreen = styled.div`
   position: relative;
-  width: 100%;
-  height: 100%;
+  height: 100vh;
   border-radius: 2rem;
   overflow: hidden;
   background: white;
