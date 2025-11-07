@@ -8,7 +8,6 @@ import { useState, useEffect, useRef } from 'react';
 import LanguageSelectorModal from 'components/LanguageSelectorModal';
 import { DEFAULT_LANGUAGES, Language, Levels, useVisitor } from 'contexts/VisitorContext';
 import Logo from 'components/Logo';
-import { log } from 'console';
 
 export default function Hero() {
   const [isLanguageSelectorModalOpen, setIsLanguageSelectorModalOpen] = useState(false);
@@ -118,7 +117,7 @@ export default function Hero() {
             <DeviceFrame scrollProgress={scrollProgress}>
               <DeviceScreen>
                 <StyledIframe
-                  src="https://beta-app.langomango.com/demo_user_1762019550748_9416/reader/?chapter=2"
+                  src="https://beta-app.langomango.com/demo_user_1762019550748_9416/reader?chapter=2"
                   title="LangoMango Reader Demo"
                 />
               </DeviceScreen>
