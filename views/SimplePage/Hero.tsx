@@ -117,7 +117,7 @@ export default function Hero() {
             <DeviceFrame scrollProgress={scrollProgress}>
               <DeviceScreen>
                 <StyledIframe
-                  src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/reader?chapter=2"
+                  src="https://ebook-beta.langomango.com/demo_user_1762019550748_9416/landing-reader?chapter=2"
                   title="LangoMango Reader Demo"
                 />
               </DeviceScreen>
